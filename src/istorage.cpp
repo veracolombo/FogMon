@@ -149,6 +149,14 @@ int IStorage::VectorIntCallback(void *vec, int argc, char **argv, char **azColNa
     return 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+int IStorage::VectorFloatCallback(void *vec, int argc, char **argv, char **azColName) {
+    vector<float> *v = (vector<float>*)vec;
+    v->push_back(stof(argv[0]));
+    return 0;
+}
+////////////////////////////////////////////////////////////////////////////////////////
+
 int IStorage::VectorIoTCallback(void *vec, int argc, char **argv, char **azColName) {
     vector<Report::IoT> *v = (vector<Report::IoT>*)vec;
     Report::IoT iot;
@@ -159,6 +167,7 @@ int IStorage::VectorIoTCallback(void *vec, int argc, char **argv, char **azColNa
 
     return 0;
 }
+
 
 int getInt64Callback(void *i, int argc, char **argv, char **azColName) {
     int64_t *val = (int64_t*)i;

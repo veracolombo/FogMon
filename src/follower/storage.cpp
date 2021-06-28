@@ -103,6 +103,60 @@ Report::hardware_result Storage::getHardware() {
     return r;
 }
 
+
+vector<float> Storage::getFreeCpu(int k){
+  
+    char *zErrMsg = 0;
+    char buf[1024];
+    stringstream query;
+    query << "SELECT free_cpu FROM Hardware ORDER BY time DESC LIMIT " << k;
+    std::sprintf(buf, query.str().c_str());
+
+    vector<float> r;
+    int err = sqlite3_exec(this->db, buf, IStorage::VectorFloatCallback, &r, &zErrMsg);
+    isError(err, zErrMsg, "getFreeCpu");
+
+    return r;
+}
+
+vector<float> Storage::getFreeMemory(int k){
+    char *zErrMsg = 0;
+    char buf[1024];
+    stringstream query;
+    query << "SELECT free_memory/memory FROM Hardware ORDER BY time DESC LIMIT " << k;
+    std::sprintf(buf, query.str().c_str());
+
+    vector<float> r;
+    int err = sqlite3_exec(this->db, buf, IStorage::VectorFloatCallback, &r, &zErrMsg);
+    isError(err, zErrMsg, "getFreeMemory");
+
+    return r;
+}
+
+vector<float> Storage::getFreeDisk(int k){
+    char *zErrMsg = 0;
+    char buf[1024];
+    stringstream query;
+    query << "SELECT free_disk/disk FROM Hardware ORDER BY time DESC LIMIT " << k;
+    std::sprintf(buf, query.str().c_str());
+
+    vector<float> r;
+    int err = sqlite3_exec(this->db, buf, IStorage::VectorFloatCallback, &r, &zErrMsg);
+    isError(err, zErrMsg, "getFreeDisk");
+
+    return r;
+}
+
+/*
+vector<float> getFreeMemory(int k) {
+
+}
+
+vector<float> getFreeDisk(int k) {
+
+}
+*/
+
 std::vector<Report::test_result> Storage::getLatency(int sensitivity, int64_t last) {
     char *zErrMsg = 0;
     char buf[1024];

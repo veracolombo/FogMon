@@ -137,6 +137,13 @@ public:
 
     int64_t getTime();
 
+
+    ////////////////////////////////////////////
+    virtual std::vector<float> getFreeCpu(int k) = 0;
+    virtual std::vector<float> getFreeMemory(int k) = 0;
+    virtual std::vector<float> getFreeDisk(int k) = 0;
+    ////////////////////////////////////////////
+
 protected:
 
     /**
@@ -149,6 +156,9 @@ protected:
     static int VectorNodeCallback(void *vec, int argc, char **argv, char **azColName);
     static int VectorStringCallback(void *vec, int argc, char **argv, char **azColName);
     static int VectorIntCallback(void *vec, int argc, char **argv, char **azColName);
+    /////////////////////
+    static int VectorFloatCallback(void *vec, int argc, char **argv, char **azColName);
+    ////////////////////
     static int VectorIoTCallback(void *vec, int argc, char **argv, char **azColName);
 
     /**

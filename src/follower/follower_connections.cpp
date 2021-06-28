@@ -174,7 +174,29 @@ void FollowerConnections::handler(int fd, Message &m) {
                 cout << "I'm not a leader anymore!? (closed)" << endl;
             }
         }
-    }   
+    }else if(m.getType() == Message::Type::PREQUEST){
+        if(m.getCommand() == Message::Command::SET) {
+            if(m.getArgument() == Message::Argument::PARAM_TIME_REPORT){
+
+                int time_report_new;
+                m.getData(time_report_new);
+                cout << "Time Report update: " <<  time_report_new << endl;
+
+                Message res; 
+                    res.setType(Message::Type::PRESPONSE);
+                    res.setCommand(Message::Command::SET);
+
+                if (!m.getData(time_report_new)) {
+                    res.setArgument(Message::Argument::NEGATIVE);
+                }else {
+                    res.setArgument(Message::Argument::NEGATIVE);
+                    this->parent->node->timeReport = time_report_new;
+                }
+                this->sendMessage(fd, res);
+            }
+        }
+    }
+     /////////////////////////////////////////////////////////////
 }
 
 vector<Message::node> FollowerConnections::requestNodes(Message::node ipS) {
@@ -324,7 +346,7 @@ optional<pair<int64_t,Message::node>> FollowerConnections::sendUpdate(Message::n
 
     int64_t now = this->parent->getStorage()->getTime();
     int64_t time = update.first;
-    if(ipS == update.second) {
+    if(ipS == update.second) {          // se l'ultima update è stata fatta a questo ip
         r.setLatency(this->parent->getStorage()->getLatency(this->parent->node->sensitivity,time));
         r.setBandwidth(this->parent->getStorage()->getBandwidth(this->parent->node->sensitivity,time));
         

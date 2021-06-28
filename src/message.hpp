@@ -17,7 +17,7 @@ public:
     /**
      * possible types for the messages
     */
-    enum Type {REQUEST, NOTIFY, RESPONSE, MREQUEST, MNOTIFY, MRESPONSE};
+    enum Type {REQUEST, NOTIFY, RESPONSE, MREQUEST, MNOTIFY, MRESPONSE, PREQUEST, PRESPONSE};
     /**
      * possible commands for the messages
     */
@@ -25,7 +25,7 @@ public:
     /**
      * possible arguments for the messages
     */
-    enum Argument {NONE, NODES, MNODES, REPORT, POSITIVE, NEGATIVE, IPERF, ESTIMATE, LATENCY, BANDWIDTH, ROLES};
+    enum Argument {NONE, NODES, MNODES, REPORT, POSITIVE, NEGATIVE, IPERF, ESTIMATE, LATENCY, BANDWIDTH, ROLES, PARAM_TIME_REPORT};
 
     typedef struct node {
         std::string id;

@@ -406,6 +406,47 @@ bool LeaderConnections::sendRequestReport(Message::node ip) {
     return ret;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+bool LeaderConnections::sendChangeTimeReport(Message::node ip, int newTimeReport){
+    int Socket = openConnection(ip.ip, ip.port);
+
+    if (Socket < 0){
+        return false;
+    }
+
+    fflush(stdout);
+    char buffer[10];
+
+    // build message
+    Message m;
+    m.setSender(this->parent->getMyNode());
+    m.setType(Message::Type::PREQUEST);
+    m.setCommand(Message::Command::SET);
+    m.setArgument(Message::Argument::PARAM_TIME_REPORT);
+
+    m.setData(newTimeReport);
+
+    bool ret = false;
+
+    // send message
+    if (this->sendMessage(Socket, m)){
+        ret = true;
+        
+        Message res;
+        if (this->getMessage(Socket, res)){
+            if( res.getType()==Message::Type::PRESPONSE &&
+                res.getCommand() == Message::Command::SET &&
+                res.getArgument() == Message::Argument::POSITIVE) {
+                    ret = true;
+                }
+        }
+    }
+
+    close(Socket);
+    return ret;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 bool LeaderConnections::sendMReport(Message::node ip, vector<Report::report_result> report) {
     int Socket = this->openConnection(ip.ip, ip.port);
     if(Socket < 0) {

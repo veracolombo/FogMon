@@ -27,6 +27,8 @@ Node::Node(string port, bool isLeader, int threads) {
     this->sensitivity = 10;
     this->leaderFormula = 0;
 
+    this->hardwareSamplingRate = 5;
+
     this->isLeader = isLeader;
     this->agent = NULL;
     this->port = port;
@@ -192,6 +194,8 @@ bool Node::setParam(std::string name, int value) {
         this->leaderFormula = value;
     }else if(name == string("session")) {
         this->session = value;
+    }else if(name == string("hardware-sampling-rate")){
+        this->hardwareSamplingRate = value;
     }else
         return this->agent->setParam(name,value);
     cout << "setting: "<<name << " = "<< value << endl;

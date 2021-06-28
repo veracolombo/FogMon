@@ -8,6 +8,11 @@
 #include "iiotdiscoverer.hpp"
 #include "readproc.hpp"
 
+//////////////////////
+#include "states.hpp"
+//////////////////////
+
+
 class Follower : virtual public IAgent {
 public:
     Follower(Message::node node, int nThreads);
@@ -71,6 +76,10 @@ protected:
 
     int nThreads;
 
+    /////////////////
+    States* states;                 // oggetto che gestisce gli stati di una metrica
+    vector<States::Metric> metrics = {States::Metric::FREE_CPU, States::Metric::FREE_MEMORY, States::Metric::FREE_DISK}; // metriche che possono essere misurate
+    /////////////////
 
     //start iperf command line server
     virtual int startIperf();

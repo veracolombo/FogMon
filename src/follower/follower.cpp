@@ -28,6 +28,10 @@
 #include "storage.hpp"
 #include "node.hpp"
 
+///////////////////////
+#include "states.hpp"
+///////////////////////
+
 using namespace std;
 using namespace rapidjson;
 
@@ -57,6 +61,11 @@ void Follower::initialize(Factory* fact) {
     }
     this->connections->initialize(this);
     this->server = this->factory->newServer(this->connections,5555);
+
+    ////////////////////////////
+    this->states = new States(this);
+    this->states->setMetrics(this->metrics);
+    ////////////////////////////
 }
 
 Follower::~Follower() {
@@ -508,7 +517,7 @@ void Follower::getHardware() {
     sigar_t *sigar;
     sigar_cpu_t cpuT1;
     sigar_cpu_t cpuT2;
-    sigar_cpu_list_t cpulist;
+    sigar_cpu_list_t cpulist;               // number of cores
 
     sigar_open(&sigar);
     sigar_file_system_usage_t disk;
@@ -549,7 +558,7 @@ void Follower::getHardware() {
     hardware.disk = disk.total;
     hardware.mean_free_disk = disk.avail;
 
-    this->storage->saveHardware(hardware, this->node->hardwareWindow);
+    this->storage->saveHardware(hardware, this->node->hardwareWindow);          // save hardware data on DB
 
     sigar_cpu_list_destroy(sigar, &cpulist);
 
@@ -559,9 +568,52 @@ void Follower::getHardware() {
 void Follower::timer() {
     int iter=0;
     while(this->running) {
+
         auto t_start = std::chrono::high_resolution_clock::now();
         //generate hardware report and send it
         this->getHardware();
+        
+        ////////////////////////////////////////////////////////////////////////
+        // check metrics state
+        this->states->getNodeState();
+        this->states->toString();
+
+        /*
+            cout << "States: ";
+            for (int i=0; i<freeCpuStates.size(); i++){
+                switch(freeCpuStates[i]){
+                    case States::State::STABLE:         cout << "Stable "; break;
+                    case States::State::UNSTABLE:       cout << "Unstable "; break;
+                    case States::State::INCREASING:     cout << "Increasing "; break;
+                    case States::State::DECREASING:     cout << "Decreasing "; break;
+                    case States::State::OK:             cout << "Ok "; break;
+                    case States::State::ALARMING_HIGH:  cout << "Alarming_High "; break;
+                    case States::State::ALARMING_LOW:   cout << "Alarming_Low "; break;
+                    case States::State::TOO_HIGH:       cout << "Too_High "; break;
+                    case States::State::TOO_LOW:        cout << "Too_Low "; break;  
+                }
+            }
+            cout << endl;
+
+            bool stable = false;
+            for(int i =0; i<freeCpuStates.size(); i++){
+                if(freeCpuStates[i] == States::State::STABLE){
+                    stable = true;
+                    break;
+                }
+            }
+
+            if (!stable){
+                this->node->timeReport = 10;
+            }else{
+                this->node->timeReport = 30;
+            }
+        */
+        ////////////////////////////////////////////////////////////////////////////
+
+        // prendere lista di valori di free cpu da DB
+        //vector<States::State> states = this->states->getList()
+
         std::optional<std::pair<int64_t,Message::node>> ris = this->connections->sendUpdate(this->nodeS, this->update);
         if(ris == nullopt) {
             cout << "update retry..." << endl;
@@ -583,7 +635,7 @@ void Follower::timer() {
 
         //every 10 iterations ask the nodes in case the server cant reach this network
         if(iter%10 == 0) {
-            vector<Message::node> ips = this->connections->requestNodes(this->nodeS);
+            vector<Message::node> ips = this->connections->requestNodes(this->nodeS);   // chiede al leader gli i ip dei follower nel suo gruppo
             vector<Message::node> tmp = this->getStorage()->getNodes();
             vector<Message::node> rem;
 
@@ -600,21 +652,21 @@ void Follower::timer() {
                 }
             }
 
-            this->getStorage()->updateNodes(ips,rem);
+            this->getStorage()->updateNodes(ips,rem);               // elimina dallo storage i nodi che non vengono restituiti dal leader
         }
 
         //every leaderCheck iterations update the MNodes
         if(iter% this->node->leaderCheck == this->node->leaderCheck-1) {
-            vector<Message::node> res = this->connections->requestMNodes(this->nodeS);
+            vector<Message::node> res = this->connections->requestMNodes(this->nodeS);  // chiede al leader gli i ip dei follower nel suo gruppo
             if(!res.empty()) {
                 for(int j=0; j<res.size(); j++)
                 {
                     if(res[j].ip==std::string("::1")||res[j].ip==std::string("127.0.0.1"))
-                        res[j].ip = this->nodeS.ip;
+                        res[j].ip = this->nodeS.ip;         // sostituzione ip locale del leader con ip esterno
                 }
-                this->node->setMNodes(res);
+                this->node->setMNodes(res);                 // aggiornamento dei nodi conosciuti
                 cout << "Check server" << endl;
-                bool change = this->checkServer(res);
+                bool change = this->checkServer(res);       // controlla se c'è un nodo con latenza minore
                 if(change) {
                     cout << "Changing server" << endl;
                     if(!selectServer(res)) {
@@ -646,6 +698,11 @@ void Follower::timer() {
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
         int sleeptime = this->node->timeReport-elapsed_time;
+        
+        //
+        //cout << "Time report: " << this->node->timeReport << endl;
+        //
+
         if (sleeptime > 0)
             sleeper.sleepFor(chrono::seconds(sleeptime));
         iter++;
@@ -701,7 +758,7 @@ void Follower::TestTimer() {
             vector<Message::node> ips = this->storage->getLRBandwidth(this->node->maxPerBandwidth + 5, this->node->timeBandwidth);
             cout << "List B: ";
             for(auto node : ips) {
-                cout << node.ip << " ";
+                //cout << node.ip << " ";
             }
             cout << endl;
             int i=0;

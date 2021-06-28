@@ -56,6 +56,8 @@ public:
     std::string interfaceIp;
     int session;
 
+    int hardwareSamplingRate;
+
 protected:
     IAgent * agent;
     bool isLeader;

@@ -46,6 +46,12 @@ public:
     std::vector<Report::IoT> getIots();
 
     void addIot(IThing *iot);
+
+    ////////////////////////////////////////
+    virtual std::vector<float> getFreeCpu(int k);
+    virtual std::vector<float> getFreeMemory(int k);
+    virtual std::vector<float> getFreeDisk(int k);
+    ////////////////////////////////////////
 };
 
 
