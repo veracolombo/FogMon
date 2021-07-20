@@ -14,6 +14,7 @@ using namespace std;
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "clips.h"
 
 void handler(int sig) {
   void *array[10];
@@ -28,6 +29,7 @@ void handler(int sig) {
   fflush(stderr);
   exit(1);
 }
+
 
 //sudo docker run -it --net=host server -C 54.93.78.224
 //sudo docker run -it --net=host node -C 54.93.78.224
@@ -60,7 +62,6 @@ int main(int argc, char *argv[]) {
         return 0;
     }
      
-
     string ipR = "";
     string portR = "5555";
     string myPort = "5555";
@@ -159,6 +160,7 @@ int main(int argc, char *argv[]) {
         known.push_back(Message::node("",ipR,portR));
 
     node.setMNodes(known);
+
 
     node.setParam(string("heartbeat"), time_silent);
     node.setParam(string("time-propagation"), time_propagation);

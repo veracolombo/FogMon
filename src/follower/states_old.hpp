@@ -1,5 +1,6 @@
-#ifndef STATES_HPP_
-#define STATES_HPP_
+/*
+#ifndef STATES_OLD_HPP_
+#define STATES_OLD_HPP_
 
 #include <vector>
 #include <map>
@@ -10,16 +11,16 @@
 
 using namespace std;
 
-class States {
+class StatesOld {
 
 public:
     enum State {STABLE, UNSTABLE, INCREASING, DECREASING, TOO_HIGH, TOO_LOW, ALARMING_HIGH, ALARMING_LOW, OK, NONE};
     enum Metric {FREE_CPU, FREE_MEMORY, FREE_DISK, LATENCY, BANDWIDTH};
 
-    States();
-    States(IAgent* node, int history=5, float tol=0.8);
+    StatesOld();
+    StatesOld(IAgent* node, int history=5, float tol=0.8);
 
-    ~States();
+    ~StatesOld();
 
     void setNode(IAgent* node);
     void setHistory(int history);
@@ -167,3 +168,4 @@ private:
 };
 
 #endif
+*/

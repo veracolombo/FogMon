@@ -8,10 +8,6 @@
 #include "iiotdiscoverer.hpp"
 #include "readproc.hpp"
 
-//////////////////////
-#include "states.hpp"
-//////////////////////
-
 
 class Follower : virtual public IAgent {
 public:
@@ -76,21 +72,16 @@ protected:
 
     int nThreads;
 
-    /////////////////
-    States* states;                 // oggetto che gestisce gli stati di una metrica
-    vector<States::Metric> metrics = {States::Metric::FREE_CPU, States::Metric::FREE_MEMORY, States::Metric::FREE_DISK}; // metriche che possono essere misurate
-    /////////////////
-
     //start iperf command line server
     virtual int startIperf();
     //start estimate tool (assolo) server
     virtual int startEstimate();
 
     //timer for heartbeat
-    void timer();
+    virtual void timer();
 
     //timer for latency and bandwidth tests
-    void TestTimer();
+    virtual void TestTimer();
 
     void testIoT();
 
@@ -112,7 +103,7 @@ protected:
     bool checkServer(vector<Message::node> mNodes);
 
     //get the hardware of this node
-    void getHardware();
+    virtual void getHardware();
 };
 
 #endif

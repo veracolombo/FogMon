@@ -2,6 +2,7 @@
 #define STORAGE_HPP_
 
 #include "istorage.hpp"
+#include "common.hpp"
 
 class Storage : virtual public IStorage {
 protected:
@@ -47,11 +48,12 @@ public:
 
     void addIot(IThing *iot);
 
-    ////////////////////////////////////////
-    virtual std::vector<float> getFreeCpu(int k);
-    virtual std::vector<float> getFreeMemory(int k);
-    virtual std::vector<float> getFreeDisk(int k);
-    ////////////////////////////////////////
+    std::vector<float> getLastValues(Metric metric, int limit);
+    /*
+    virtual std::vector<float> getFreeCpu(int limit);
+    virtual std::vector<float> getFreeMemory(int limit);
+    virtual std::vector<float> getFreeDisk(int limit);
+    */
 };
 
 

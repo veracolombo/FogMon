@@ -1,14 +1,11 @@
 #ifndef NODE_HPP_
 #define NODE_HPP_
 
-
-
 #include <string>
-
 #include <thread>
 #include "message.hpp"
-class IAgent;
 
+class IAgent;
 
 class Node {
 public:
@@ -36,7 +33,7 @@ public:
     bool isFollower();
 
     //configs
-    int timeReport;
+    static int timeReport;
     int timeTests;
     int timeLatency;
     int timeBandwidth;

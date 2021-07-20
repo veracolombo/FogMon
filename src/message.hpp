@@ -17,15 +17,15 @@ public:
     /**
      * possible types for the messages
     */
-    enum Type {REQUEST, NOTIFY, RESPONSE, MREQUEST, MNOTIFY, MRESPONSE, PREQUEST, PRESPONSE};
+    enum Type {typeREQUEST, typeNOTIFY, typeRESPONSE, typeMREQUEST, typeMNOTIFY, typeMRESPONSE, typePREQUEST, typePRESPONSE};
     /**
      * possible commands for the messages
     */
-    enum Command {GET, SET, HELLO, MHELLO, NODELIST, MNODELIST, UPDATE, START, SELECTION_INIT, SELECTION_START, SELECTION, SELECTION_END};
+    enum Command {commGET, commSET, commHELLO, commMHELLO, commNODELIST, commMNODELIST, commUPDATE, commSTART, commSELECTION_INIT, commSELECTION_START, commSELECTION, commSELECTION_END};
     /**
      * possible arguments for the messages
     */
-    enum Argument {NONE, NODES, MNODES, REPORT, POSITIVE, NEGATIVE, IPERF, ESTIMATE, LATENCY, BANDWIDTH, ROLES, PARAM_TIME_REPORT};
+    enum Argument {argNONE, argNODES, argMNODES, argREPORT, argPOSITIVE, argNEGATIVE, argIPERF, argESTIMATE, argLATENCY, argBANDWIDTH, argROLES, argPARAM_TIME_REPORT};
 
     typedef struct node {
         std::string id;

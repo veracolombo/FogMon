@@ -33,73 +33,73 @@ void FollowerConnections::initialize(IAgent *parent) {
 void FollowerConnections::handler(int fd, Message &m) {
     string strIp = this->getSource(fd,m);
 
-    if(m.getType() == Message::Type::REQUEST) {
-        if(m.getArgument() == Message::Argument::IPERF) {
-            if(m.getCommand() == Message::Command::START) {
+    if(m.getType() == Message::Type::typeREQUEST) {
+        if(m.getArgument() == Message::Argument::argIPERF) {
+            if(m.getCommand() == Message::Command::commSTART) {
                 
                 Message res;
-                res.setType(Message::Type::RESPONSE);
-                res.setCommand(Message::Command::START);
+                res.setType(Message::Type::typeRESPONSE);
+                res.setCommand(Message::Command::commSTART);
                 int port = this->parent->getIperfPort();
                 if(port > 0) {
-                    res.setArgument(Message::Argument::POSITIVE);
+                    res.setArgument(Message::Argument::argPOSITIVE);
                     res.setData(port);
                 }else {
-                    res.setArgument(Message::Argument::NEGATIVE);
+                    res.setArgument(Message::Argument::argNEGATIVE);
                 }
                 //send response
                 if(this->sendMessage(fd, res)) {
                     
                 }
             }
-        }else if(m.getArgument() == Message::Argument::ESTIMATE) {
-            if(m.getCommand() == Message::Command::START) {
+        }else if(m.getArgument() == Message::Argument::argESTIMATE) {
+            if(m.getCommand() == Message::Command::commSTART) {
                 
                 Message res;
-                res.setType(Message::Type::RESPONSE);
-                res.setCommand(Message::Command::START);
+                res.setType(Message::Type::typeRESPONSE);
+                res.setCommand(Message::Command::commSTART);
                 int port = this->parent->getEstimatePort();
                 string a = string(" ");
                 string port_ = to_string(port);
                 Message::node val(a,strIp,port_);
                 if(port > 0) {
-                    res.setArgument(Message::Argument::POSITIVE);
+                    res.setArgument(Message::Argument::argPOSITIVE);
                     res.setData(val);
                 }else {
-                    res.setArgument(Message::Argument::NEGATIVE);
+                    res.setArgument(Message::Argument::argNEGATIVE);
                 }
                 //send response
                 if(this->sendMessage(fd, res)) {
                     
                 }
             }
-        }else if(m.getArgument() == Message::Argument::NODES) {
-            if(m.getCommand() == Message::Command::GET) {
+        }else if(m.getArgument() == Message::Argument::argNODES) {
+            if(m.getCommand() == Message::Command::commGET) {
                 //build array of nodes
                 vector<Message::node> nodes = this->parent->getStorage()->getNodes();
 
                 //send nodes
                 Message res;
-                res.setType(Message::Type::RESPONSE);
-                res.setCommand(Message::Command::GET);
-                res.setArgument(Message::Argument::POSITIVE);
+                res.setType(Message::Type::typeRESPONSE);
+                res.setCommand(Message::Command::commGET);
+                res.setArgument(Message::Argument::argPOSITIVE);
 
                 res.setData(nodes);
             
                 if(this->sendMessage(fd, res)) {
                     
                 }
-            }else if(m.getCommand() == Message::Command::SET) {
+            }else if(m.getCommand() == Message::Command::commSET) {
                 Message res; //--------------------------------
-                res.setType(Message::Type::RESPONSE);
-                res.setCommand(Message::Command::SET);
+                res.setType(Message::Type::typeRESPONSE);
+                res.setCommand(Message::Command::commSET);
 
                 //refresh all the nodes with the array of nodes
                 vector<Message::node> ips;
                 if(!m.getData(ips)) {
-                    res.setArgument(Message::Argument::NEGATIVE);
+                    res.setArgument(Message::Argument::argNEGATIVE);
                 }else {
-                    res.setArgument(Message::Argument::POSITIVE);
+                    res.setArgument(Message::Argument::argPOSITIVE);
                 }
                 //ips now contains the ip of the nodes
                 this->parent->getStorage()->refreshNodes(ips);
@@ -109,27 +109,27 @@ void FollowerConnections::handler(int fd, Message &m) {
                     
                 }
             }
-        }else if(m.getArgument() == Message::Argument::MNODES) {
-            if(m.getCommand() == Message::Command::GET) {
+        }else if(m.getArgument() == Message::Argument::argMNODES) {
+            if(m.getCommand() == Message::Command::commGET) {
                 //build array of nodes
                 vector<Message::node> nodes = this->parent->node->getMNodes();
                 //send nodes
                 Message res;
-                res.setType(Message::Type::RESPONSE);
-                res.setCommand(Message::Command::MNODELIST);
-                res.setArgument(Message::Argument::POSITIVE);
+                res.setType(Message::Type::typeRESPONSE);
+                res.setCommand(Message::Command::commMNODELIST);
+                res.setArgument(Message::Argument::argPOSITIVE);
 
                 res.setData(nodes);
             
                 sendMessage(fd, res);
             }
-        }else if(m.getArgument() == Message::Argument::REPORT) {
-            if(m.getCommand() == Message::Command::GET) {
+        }else if(m.getArgument() == Message::Argument::argREPORT) {
+            if(m.getCommand() == Message::Command::commGET) {
                 //build report
                 Message res;
-                res.setType(Message::Type::RESPONSE);
-                res.setCommand(Message::Command::GET);
-                res.setArgument(Message::Argument::POSITIVE);
+                res.setType(Message::Type::typeRESPONSE);
+                res.setCommand(Message::Command::commGET);
+                res.setArgument(Message::Argument::argPOSITIVE);
                 Report r;
                 
                 r.setHardware(this->parent->getStorage()->getHardware());
@@ -143,8 +143,8 @@ void FollowerConnections::handler(int fd, Message &m) {
                     
                 }
             }
-        }else if(m.getArgument() == Message::Argument::ROLES) {
-            if(m.getCommand() == Message::Command::SET) {
+        }else if(m.getArgument() == Message::Argument::argROLES) {
+            if(m.getCommand() == Message::Command::commSET) {
                 Message::leader_update update;
                 //contains the list of new leaders
                 m.getData(update);
@@ -158,9 +158,9 @@ void FollowerConnections::handler(int fd, Message &m) {
                 this->parent->changeRole(update.selected);
             }
         }
-    }else if(m.getType() == Message::Type::NOTIFY) {
-        if(m.getCommand() == Message::Command::UPDATE) {
-            if(m.getArgument() == Message::Argument::NODES) {
+    }else if(m.getType() == Message::Type::typeNOTIFY) {
+        if(m.getCommand() == Message::Command::commUPDATE) {
+            if(m.getArgument() == Message::Argument::argNODES) {
                 //data contains 2 array: new and deleted nodes
                 vector<Message::node> ipsNew;
                 vector<Message::node> ipsRem;
@@ -168,28 +168,28 @@ void FollowerConnections::handler(int fd, Message &m) {
                     return;
                 //update the nodes
                 this->parent->getStorage()->updateNodes(ipsNew,ipsRem);
-            }else if(m.getArgument() == Message::Argument::REPORT) {
+            }else if(m.getArgument() == Message::Argument::argREPORT) {
                 cout << "I'm not a leader anymore!?" << endl;
                 fflush(stdout);
                 cout << "I'm not a leader anymore!? (closed)" << endl;
             }
         }
-    }else if(m.getType() == Message::Type::PREQUEST){
-        if(m.getCommand() == Message::Command::SET) {
-            if(m.getArgument() == Message::Argument::PARAM_TIME_REPORT){
+    }else if(m.getType() == Message::Type::typePREQUEST){
+        if(m.getCommand() == Message::Command::commSET) {
+            if(m.getArgument() == Message::Argument::argPARAM_TIME_REPORT){
 
                 int time_report_new;
                 m.getData(time_report_new);
                 cout << "Time Report update: " <<  time_report_new << endl;
 
                 Message res; 
-                    res.setType(Message::Type::PRESPONSE);
-                    res.setCommand(Message::Command::SET);
+                    res.setType(Message::Type::typePRESPONSE);
+                    res.setCommand(Message::Command::commSET);
 
                 if (!m.getData(time_report_new)) {
-                    res.setArgument(Message::Argument::NEGATIVE);
+                    res.setArgument(Message::Argument::argNEGATIVE);
                 }else {
-                    res.setArgument(Message::Argument::NEGATIVE);
+                    res.setArgument(Message::Argument::argPOSITIVE);
                     this->parent->node->timeReport = time_report_new;
                 }
                 this->sendMessage(fd, res);
@@ -209,9 +209,9 @@ vector<Message::node> FollowerConnections::requestNodes(Message::node ipS) {
     //build request message
     Message m;
     m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::REQUEST);
-    m.setCommand(Message::Command::GET);
-    m.setArgument(Message::Argument::NODES);
+    m.setType(Message::Type::typeREQUEST);
+    m.setCommand(Message::Command::commGET);
+    m.setArgument(Message::Argument::argNODES);
 
     vector<Message::node> nodes;
     bool result = false;
@@ -219,9 +219,9 @@ vector<Message::node> FollowerConnections::requestNodes(Message::node ipS) {
     if(this->sendMessage(Socket, m)) {
         Message res;
         if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::RESPONSE &&
-                res.getCommand() == Message::Command::NODELIST &&
-                res.getArgument() == Message::Argument::POSITIVE) {
+            if( res.getType()==Message::Type::typeRESPONSE &&
+                res.getCommand() == Message::Command::commNODELIST &&
+                res.getArgument() == Message::Argument::argPOSITIVE) {
                 if(res.getData(nodes)) {
                     result = true;
                 }
@@ -246,9 +246,9 @@ vector<Message::node> FollowerConnections::requestMNodes(Message::node ipS) {
     //build request message
     Message m;
     m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::REQUEST);
-    m.setCommand(Message::Command::GET);
-    m.setArgument(Message::Argument::MNODES);
+    m.setType(Message::Type::typeREQUEST);
+    m.setCommand(Message::Command::commGET);
+    m.setArgument(Message::Argument::argMNODES);
 
     vector<Message::node> nodes;
     bool result = false;
@@ -256,9 +256,9 @@ vector<Message::node> FollowerConnections::requestMNodes(Message::node ipS) {
     if(this->sendMessage(Socket, m)) {
         Message res;
         if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::RESPONSE &&
-                res.getCommand() == Message::Command::MNODELIST &&
-                res.getArgument() == Message::Argument::POSITIVE) {
+            if( res.getType()==Message::Type::typeRESPONSE &&
+                res.getCommand() == Message::Command::commMNODELIST &&
+                res.getArgument() == Message::Argument::argPOSITIVE) {
                 if(res.getData(nodes)) {
                     result = true;
                 }
@@ -290,8 +290,8 @@ bool FollowerConnections::sendHello(Message::node ipS) {
     //build hello message
     Message m;
     m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::NOTIFY);
-    m.setCommand(Message::Command::HELLO);
+    m.setType(Message::Type::typeNOTIFY);
+    m.setCommand(Message::Command::commHELLO);
     Report r;
     
     r.setHardware(this->parent->getStorage()->getHardware());
@@ -302,9 +302,9 @@ bool FollowerConnections::sendHello(Message::node ipS) {
     if(this->sendMessage(Socket, m)) {
         Message res;
         if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::RESPONSE &&
-                res.getCommand() == Message::Command::HELLO &&
-                res.getArgument() == Message::Argument::POSITIVE) {
+            if( res.getType()==Message::Type::typeRESPONSE &&
+                res.getCommand() == Message::Command::commHELLO &&
+                res.getArgument() == Message::Argument::argPOSITIVE) {
                 Message::node node;
                 vector<Message::node> vec;
                 if(res.getData(node, vec)) {
@@ -336,9 +336,9 @@ optional<pair<int64_t,Message::node>> FollowerConnections::sendUpdate(Message::n
     //build update message
     Message m;
     m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::NOTIFY);
-    m.setCommand(Message::Command::UPDATE);
-    m.setArgument(Message::Argument::REPORT);
+    m.setType(Message::Type::typeNOTIFY);
+    m.setCommand(Message::Command::commUPDATE);
+    m.setArgument(Message::Argument::argREPORT);
     Report r;
     
     r.setHardware(this->parent->getStorage()->getHardware());
@@ -365,9 +365,9 @@ optional<pair<int64_t,Message::node>> FollowerConnections::sendUpdate(Message::n
         cout << "sendUpdate2" << endl;
         Message res;
         if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::RESPONSE &&
-                res.getCommand() == Message::Command::UPDATE &&
-                res.getArgument() == Message::Argument::POSITIVE) {
+            if( res.getType()==Message::Type::typeRESPONSE &&
+                res.getCommand() == Message::Command::commUPDATE &&
+                res.getArgument() == Message::Argument::argPOSITIVE) {
                 
                 result = std::make_pair(now, ipS);
                 this->parent->getStorage()->saveState(time,this->parent->node->sensitivity);
@@ -392,9 +392,9 @@ int FollowerConnections::sendStartIperfTest(Message::node ip) {
     //build start iperf message
     Message m;
     m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::REQUEST);
-    m.setCommand(Message::Command::START);
-    m.setArgument(Message::Argument::IPERF);
+    m.setType(Message::Type::typeREQUEST);
+    m.setCommand(Message::Command::commSTART);
+    m.setArgument(Message::Argument::argIPERF);
 
     int port = -1;
 
@@ -402,9 +402,9 @@ int FollowerConnections::sendStartIperfTest(Message::node ip) {
     if(this->sendMessage(Socket, m)) {
         Message res;
         if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::RESPONSE &&
-                res.getCommand() == Message::Command::START &&
-                res.getArgument() == Message::Argument::POSITIVE) {
+            if( res.getType()==Message::Type::typeRESPONSE &&
+                res.getCommand() == Message::Command::commSTART &&
+                res.getArgument() == Message::Argument::argPOSITIVE) {
                 
                 res.getData(port);
             }
@@ -427,9 +427,9 @@ int FollowerConnections::sendStartEstimateTest(Message::node ip, std::string &my
     //build start estimate message
     Message m;
     m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::REQUEST);
-    m.setCommand(Message::Command::START);
-    m.setArgument(Message::Argument::ESTIMATE);
+    m.setType(Message::Type::typeREQUEST);
+    m.setCommand(Message::Command::commSTART);
+    m.setArgument(Message::Argument::argESTIMATE);
 
     int port = -1;
 
@@ -437,9 +437,9 @@ int FollowerConnections::sendStartEstimateTest(Message::node ip, std::string &my
     if(this->sendMessage(Socket, m)) {
         Message res;
         if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::RESPONSE &&
-                res.getCommand() == Message::Command::START &&
-                res.getArgument() == Message::Argument::POSITIVE) {
+            if( res.getType()==Message::Type::typeRESPONSE &&
+                res.getCommand() == Message::Command::commSTART &&
+                res.getArgument() == Message::Argument::argPOSITIVE) {
                 Message::node val;
                 res.getData(val);
                 port = stol(val.port);

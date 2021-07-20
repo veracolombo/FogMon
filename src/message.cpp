@@ -10,7 +10,7 @@ using namespace std;
 using namespace rapidjson;
 
 Message::Message() {
-    this->argument = Argument::NONE;
+    this->argument = Argument::argNONE;
     this->data = Value("none");
     this->doc.SetObject();
 }

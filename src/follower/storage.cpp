@@ -60,18 +60,6 @@ void Storage::isError(int err, char *zErrMsg, std::string mess) {
     }
 }
 
-int getFloatCallback(void *i, int argc, char **argv, char **azColName) {
-    float *val = (float*)i;
-    *val = stof(argv[0]);
-    return 0;
-}
-
-int getIntCallback(void *i, int argc, char **argv, char **azColName) {
-    int *val = (int*)i;
-    *val = stoi(argv[0]);
-    return 0;
-}
-
 void Storage::createTables() {
     char *zErrMsg = 0;
 
@@ -104,12 +92,36 @@ Report::hardware_result Storage::getHardware() {
 }
 
 
-vector<float> Storage::getFreeCpu(int k){
-  
+vector<float> Storage::getLastValues(Metric metric, int limit){
     char *zErrMsg = 0;
     char buf[1024];
     stringstream query;
-    query << "SELECT free_cpu FROM Hardware ORDER BY time DESC LIMIT " << k;
+
+    if(metric == Metric::FREE_CPU){
+        query << "SELECT free_cpu FROM Hardware ORDER BY time DESC LIMIT " << limit;
+
+    }else if(metric == Metric::FREE_MEMORY){
+        query << "SELECT free_memory/memory FROM Hardware ORDER BY time DESC LIMIT " << limit;
+
+    }else if(metric == Metric::FREE_DISK){
+        query << "SELECT free_disk/disk FROM Hardware ORDER BY time DESC LIMIT " << limit; 
+    }
+
+    std::sprintf(buf, query.str().c_str());
+
+    vector<float> r;
+    int err = sqlite3_exec(this->db, buf, IStorage::VectorFloatCallback, &r, &zErrMsg);
+    isError(err, zErrMsg, "getLastValues");
+
+    return r;
+}
+
+/*
+vector<float> Storage::getFreeCpu(int limit){
+    char *zErrMsg = 0;
+    char buf[1024];
+    stringstream query;
+    query << "SELECT free_cpu FROM Hardware ORDER BY time DESC LIMIT " << limit;
     std::sprintf(buf, query.str().c_str());
 
     vector<float> r;
@@ -118,12 +130,14 @@ vector<float> Storage::getFreeCpu(int k){
 
     return r;
 }
+*/
 
-vector<float> Storage::getFreeMemory(int k){
+/*
+vector<float> Storage::getFreeMemory(int limit){
     char *zErrMsg = 0;
     char buf[1024];
     stringstream query;
-    query << "SELECT free_memory/memory FROM Hardware ORDER BY time DESC LIMIT " << k;
+    query << "SELECT free_memory/memory FROM Hardware ORDER BY time DESC LIMIT " << limit;
     std::sprintf(buf, query.str().c_str());
 
     vector<float> r;
@@ -132,12 +146,14 @@ vector<float> Storage::getFreeMemory(int k){
 
     return r;
 }
+*/
 
-vector<float> Storage::getFreeDisk(int k){
+/*
+vector<float> Storage::getFreeDisk(int limit){
     char *zErrMsg = 0;
     char buf[1024];
     stringstream query;
-    query << "SELECT free_disk/disk FROM Hardware ORDER BY time DESC LIMIT " << k;
+    query << "SELECT free_disk/disk FROM Hardware ORDER BY time DESC LIMIT " << limit;
     std::sprintf(buf, query.str().c_str());
 
     vector<float> r;
@@ -145,15 +161,6 @@ vector<float> Storage::getFreeDisk(int k){
     isError(err, zErrMsg, "getFreeDisk");
 
     return r;
-}
-
-/*
-vector<float> getFreeMemory(int k) {
-
-}
-
-vector<float> getFreeDisk(int k) {
-
 }
 */
 

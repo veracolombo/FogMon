@@ -322,9 +322,9 @@ TEST(SelectorTest, ScriptTest) {
         {500,500,500,500,500,500,0,1,1,1},
         {500,500,500,500,500,500,0,1,1,1},
     };
-    unlink("leader_node.db");
+    unlink("monitoring.db");
     ILeaderStorage * stor = new LeaderStorage(Message::node("0","::1",""));
-    stor->open("leader_node.db");
+    stor->open("monitoring.db");
     
     for(int i=0; i< 10; i++) {
         stor->addNode(Message::node(to_string(i),to_string(i),""),Report::hardware_result());
@@ -405,9 +405,9 @@ TEST(SelectorTest, ScriptTest2) {
         {500,500,500,500,500,500,0,1,1,1},
         {500,500,500,500,500,500,0,1,1,1},
     };
-    unlink("leader_node.db");
+    unlink("monitoring.db");
     ILeaderStorage * stor = new LeaderStorage(Message::node("0","::1",""));
-    stor->open("leader_node.db");
+    stor->open("monitoring.db");
     
     for(int i=0; i< 10; i++) {
         stor->addNode(Message::node(to_string(i),to_string(i),""),Report::hardware_result());

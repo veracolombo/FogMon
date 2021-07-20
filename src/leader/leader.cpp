@@ -29,7 +29,7 @@ void Leader::initialize(LeaderFactory* fact) {
     }else {
         this->factory = fact;
     }
-    this->storage = this->factory->newStorage("leader_node.db", this->nodeS);
+    this->storage = this->factory->newStorage("monitoring", this->nodeS);
     Follower::storage = this->storage;
     this->connections = this->factory->newConnections(this->nThreads);
     this->connections->initialize(this);

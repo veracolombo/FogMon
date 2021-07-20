@@ -28,10 +28,6 @@
 #include "storage.hpp"
 #include "node.hpp"
 
-///////////////////////
-#include "states.hpp"
-///////////////////////
-
 using namespace std;
 using namespace rapidjson;
 
@@ -55,17 +51,12 @@ void Follower::initialize(Factory* fact) {
         this->factory = fact;
     }
     if(this->storage == NULL)
-        this->storage = this->factory->newStorage("leader_node.db");
+        this->storage = this->factory->newStorage("monitoring.db");
     if(this->connections == NULL) {
         this->connections = this->factory->newConnections(this->nThreads);
     }
     this->connections->initialize(this);
     this->server = this->factory->newServer(this->connections,5555);
-
-    ////////////////////////////
-    this->states = new States(this);
-    this->states->setMetrics(this->metrics);
-    ////////////////////////////
 }
 
 Follower::~Follower() {
@@ -291,7 +282,6 @@ int Follower::startIperf() {
 }
 
 int Follower::startEstimate() {
-    
     
     int port = random()%2000 + 5600;
 
@@ -561,7 +551,6 @@ void Follower::getHardware() {
     this->storage->saveHardware(hardware, this->node->hardwareWindow);          // save hardware data on DB
 
     sigar_cpu_list_destroy(sigar, &cpulist);
-
     sigar_close(sigar);
 }
 
@@ -570,49 +559,9 @@ void Follower::timer() {
     while(this->running) {
 
         auto t_start = std::chrono::high_resolution_clock::now();
+
         //generate hardware report and send it
         this->getHardware();
-        
-        ////////////////////////////////////////////////////////////////////////
-        // check metrics state
-        this->states->getNodeState();
-        this->states->toString();
-
-        /*
-            cout << "States: ";
-            for (int i=0; i<freeCpuStates.size(); i++){
-                switch(freeCpuStates[i]){
-                    case States::State::STABLE:         cout << "Stable "; break;
-                    case States::State::UNSTABLE:       cout << "Unstable "; break;
-                    case States::State::INCREASING:     cout << "Increasing "; break;
-                    case States::State::DECREASING:     cout << "Decreasing "; break;
-                    case States::State::OK:             cout << "Ok "; break;
-                    case States::State::ALARMING_HIGH:  cout << "Alarming_High "; break;
-                    case States::State::ALARMING_LOW:   cout << "Alarming_Low "; break;
-                    case States::State::TOO_HIGH:       cout << "Too_High "; break;
-                    case States::State::TOO_LOW:        cout << "Too_Low "; break;  
-                }
-            }
-            cout << endl;
-
-            bool stable = false;
-            for(int i =0; i<freeCpuStates.size(); i++){
-                if(freeCpuStates[i] == States::State::STABLE){
-                    stable = true;
-                    break;
-                }
-            }
-
-            if (!stable){
-                this->node->timeReport = 10;
-            }else{
-                this->node->timeReport = 30;
-            }
-        */
-        ////////////////////////////////////////////////////////////////////////////
-
-        // prendere lista di valori di free cpu da DB
-        //vector<States::State> states = this->states->getList()
 
         std::optional<std::pair<int64_t,Message::node>> ris = this->connections->sendUpdate(this->nodeS, this->update);
         if(ris == nullopt) {
@@ -697,11 +646,11 @@ void Follower::timer() {
 
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
-        int sleeptime = this->node->timeReport-elapsed_time;
+        int sleeptime = Node::timeReport-elapsed_time;
         
-        //
-        //cout << "Time report: " << this->node->timeReport << endl;
-        //
+        
+        cout << "Time report: " << Node::timeReport << endl;
+        
 
         if (sleeptime > 0)
             sleeper.sleepFor(chrono::seconds(sleeptime));
