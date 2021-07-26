@@ -2,7 +2,6 @@
 #include "adaptive_follower.hpp"
 #include "node.hpp"
 #include "common.hpp"
-
 #include <iostream>
 
 Action::Action() {}

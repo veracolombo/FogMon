@@ -7,9 +7,9 @@
 
 using namespace std;
 
-AdaptiveStorage::AdaptiveStorage() {}
+AdaptiveStorage::AdaptiveStorage() { }
 
-AdaptiveStorage::~AdaptiveStorage() {}
+AdaptiveStorage::~AdaptiveStorage() { }
 
 void AdaptiveStorage::isError(int err, char *zErrMsg, std::string mess) {
     if( err!=SQLITE_OK )
@@ -37,7 +37,7 @@ vector<tuple<string, int, int>> AdaptiveStorage::getStates(){
     char buf[1024];
 
     stringstream query;
-    query << "SELECT * FROM States";
+    query << "SELECT * FROM States ORDER BY timestamp DESC";
     std::sprintf(buf, query.str().c_str());
 
     vector<tuple<string, int, int>> vect;

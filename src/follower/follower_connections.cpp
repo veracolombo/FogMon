@@ -317,7 +317,9 @@ bool FollowerConnections::sendHello(Message::node ipS) {
             }
         }
     }
+
     close(Socket);
+    
     return result;
 }
 

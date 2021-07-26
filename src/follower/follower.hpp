@@ -11,6 +11,7 @@
 
 class Follower : virtual public IAgent {
 public:
+    Follower();
     Follower(Message::node node, int nThreads);
     ~Follower();
 
@@ -37,6 +38,8 @@ public:
     virtual Server* getServer();
 
     virtual void changeRole(std::vector<Message::node> leaders);
+
+    static int nUpdate;
 
 protected:
 

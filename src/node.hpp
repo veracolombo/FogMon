@@ -10,7 +10,7 @@ class IAgent;
 class Node {
 public:
 
-    Node(std::string port, bool isLeader, int threads);
+    Node(std::string port, bool isLeader, int threads, bool adp);
     ~Node();
     //start listener for incoming ping and directions
     void start();
@@ -58,6 +58,8 @@ public:
 protected:
     IAgent * agent;
     bool isLeader;
+
+    bool adp;   // adaptivity support
 
     //list of known leaders for future reconnections
     std::vector<Message::node> mNodes;

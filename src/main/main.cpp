@@ -102,6 +102,7 @@ int main(int argc, char *argv[]) {
     int leader_formula = 0;
 
     bool leader = false;
+    bool adp = false;   // adaptivity support
     
     std::string interfaceIp = "";
     int session = 0;
@@ -146,13 +147,16 @@ int main(int argc, char *argv[]) {
     if(input.cmdOptionExists("--leader"))
         leader = true;
 
+    if(input.cmdOptionExists("--adp"))
+        adp = true;
+
     if(input.cmdOptionExists("-i"))
         interfaceIp = input.getCmdOption("-i");
     
     if(input.cmdOptionExists("-s"))
         session = stoi(input.getCmdOption("-s"));
 
-    Node node(myPort, leader, threads);
+    Node node(myPort, leader, threads, adp);
 
     vector<Message::node> known;
 

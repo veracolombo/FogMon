@@ -74,6 +74,7 @@ void UserFunctions(
 #pragma unused(env)
 #endif
 
+
  // conditions
  AddUDF(env,"MetricInStateFor","l",2,2,"s",Condition::MetricInStateFor,"MetricInStateFor",NULL);
 
@@ -84,4 +85,5 @@ void UserFunctions(
 
  // helper
  AddUDF(env, "GetTimeReport", "l",5,5,"l",ClipsFunction::GetTimeReport,"GetTimeReport",NULL);
+ 
   }

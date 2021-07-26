@@ -3,6 +3,7 @@
 #include <iostream>
 
 AdaptiveController::AdaptiveController(AdaptiveFollower* node){
+    this->running = false;
     this->node = node;
     this->rule = new Rule();
 }
@@ -14,10 +15,12 @@ void AdaptiveController::initialize() {
 }
 
 void AdaptiveController::start() {
+    this->running = true;
     this->statesThread = thread(&AdaptiveController::statesTimer, this);
 }
 
 void AdaptiveController::stop() {
+    this->running = false;
     if(this->statesThread.joinable()){
         this->statesThread.join();
     }
@@ -32,16 +35,14 @@ void AdaptiveController::addState(Metric metric, State state){
 }
 
 void AdaptiveController::saveStates(){
-    
     for(auto &s : this->states){
         this->node->getAdaptiveStorage()->saveStates(s.second, s.first);
     }
 }
 
-
 void AdaptiveController::statesTimer(){
 
-    while(true){
+    while(this->running){
     
         auto t_start = std::chrono::high_resolution_clock::now();
 
@@ -70,7 +71,7 @@ void AdaptiveController::statesTimer(){
 
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
-        int sleeptime = this->node->node->timeReport - elapsed_time + 1.5;
+        int sleeptime = this->node->node->timeReport - elapsed_time + 1;
         
         if (sleeptime > 0)
             sleeper.sleepFor(chrono::seconds(sleeptime));
@@ -89,7 +90,7 @@ void AdaptiveController::stable(float delta_max, float tol){
             continue;
 
         State first_sample = State::NONE;
-        if(s.second[0] - s.second[1] < delta_max){
+        if(abs(s.second[0] - s.second[1] < delta_max)){
             first_sample = State::STABLE;
         }
 
@@ -111,6 +112,7 @@ void AdaptiveController::stable(float delta_max, float tol){
         }
     }
 }
+
 
 void AdaptiveController::increasing(float tol) {
     for(auto s : this->series){
@@ -135,12 +137,15 @@ void AdaptiveController::increasing(float tol) {
                 increasing += 1;
             }
         }
-
-        if(/*first_sample == State::INCREASING &&*/ increasing >= ceil(tol*k) && s.second[0]>s.second[k]){
+        
+       
+        // first_sample == State::INCREASING &&
+        if(increasing >= ceil(tol*k) && s.second[0]>s.second[k]){
             this->states[s.first].push_back(State::INCREASING);
         }
     }
 }
+
 
 void AdaptiveController::decreasing(float tol){
     for(auto s : this->series){
@@ -166,14 +171,12 @@ void AdaptiveController::decreasing(float tol){
                 decreasing += 1;
             }
         }
-
-        if(/*first_sample == State::DECREASING && */decreasing >= ceil(tol*k) && s.second[0]<s.second[k]){
+        // first_sample == State::DECREASING &&
+        if(decreasing >= ceil(tol*k) && s.second[0]<s.second[k]){
             this->states[s.first].push_back(State::DECREASING);
         }
     }
 }
-
-
 
 
 void AdaptiveController::alarms(float tol, float too_high, float too_low, float alarming_high, float alarming_low){
@@ -230,10 +233,8 @@ void AdaptiveController::alarms(float tol, float too_high, float too_low, float 
 }
 
 
-
-
 void AdaptiveController::toStringSeries(){
-    cout << "********* Series *********" << endl;
+    cout << "************ Series ************" << endl;
 
     for(auto s : this->series){
         switch(s.first){
@@ -254,7 +255,7 @@ void AdaptiveController::toStringSeries(){
 }
 
 void AdaptiveController::toStringStates(){
-    cout << "********* Actual state *********" << endl;
+    cout << "************ Actual state ************" << endl;
 
     for(auto s : this->states){
         switch(s.first){
@@ -281,5 +282,5 @@ void AdaptiveController::toStringStates(){
         }
         cout << endl;
     }
-    cout << "********************************" << endl; 
+    cout << "**************************************" << endl; 
 }

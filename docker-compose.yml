@@ -7,7 +7,7 @@ services:
     stdin_open: true
     # tty: true
     networks:
-      default:
+      fm_net:
     expose:
       - "1024-65535"
   follower1:
@@ -18,7 +18,7 @@ services:
     depends_on:
       - leader
     networks:
-      default:
+      fm_net:
     expose:
       - "1024-65535"
   follower2:
@@ -29,7 +29,7 @@ services:
     depends_on:
       - leader
     networks:
-      default:
+      fm_net:
     expose:
       - "1024-65535"
   follower3:
@@ -40,11 +40,60 @@ services:
     depends_on:
       - leader
     networks:
-      default:
+      fm_net:
     expose:
       - "1024-65535"
+  
+
+  leader_adp:
+    build: .
+    command: --leader -i 131.114.72.76:8248 -s 10 --adp
+    stdin_open: true
+    networks:
+      fm_net_adp:
+    expose:
+      - "1024-65535"
+
+  follower1_adp:
+    build: .
+    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp
+    stdin_open: true
+    depends_on:
+      - leader_adp
+    networks:
+      fm_net_adp:
+    expose:
+      - "1024-65535"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+          
+  follower2_adp:
+    build: .
+    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp
+    stdin_open: true
+    depends_on:
+      - leader_adp
+    networks:
+      fm_net_adp:
+    expose:
+      - "1024-65535"
+
+  follower3_adp:
+    build: .
+    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp
+    stdin_open: true
+    depends_on:
+      - leader_adp
+    networks:
+      fm_net_adp:
+    expose:
+      - "1024-65535"
+
 networks:
-  default:
+  fm_net:
     driver: bridge
     enable_ipv6: true
     ipam:
@@ -54,3 +103,13 @@ networks:
           gateway: 172.16.238.1
         - subnet: 2001:3984:3989::/64
           gateway: 2001:3984:3989::1
+  fm_net_adp:
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.248.0/24
+          gateway: 172.16.248.1
+        - subnet: 2001:3984:3999::/64
+          gateway: 2001:3984:3999::1

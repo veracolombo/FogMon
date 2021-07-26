@@ -33,29 +33,27 @@ void Condition::MetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *o
     for(int i=0; i<data.size(); i++){
 
         string currtime = get<0>(data[i]);
-
-
-        if((lasttime != currtime && found == false)){
-            break;
-        }
-
-        if(currtime == lasttime && found == true){
-            continue;
+        
+        if(lasttime != currtime){
+            lasttime = currtime;
+            if(found==false){
+                break;
+            }else{
+                found = false;
+            }
+        }else{
+            if(found == true){
+                continue;
+            }
         }
 
         if(get<1>(data[i]) == lMetrics.at(metric) &&
            get<2>(data[i]) == lStates.at(state)){
                 count += 1;
                 found = true;
-        }
-
-        // reset
-        if (currtime != lasttime){
-            lasttime = currtime;
-            found = false;
-        }        
+        }     
     }
 
-    //cout << "count=" << count << endl;
+    cout << "Metric " << metric << " in state " << state << " for " << count << " samples" << endl;
     out->integerValue = CreateInteger(env,count);
  }

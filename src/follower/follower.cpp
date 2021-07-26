@@ -31,6 +31,10 @@
 using namespace std;
 using namespace rapidjson;
 
+int Follower::nUpdate = 0;
+
+Follower::Follower() {}
+
 Follower::Follower(Message::node node, int nThreads) : IAgent() {
     this->nThreads = nThreads;
 
@@ -581,6 +585,10 @@ void Follower::timer() {
             this->update.first= (*ris).first;
             this->update.second= (*ris).second;
         }
+
+        nUpdate += 1;
+
+        cout << "Number of updates sent until now: " << nUpdate << endl;
 
         //every 10 iterations ask the nodes in case the server cant reach this network
         if(iter%10 == 0) {

@@ -5,6 +5,9 @@
 #include "uiconnection.hpp"
 
 using namespace std;
+
+Selector::Selector() {}
+
 Selector::Selector(ILeader *leader) {
     this->parent = leader;
     status = FREE;
