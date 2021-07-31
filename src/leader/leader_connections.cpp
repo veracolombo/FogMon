@@ -341,7 +341,8 @@ bool LeaderConnections::notifyAllM(Message &m) {
 
 bool LeaderConnections::sendRemoveNodes(std::vector<Message::node> ips) {
     Message broadcast;
-    broadcast.setSender(this->parent->getMyNode());
+
+    broadcast.setSender(this->parent->getMyNode()); // non funziona !!
     broadcast.setType(Message::Type::typeNOTIFY);
     broadcast.setCommand(Message::Command::commUPDATE);
     broadcast.setArgument(Message::Argument::argNODES);

@@ -2,6 +2,8 @@
 #include "adaptive_follower.hpp"
 #include <iostream>
 
+bool AdaptiveController::ready = false;
+
 AdaptiveController::AdaptiveController(AdaptiveFollower* node){
     this->running = false;
     this->node = node;
@@ -11,6 +13,7 @@ AdaptiveController::AdaptiveController(AdaptiveFollower* node){
 AdaptiveController::~AdaptiveController() {}
 
 void AdaptiveController::initialize() {
+    cout << "AdaptiveController::initialize()" << endl;
     this->rule->initialize("clips/facts.clp", "clips/rules.clp");
 }
 
@@ -41,20 +44,31 @@ void AdaptiveController::saveStates(){
 }
 
 void AdaptiveController::statesTimer(){
-
     while(this->running){
-    
-        auto t_start = std::chrono::high_resolution_clock::now();
+
+        std::unique_lock<std::mutex> lck(mtx);
+        cv.wait(lck, [] { return ready; });
 
         this->series.clear();
         this->states.clear();
 
-        for(auto const &m : this->node->getMetrics()){
-        
-            vector<float> res = this->node->getStorage()->getLastValues(m, this->history);
+        vector<Metric> met = this->node->getMetrics(); 
+
+        for(auto const &m : met){
+
+            vector<float> res;
+            res = this->node->getStorage()->getLastValues(m, this->history);
+
+            /*
+            switch(m){
+                case(FREE_CPU):     {res = this->node->getAdaptiveStorage()->getFreeCpu(this->history); break;}
+                case(FREE_MEMORY):  {res = this->node->getAdaptiveStorage()->getFreeMemory(this->history); break;}
+                case(FREE_DISK):    {res = this->node->getAdaptiveStorage()->getFreeDisk(this->history); break;}
+            }
+            */
 
             if(!res.empty()){
-                this->series[m] = res;
+              this->series[m] = res;
             }
         }
 
@@ -64,21 +78,16 @@ void AdaptiveController::statesTimer(){
         this->alarms();
 
         this->saveStates();
-        this->rule->run();      // trigger
+        this->rule->run();         // trigger to CLIPS rules engine
 
         this->toStringSeries();
         this->toStringStates();
 
-        auto t_end = std::chrono::high_resolution_clock::now();
-        auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
-        int sleeptime = this->node->node->timeReport - elapsed_time + 1;
-        
-        if (sleeptime > 0)
-            sleeper.sleepFor(chrono::seconds(sleeptime));
+        ready = false;
+        lck.unlock();
+        cv.notify_one();
     }
 }
-
-
 
 void AdaptiveController::stable(float delta_max, float tol){
     

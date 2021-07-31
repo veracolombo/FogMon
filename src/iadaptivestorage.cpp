@@ -92,3 +92,10 @@ int IAdaptiveStorage::_getIntCallback(void *i, int argc, char **argv, char **azC
     *val = stoi(argv[0]);
     return 0;
 }
+
+
+int IAdaptiveStorage::_VectorFloatCallback(void *vec, int argc, char **argv, char **azColName) {
+    vector<float> *v = (vector<float>*)vec;
+    v->push_back(stof(argv[0]));
+    return 0;
+}

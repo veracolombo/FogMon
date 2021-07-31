@@ -1,0 +1,22 @@
+#ifndef ADAPTIVE_FOLLOWER_CONNECTIONS_HPP_
+#define ADAPTIVE_FOLLOWER_CONNECTIONS_HPP_
+
+#include "follower_connections.hpp"
+#include "iadaptivefollower_connections.hpp"
+
+class AdaptiveFollowerConnections : virtual public FollowerConnections, virtual public IAdaptiveFollowerConnections {
+protected:
+    //void handler(int fd, Message &m);
+
+    IAdaptiveFollower* parent;
+
+    //virtual void call_super_handler(int fd, Message &m);
+
+public:
+    AdaptiveFollowerConnections(int nThread);
+    ~AdaptiveFollowerConnections();
+
+    void initialize(IAdaptiveFollower* parent);
+};
+
+#endif

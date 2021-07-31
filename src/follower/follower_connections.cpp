@@ -31,6 +31,7 @@ void FollowerConnections::initialize(IAgent *parent) {
 }
 
 void FollowerConnections::handler(int fd, Message &m) {
+    cout << "FollowerConnections::handler()" << endl;
     string strIp = this->getSource(fd,m);
 
     if(m.getType() == Message::Type::typeREQUEST) {
@@ -341,8 +342,8 @@ optional<pair<int64_t,Message::node>> FollowerConnections::sendUpdate(Message::n
     m.setType(Message::Type::typeNOTIFY);
     m.setCommand(Message::Command::commUPDATE);
     m.setArgument(Message::Argument::argREPORT);
+
     Report r;
-    
     r.setHardware(this->parent->getStorage()->getHardware());
     r.setIot(this->parent->getStorage()->getIots());
 
@@ -371,8 +372,8 @@ optional<pair<int64_t,Message::node>> FollowerConnections::sendUpdate(Message::n
                 res.getCommand() == Message::Command::commUPDATE &&
                 res.getArgument() == Message::Argument::argPOSITIVE) {
                 
-                result = std::make_pair(now, ipS);
-                this->parent->getStorage()->saveState(time,this->parent->node->sensitivity);
+                result = std::make_pair(now, ipS); // aggiornamento del dato membro 'update' con nodo e tempo dell'ultimo update
+                this->parent->getStorage()->saveState(time,this->parent->node->sensitivity);        // ??? non viene svolto
             }
         }
     }

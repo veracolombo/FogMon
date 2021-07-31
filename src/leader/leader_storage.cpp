@@ -97,7 +97,7 @@ std::vector<Message::node> LeaderStorage::getAllNodes() {
     return nodes;
 }
 
-vector<Message::node> LeaderStorage::getNodes() {
+vector<Message::node> LeaderStorage::getNodes() {    // restituisce nodi monitorati dal Leader (i.e. i suoi Follower)
     char *zErrMsg = 0;
     char buf[1024];
     std::sprintf(buf,"SELECT id,ip,port FROM MNodes WHERE monitoredBy = \"%s\"",this->nodeM.id.c_str());

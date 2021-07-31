@@ -21,7 +21,7 @@ public:
     /**
      * possible commands for the messages
     */
-    enum Command {commGET, commSET, commHELLO, commMHELLO, commNODELIST, commMNODELIST, commUPDATE, commSTART, commSELECTION_INIT, commSELECTION_START, commSELECTION, commSELECTION_END};
+    enum Command {commGET, commSET, commHELLO, commMHELLO, commNODELIST, commMNODELIST, commUPDATE, commSTART, commSELECTION_INIT, commSELECTION_START, commSELECTION, commSELECTION_END, commSELECT_NEW_SERVER};
     /**
      * possible arguments for the messages
     */

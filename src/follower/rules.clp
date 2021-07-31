@@ -19,24 +19,15 @@
                                   ?*min-time-report* 
                                   ?*max-time-report*)))
 
-(defrule en_qos (declare (salience ?*mid-priority*))
- (test (>= (MetricInStateFor "free_cpu" "stable") 3))
- (test (>= (MetricInStateFor "free_memory" "stable") 3))
- (test (>= (MetricInStateFor "free_disk" "stable") 3))
- (test (>= (MetricInStateFor "free_cpu" "ok") 3))
- (test (>= (MetricInStateFor "free_memory" "ok") 3))
- (test (>= (MetricInStateFor "free_disk" "ok") 3))
+(defrule en_mem_disk
+ (test (>= (MetricInStateFor "free_cpu" "stable") 2))
  =>
- (EnableMetric "latency")
- (EnableMetric "bandwidth"))
+ (EnableMetric "free_memory")
+ (EnableMetric "free_disk"))
 
-
-(defrule dis_qos (declare (salience ?*mid-priority*))
- (or 
- (test (>= (MetricInStateFor "free_cpu" "unstable") 2))
- (test (>= (MetricInStateFor "free_memory" "unstable") 2))
- (test (>= (MetricInStateFor "free_disk" "unstable") 2))
- )
+(defrule dis_mem_disk
+ (test (>= (MetricInStateFor "free_cpu" "unstable") 3))
  =>
- (DisableMetric "latency")
- (DisableMetric "bandwidth"))
+ (DisableMetric "free_memory")
+ (DisableMetric "free_disk")
+)

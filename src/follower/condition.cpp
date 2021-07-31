@@ -54,6 +54,6 @@ void Condition::MetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *o
         }     
     }
 
-    cout << "Metric " << metric << " in state " << state << " for " << count << " samples" << endl;
+    // cout << "Metric " << metric << " in state " << state << " for " << count << " samples" << endl;
     out->integerValue = CreateInteger(env,count);
  }

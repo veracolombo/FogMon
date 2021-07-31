@@ -8,14 +8,22 @@
 #include <map>
 #include <vector>
 #include <math.h>
-#include <thread>
+
+#include <thread>               // std::thread
+#include <mutex>                // std::mutex, std::unique_lock
+#include <condition_variable>   // std::condition_variable
 
 
 class AdaptiveFollower;
 
 class AdaptiveController {
+    
+friend class AdaptiveFollower;
 
 public:
+
+    map<Metric, vector<State>> getStates();
+    Rule* rule;
 
     AdaptiveController(AdaptiveFollower* node);
     ~AdaptiveController();
@@ -25,13 +33,8 @@ public:
     void start();
     void stop();
 
-    map<Metric, vector<State>> getStates();
-
     void toStringSeries();
     void toStringStates();
-
-    Rule* rule;
-    
 
 private:
     AdaptiveFollower* node;
@@ -43,8 +46,10 @@ private:
 
     //threads
     std::thread statesThread;
-    
-    Sleeper sleeper;
+
+    static bool ready;
+    std::mutex mtx;
+    std::condition_variable cv;
 
     bool running;
 
@@ -58,5 +63,6 @@ private:
     void decreasing(float tol = 0.8);
     void alarms(float tol=0.8, float too_high=1, float too_low=0.4, float alarming_high=1, float alarming_low=0.3);
 
+    friend class AdaptiveFollower;  // to wake up main thread
 };
 #endif

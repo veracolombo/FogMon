@@ -6,8 +6,10 @@
 #include "adaptive_factory.hpp"  
 #include "adaptive_controller.hpp"
 #include "common.hpp"
+#include "adaptive_follower_connections.hpp"
+#include "iadaptivefollower.hpp"
 
-class AdaptiveFollower : virtual public Follower {
+class AdaptiveFollower : virtual public IAdaptiveFollower, virtual public Follower {
 
 public:
     // metrics
@@ -18,10 +20,12 @@ public:
     ~AdaptiveFollower();
 
     
-    virtual void initialize(Factory* factory = NULL, AdaptiveFactory* adaptiveFactory = NULL);
+    virtual void initialize(AdaptiveFactory* factory = NULL);
 
     virtual void start(vector<Message::node> mNodes);
     virtual void stop();
+
+    IAdaptiveFollowerConnections* getConnections();
 
     
     vector<Metric> getMetrics();
@@ -39,12 +43,20 @@ protected:
     AdaptiveController* adaptive_controller;
     IAdaptiveStorage* adaptiveStorage;
 
-    AdaptiveFactory adaptiveTFactory;
-    AdaptiveFactory * adaptiveFactory;
+    AdaptiveFactory tFactory;
+    AdaptiveFactory * factory;
 
+    AdaptiveFollowerConnections *connections;
+
+    //void getCpu();
+    //void getMemory();
+    //void getDisk();
+
+    // void changeServer();
     
     bool sendReport();
 
+    void getHardware() override;
     void timer() override;
     void TestTimer() override;
     

@@ -1,51 +1,6 @@
 version: '3'
 services:
   leader:
-    # image: diunipisocc/liscio-fogmon:test2
-    build: .
-    command: --leader -i 131.114.72.76:8248 -s 10
-    stdin_open: true
-    # tty: true
-    networks:
-      fm_net:
-    expose:
-      - "1024-65535"
-  follower1:
-    # image: diunipisocc/liscio-fogmon:test2
-    build: .
-    command: -C leader -i 131.114.72.76:8248 -s 10
-    stdin_open: true
-    depends_on:
-      - leader
-    networks:
-      fm_net:
-    expose:
-      - "1024-65535"
-  follower2:
-    # image: diunipisocc/liscio-fogmon:test2
-    build: .
-    command: -C leader -i 131.114.72.76:8248 -s 10
-    stdin_open: true
-    depends_on:
-      - leader
-    networks:
-      fm_net:
-    expose:
-      - "1024-65535"
-  follower3:
-    # image: diunipisocc/liscio-fogmon:test2
-    build: .
-    command: -C leader -i 131.114.72.76:8248 -s 10
-    stdin_open: true
-    depends_on:
-      - leader
-    networks:
-      fm_net:
-    expose:
-      - "1024-65535"
-  
-
-  leader_adp:
     build: .
     command: --leader -i 131.114.72.76:8248 -s 10 --adp
     stdin_open: true
@@ -56,26 +11,26 @@ services:
 
   follower1_adp:
     build: .
-    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp
+    command: -C leader -i 131.114.72.76:8248 -s 10 --adp
     stdin_open: true
     depends_on:
-      - leader_adp
+      - leader
     networks:
       fm_net_adp:
     expose:
       - "1024-65535"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 50M
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        cpus: '0.50'
+  #        memory: 50M
           
   follower2_adp:
     build: .
-    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp
+    command: -C leader -i 131.114.72.76:8248 -s 10 --adp
     stdin_open: true
     depends_on:
-      - leader_adp
+      - leader
     networks:
       fm_net_adp:
     expose:
@@ -83,10 +38,10 @@ services:
 
   follower3_adp:
     build: .
-    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp
+    command: -C leader -i 131.114.72.76:8248 -s 10 --adp
     stdin_open: true
     depends_on:
-      - leader_adp
+      - leader
     networks:
       fm_net_adp:
     expose:

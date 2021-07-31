@@ -21,6 +21,16 @@ public:
 
     vector<tuple<string, int, int>> getStates();
     void saveStates(vector<State> states, Metric metric);
+
+    vector<float> getFreeCpu(int history);
+    vector<float> getFreeMemory(int history);
+    vector<float> getFreeDisk(int history);
+
+    void saveCpu(int cores, float free_cpu, int window);
+    void saveMemory(int64_t memory, float free_memory, int window);
+    void saveDisk(int64_t disk, float free_disk, int window);
+
+    vector<float> getLastValues(Metric metric, int history);
 };
 
 #endif
