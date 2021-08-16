@@ -1,10 +1,12 @@
 #include "condition.hpp"
 #include "adaptive_storage.hpp"
+#include "adaptive_follower.hpp"
 #include <iostream>
 
 Condition::Condition() {}
 
 Condition::~Condition() {}
+
 
 void Condition::MetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *out) {
 
@@ -16,10 +18,48 @@ void Condition::MetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *o
     const char* metric = m.lexemeValue->contents;
     const char* state = s.lexemeValue->contents;
 
-    // get data
+    int res = MetricInStateFor(lMetrics.at(metric), lStates.at(state));
+    out->integerValue = CreateInteger(env, res);
+}
+
+void Condition::IsMetricEnabled(Environment *env, UDFContext *udfc, UDFValue *out) {
+
+    //get arguments
+    UDFValue m;
+    UDFFirstArgument(udfc, STRING_BIT, &m);
+
+    const char* metric = m.lexemeValue->contents;
+
+    Metric met = lMetrics.at(metric);
+    bool enabled = AdaptiveFollower::metrics.at(met);
+
+    out->lexemeValue = CreateBoolean(env, enabled);
+}
+
+void Condition::NumMetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *out) {
+
+    //get arguments
+    UDFValue s; UDFValue t;
+    UDFNthArgument(udfc, 1, STRING_BIT, &s);
+    UDFNthArgument(udfc, 2, INTEGER_BIT, &t);
+
+    const char* state = s.lexemeValue->contents;
+    int time = t.integerValue->contents;
+
+    int res = NumMetricInStateFor(lStates.at(state), time);
+    out->integerValue = CreateInteger(env, res);
+}
+
+vector<tuple<string, int, int>> Condition::getData(){
     IAdaptiveStorage* storage = new AdaptiveStorage();
     storage->open("adaptive_storage.db");
     vector<tuple<string, int, int>> data = storage->getStates();
+
+    return data;
+}
+
+int Condition::MetricInStateFor(Metric metric, State state){
+    vector<tuple<string, int, int>> data = getData();
 
     int count = 0;
     bool found = false;
@@ -47,13 +87,26 @@ void Condition::MetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *o
             }
         }
 
-        if(get<1>(data[i]) == lMetrics.at(metric) &&
-           get<2>(data[i]) == lStates.at(state)){
+        if(get<1>(data[i]) == metric &&
+           get<2>(data[i]) == state){
                 count += 1;
                 found = true;
         }     
     }
 
-    // cout << "Metric " << metric << " in state " << state << " for " << count << " samples" << endl;
-    out->integerValue = CreateInteger(env,count);
- }
+    return count;
+}
+
+int Condition::NumMetricInStateFor(State state, int time) {
+    cout << "nummetricinstatefor<()" << endl;
+    int count = 0;
+    for(auto &m : AdaptiveFollower::metrics){
+        if(m.second){
+            if(MetricInStateFor(m.first, state) >= time){
+                count += 1;
+            }
+        }
+    }
+    cout << "count= " << count << endl;
+    return count;
+}

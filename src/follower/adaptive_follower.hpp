@@ -15,6 +15,9 @@ public:
     // metrics
     static map<Metric, bool> metrics;
 
+    // leader adequacy
+    static bool leaderAdequacy;
+
     AdaptiveFollower();
     AdaptiveFollower(Message::node node, int nThreads);
     ~AdaptiveFollower();
@@ -38,6 +41,8 @@ public:
     */
 
     IAdaptiveStorage* getAdaptiveStorage();
+
+    virtual bool changeServer(vector<Message::node> mNodes);
 
 protected:
     AdaptiveController* adaptive_controller;

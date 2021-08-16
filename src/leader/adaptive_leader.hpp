@@ -9,8 +9,6 @@
 class AdaptiveLeader : virtual public IAdaptiveLeader, public Leader, public AdaptiveFollower {
 
 public:
-    static bool leaderAdequacy;
-
     AdaptiveLeader();
     AdaptiveLeader(Message::node node, int nThreads);
     ~AdaptiveLeader();
@@ -23,7 +21,7 @@ public:
     IAdaptiveLeaderConnections* getConnections();
 
 protected:
-    // void timerFun() override;
+    void timerFun() override;
 
     AdaptiveLeaderFactory tFactory;
     AdaptiveLeaderFactory *factory;

@@ -54,13 +54,13 @@ void Follower::initialize(Factory* fact) {
     }else {
         this->factory = fact;
     }
+
     if(this->storage == NULL)
-        cout << "storage == NULL" << endl;
         this->storage = this->factory->newStorage("monitoring.db");
-    if(this->connections == NULL) {
-        cout << "connections == NULL" << endl;
+
+    if(this->connections == NULL)
         this->connections = this->factory->newConnections(this->nThreads);
-    }
+    
     this->connections->initialize(this);
     this->server = this->factory->newServer(this->connections,5555);
 }

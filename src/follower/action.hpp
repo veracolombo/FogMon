@@ -13,6 +13,8 @@ public:
     
     static void EnableMetric(Environment *env, UDFContext *udfc, UDFValue *out);
     static void DisableMetric(Environment *env, UDFContext *udfc, UDFValue *out);
+
+    static void SetLeaderAdequacy(Environment *env, UDFContext *udfc, UDFValue *out);
 };
 
 #endif

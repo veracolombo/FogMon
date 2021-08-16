@@ -31,7 +31,6 @@ void FollowerConnections::initialize(IAgent *parent) {
 }
 
 void FollowerConnections::handler(int fd, Message &m) {
-    cout << "FollowerConnections::handler()" << endl;
     string strIp = this->getSource(fd,m);
 
     if(m.getType() == Message::Type::typeREQUEST) {

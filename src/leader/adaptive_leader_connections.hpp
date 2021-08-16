@@ -8,8 +8,8 @@
 
 class AdaptiveLeaderConnections : public LeaderConnections, public AdaptiveFollowerConnections, virtual public IAdaptiveLeaderConnections {
 protected:
-    // void handler(int fd, Message &m);
-    // void call_super_handler(int fd, Message &m) override;
+    void handler(int fd, Message &m);
+    void call_super_handler(int fd, Message &m) override;
 
     IAdaptiveLeader* parent;
 

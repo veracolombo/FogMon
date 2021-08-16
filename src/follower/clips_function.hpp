@@ -10,6 +10,7 @@ public:
     ~ClipsFunction();
 
     static void GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *out);
+    static void GetNumActiveMetrics(Environment *env, UDFContext *udfc, UDFValue *out);
 };
 
 #endif

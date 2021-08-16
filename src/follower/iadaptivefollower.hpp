@@ -10,6 +10,8 @@ class IAdaptiveFollower : virtual public IAgent {
 public:
     virtual IAdaptiveFollowerConnections* getConnections() = 0;
     virtual IAdaptiveStorage* getAdaptiveStorage() = 0;
+
+    virtual bool changeServer(vector<Message::node> nodes) = 0;
 };
 
 #endif

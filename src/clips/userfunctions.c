@@ -77,13 +77,19 @@ void UserFunctions(
 
  // conditions
  AddUDF(env,"MetricInStateFor","l",2,2,"s",Condition::MetricInStateFor,"MetricInStateFor",NULL);
+ AddUDF(env,"IsMetricEnabled","b",1,1,"s",Condition::IsMetricEnabled,"IsMetricEnabled",NULL);
+ AddUDF(env,"NumMetricInStateFor","l",2,2,"sl",Condition::NumMetricInStateFor,"NumMetricInStateFor",NULL);
+ //AddUDF(env,"OneMetrcAlarmingHigh","b",0,0,NULL,Condition::OneMetricAlarmingHigh,"OneMetricAlarmingHigh",NULL);
+ //AddUDF(env,"AllMetricsOk","b",0,0,NULL,Condition::AllMetricsOk,"AllMetricsOk",NULL);
 
 // actions
  AddUDF(env, "ChangeTimeReport","v",1,1,"l",Action::ChangeTimeReport,"ChangeTimeReport",NULL);
  AddUDF(env, "EnableMetric", "v",1,1,"s",Action::EnableMetric,"EnableMetric",NULL);
  AddUDF(env, "DisableMetric","v",1,1,"s",Action::DisableMetric,"DisableMetric",NULL);
+ AddUDF(env, "SetLeaderAdequacy","v",1,1,"l",Action::SetLeaderAdequacy,"SetLeaderAdequacy",NULL);
 
  // helper
  AddUDF(env, "GetTimeReport", "l",5,5,"l",ClipsFunction::GetTimeReport,"GetTimeReport",NULL);
+ AddUDF(env, "GetNumActiveMetrics",NULL,0,0,"l",ClipsFunction::GetNumActiveMetrics,"GetNumActiveMetrics",NULL);
  
   }
