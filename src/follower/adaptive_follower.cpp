@@ -9,7 +9,8 @@ map<Metric, bool> AdaptiveFollower::metrics = {
     {Metric::FREE_DISK, false},
     {Metric::LATENCY, true},
     {Metric::BANDWIDTH, true},
-    {Metric::CONNECTED_IOTS, true}
+    {Metric::CONNECTED_IOTS, true},
+    {Metric::BATTERY, true}
 };
 
 bool AdaptiveFollower::leaderAdequacy = true;
@@ -38,10 +39,14 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
     this->adaptive_controller = new AdaptiveController(this);
     this->adaptive_controller->initialize();
 
-    if(this->connections == NULL){
+    if(this->connections == NULL && this->storage == NULL){
         this->connections = this->factory->newConnections(this->nThreads);
         this->connections->initialize(this);
         Follower::connections = this->connections;
+
+        this->storage = this->factory->newStorage("monitoring.db");
+        Follower::storage = this->storage;
+
         Follower::initialize(this->factory);
     }
 }
@@ -108,74 +113,6 @@ IAdaptiveStorage* AdaptiveFollower::getAdaptiveStorage() {
     return this->adaptiveStorage;
 }
 
-/*
-void AdaptiveFollower::getCpu() {
-    int status, i;
-    sigar_t *sigar;
-    sigar_cpu_t cpuT1;
-    sigar_cpu_t cpuT2;
-    sigar_cpu_list_t cpulist;
-
-    sigar_open(&sigar);
-
-    status = sigar_cpu_list_get(sigar, &cpulist);
-    if (status != SIGAR_OK) {
-        printf("cpu_list error: %d (%s)\n",
-               status, sigar_strerror(sigar, status));
-        exit(1);
-    }
-
-    status = sigar_cpu_get(sigar, &cpuT1);
-    if (status != SIGAR_OK) {
-        printf("cpu error: %d (%s)\n",
-               status, sigar_strerror(sigar, status));
-        exit(1);
-    }
-
-    sleeper.sleepFor(chrono::seconds(1));
-
-    status = sigar_cpu_get(sigar, &cpuT2);
-    if (status != SIGAR_OK) {
-        printf("cpu error: %d (%s)\n",
-               status, sigar_strerror(sigar, status));
-        exit(1);
-    }
-
-    unsigned long long diffIdle = cpuT2.idle - cpuT1.idle;
-    unsigned long long totaldiff = cpuT2.total - cpuT1.total + cpuT2.user - cpuT1.user + cpuT2.sys - cpuT1.sys;
-
-    this->adaptiveStorage->saveCpu(cpulist.number, ((float)diffIdle)/totaldiff, this->node->hardwareWindow);
-
-    sigar_cpu_list_destroy(sigar, &cpulist);
-    sigar_close(sigar);
-}
-
-void AdaptiveFollower::getMemory() {
-    sigar_t *sigar;
-    sigar_open(&sigar);
-
-    sigar_mem_t mem;
-    sigar_mem_get(sigar,&mem);
-
-    this->adaptiveStorage->saveMemory(mem.total, mem.actual_free, this->node->hardwareWindow);
-
-    sigar_close(sigar);
-}
-
-void AdaptiveFollower::getDisk() {
-    sigar_t *sigar;
-    sigar_open(&sigar);
-
-    sigar_file_system_usage_t disk;
-    sigar_file_system_usage_get(sigar,"/",&disk);
-
-    this->adaptiveStorage->saveDisk(disk.total, disk.avail, this->node->hardwareWindow);
-
-    sigar_close(sigar);
-}
-*/
-
-
 void AdaptiveFollower::getHardware(){
 
     Report::hardware_result hardware;
@@ -216,7 +153,15 @@ void AdaptiveFollower::getHardware(){
         unsigned long long totaldiff = cpuT2.total - cpuT1.total + cpuT2.user - cpuT1.user + cpuT2.sys - cpuT1.sys;
 
         hardware.cores = cpulist.number;
+
+        vector<MetricsGenerator::Trend> trends;
+        trends.push_back(MetricsGenerator::Trend::trUNSTABLE);
+
+        hardware.mean_free_cpu = MetricsGenerator::currentVal.free_cpu;
+
+        /*
         hardware.mean_free_cpu = ((float)diffIdle)/(totaldiff);
+        */
 
         sigar_cpu_list_destroy(sigar, &cpulist);
     }
@@ -225,16 +170,25 @@ void AdaptiveFollower::getHardware(){
         sigar_mem_t mem;
         sigar_mem_get(sigar,&mem);
 
-        hardware.memory = mem.total;
-        hardware.mean_free_memory = mem.actual_free;
+        hardware.memory = MetricsGenerator::currentVal.total_memory;
+        //hardware.memory = mem.total;
+
+        hardware.mean_free_memory = MetricsGenerator::currentVal.free_memory;
+        //hardware.mean_free_memory = mem.actual_free;
     }
 
     if(metrics[FREE_DISK]){
         sigar_file_system_usage_t disk;
         sigar_file_system_usage_get(sigar,"/",&disk);
 
-        hardware.disk = disk.total;
-        hardware.mean_free_disk = disk.avail;
+        hardware.disk = MetricsGenerator::currentVal.total_disk;
+
+        //hardware.disk = disk.total;
+
+        hardware.mean_free_disk = MetricsGenerator::currentVal.free_disk;
+
+        //hardware.mean_free_disk = disk.avail;
+        
     }
 
     if(metrics[FREE_CPU] ||

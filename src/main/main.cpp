@@ -15,6 +15,7 @@ using namespace std;
 #include <unistd.h>
 
 #include "clips.h"
+#include "metrics_generator.hpp"
 
 void handler(int sig) {
   void *array[10];
@@ -185,6 +186,9 @@ int main(int argc, char *argv[]) {
 
     node.setParam(string("interface"), interfaceIp);
     node.setParam(string("session"), session);
+
+    MetricsGenerator* mg = new MetricsGenerator;
+    mg->start();
     
     node.start();
 

@@ -1,11 +1,17 @@
 #include "adaptive_factory.hpp"
 
-IAdaptiveStorage* AdaptiveFactory::newAdaptiveStorage(std::string path) {
-    IAdaptiveStorage* ret = new AdaptiveStorage();
+AdaptiveFollowerConnections* AdaptiveFactory::newConnections(int nThread) {
+    return new AdaptiveFollowerConnections(nThread);
+}
+
+IAdaptiveStorageMonitoring* AdaptiveFactory::newStorage(std::string path) {
+    IAdaptiveStorageMonitoring* ret = new AdaptiveStorageMonitoring();
     ret->open(path);
     return ret;
 }
 
-AdaptiveFollowerConnections* AdaptiveFactory::newConnections(int nThread) {
-    return new AdaptiveFollowerConnections(nThread);
+IAdaptiveStorage* AdaptiveFactory::newAdaptiveStorage(std::string path) {
+    IAdaptiveStorage* ret = new AdaptiveStorage();
+    ret->open(path);
+    return ret;
 }

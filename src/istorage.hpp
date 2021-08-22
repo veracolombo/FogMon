@@ -154,6 +154,7 @@ protected:
     static int VectorStringCallback(void *vec, int argc, char **argv, char **azColName);
     static int VectorIntCallback(void *vec, int argc, char **argv, char **azColName);
     static int VectorFloatCallback(void *vec, int argc, char **argv, char **azColName);
+    static int VectorDoubleCallback(void *vec, int argc, char **argv, char **azColName);
     static int VectorIoTCallback(void *vec, int argc, char **argv, char **azColName);
 
     static int getInt64Callback(void *i, int argc, char **argv, char **azColName);

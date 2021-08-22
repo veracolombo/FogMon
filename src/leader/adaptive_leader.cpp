@@ -40,6 +40,11 @@ void AdaptiveLeader::initialize(AdaptiveLeaderFactory* fact){
     AdaptiveFollower::connections = this->connections;
     Follower::connections = this->connections;
 
+    this->storage = this->factory->newStorage("monitoring.db", this->nodeS);
+    Leader::storage = this->storage;
+    AdaptiveFollower::storage = this->storage;
+    Follower::storage = this->storage;
+
     Leader::initialize(this->factory);
 
     //this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");

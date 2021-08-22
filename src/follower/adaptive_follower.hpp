@@ -8,6 +8,7 @@
 #include "common.hpp"
 #include "adaptive_follower_connections.hpp"
 #include "iadaptivefollower.hpp"
+#include "metrics_generator.hpp"
 
 class AdaptiveFollower : virtual public IAdaptiveFollower, virtual public Follower {
 
@@ -52,7 +53,7 @@ protected:
     AdaptiveFactory * factory;
 
     AdaptiveFollowerConnections *connections;
-
+    
     //void getCpu();
     //void getMemory();
     //void getDisk();
