@@ -30,6 +30,7 @@ public:
     virtual void stop();
 
     IAdaptiveFollowerConnections* getConnections();
+    IAdaptiveStorageMonitoring* getStorage();
 
     
     vector<Metric> getMetrics();
@@ -53,16 +54,13 @@ protected:
     AdaptiveFactory * factory;
 
     AdaptiveFollowerConnections *connections;
-    
-    //void getCpu();
-    //void getMemory();
-    //void getDisk();
+    IAdaptiveStorageMonitoring *storage;
 
-    // void changeServer();
-    
-    bool sendReport();
+    MetricsGenerator *metricsGenerator;
 
+    void getBattery();
     void getHardware() override;
+
     void timer() override;
     void TestTimer() override;
     

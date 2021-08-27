@@ -31,6 +31,7 @@ public:
     std::vector<Message::node> getMNodes();
 
     bool isFollower();
+    bool isAdaptive();
 
     //configs
     static int timeReport;

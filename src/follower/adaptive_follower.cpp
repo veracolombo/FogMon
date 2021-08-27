@@ -33,7 +33,9 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
         this->factory = fact;
     }
 
-    // if(this->adaptiveStorage == NULL)
+    this->metricsGenerator = new MetricsGenerator(this);
+    this->metricsGenerator->initialize(this->getMetrics());
+
     this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
 
     this->adaptive_controller = new AdaptiveController(this);
@@ -46,17 +48,19 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
 
         this->storage = this->factory->newStorage("monitoring.db");
         Follower::storage = this->storage;
-
-        Follower::initialize(this->factory);
     }
+    Follower::initialize(this->factory);
 }
 
 void AdaptiveFollower::start(vector<Message::node> mNodes){
     Follower::start(mNodes);
+    
+    this->metricsGenerator->start();
     this->adaptive_controller->start();
 }
 
 void AdaptiveFollower::stop(){
+    this->metricsGenerator->stop();
     this->adaptive_controller->stop();
 
     Follower::stop();
@@ -109,6 +113,10 @@ IAdaptiveFollowerConnections* AdaptiveFollower::getConnections() {
     return this->connections;
 }
 
+IAdaptiveStorageMonitoring* AdaptiveFollower::getStorage() {
+    return this->storage;
+}
+
 IAdaptiveStorage* AdaptiveFollower::getAdaptiveStorage() {
     return this->adaptiveStorage;
 }
@@ -154,14 +162,11 @@ void AdaptiveFollower::getHardware(){
 
         hardware.cores = cpulist.number;
 
-        vector<MetricsGenerator::Trend> trends;
-        trends.push_back(MetricsGenerator::Trend::trUNSTABLE);
-
         hardware.mean_free_cpu = MetricsGenerator::currentVal.free_cpu;
 
-        /*
-        hardware.mean_free_cpu = ((float)diffIdle)/(totaldiff);
-        */
+        
+        //hardware.mean_free_cpu = ((float)diffIdle)/(totaldiff);
+        
 
         sigar_cpu_list_destroy(sigar, &cpulist);
     }
@@ -170,8 +175,8 @@ void AdaptiveFollower::getHardware(){
         sigar_mem_t mem;
         sigar_mem_get(sigar,&mem);
 
-        hardware.memory = MetricsGenerator::currentVal.total_memory;
-        //hardware.memory = mem.total;
+        //hardware.memory = MetricsGenerator::currentVal.total_memory;
+        hardware.memory = mem.total;
 
         hardware.mean_free_memory = MetricsGenerator::currentVal.free_memory;
         //hardware.mean_free_memory = mem.actual_free;
@@ -181,9 +186,9 @@ void AdaptiveFollower::getHardware(){
         sigar_file_system_usage_t disk;
         sigar_file_system_usage_get(sigar,"/",&disk);
 
-        hardware.disk = MetricsGenerator::currentVal.total_disk;
+        //hardware.disk = MetricsGenerator::currentVal.total_disk;
 
-        //hardware.disk = disk.total;
+        hardware.disk = disk.total;
 
         hardware.mean_free_disk = MetricsGenerator::currentVal.free_disk;
 
@@ -199,76 +204,59 @@ void AdaptiveFollower::getHardware(){
     sigar_close(sigar);
 }
 
-bool AdaptiveFollower::sendReport(){
-    bool ret = true;
+void AdaptiveFollower::getBattery(){
+    
+    AdaptiveReport::battery_result battery;
 
-    std::optional<std::pair<int64_t,Message::node>> ris = this->connections->sendUpdate(this->nodeS, this->update);
-
-    if(ris == nullopt) {
-        cout << "update retry..." << endl;
-        ris = this->connections->sendUpdate(this->nodeS,this->update);
-        if(ris == nullopt) {
-            //change server
-            cout << "Changing server..." << endl;
-            if(!selectServer(this->node->getMNodes())) {
-                cout << "Failed to find a server!!!!!!!!" << endl;
-            }
-            ret = false;
-        }
+    if(metrics[BATTERY]){
+        battery.mean_battery = MetricsGenerator::currentVal.battery;
+        this->storage->saveBattery(battery, this->node->hardwareWindow);
     }
-
-    if(ris != nullopt) {
-        Follower::nUpdate += 1;
-        cout << "Number of updates sent until now: " << nUpdate << endl;
-        this->update.first= (*ris).first;
-        this->update.second= (*ris).second;
-    }
-
-    return ret;
 }
 
-
-void AdaptiveFollower::timer(){
+void AdaptiveFollower::timer() {
     int iter=0;
     while(this->running) {
 
         auto t_start = std::chrono::high_resolution_clock::now();
-        
+
         std::unique_lock<std::mutex> lck(this->adaptive_controller->mtx);
 
         this->getHardware();
+        this->getBattery();
 
-        /* !! possibile alternativa !!
-        if(metrics[FREE_CPU]){
-            cout << "Measuring Free CPU..." << endl;
-            getCpu();
+        std::optional<std::pair<int64_t,Message::node>> ris = this->connections->sendUpdate(this->nodeS, this->update); // manda update al nodo leader
+        if(ris == nullopt) {           // il messaggio di update non ha ottenuto ack
+            cout << "update retry..." << endl;
+            ris = this->connections->sendUpdate(this->nodeS,this->update);  
+            if(ris == nullopt) {
+                //change server
+                cout << "Changing server..." << endl;
+                if(!selectServer(this->node->getMNodes())) {        // cerca un nuovo leader
+                    cout << "Failed to find a server!!!!!!!!" << endl;
+                }
+                iter=0;
+            }
         }
 
-        if(metrics[FREE_MEMORY]){
-            cout << "Measuring Free Memory..." << endl;
-            getMemory();
-        }
+        if(ris != nullopt) {    // l'update è andato a buon fine
+            nUpdate += 1;
+            cout << "Number of updates sent until now: " << nUpdate << endl;
 
-        if(metrics[FREE_DISK]){
-            cout << "Measuring Free Disk..." << endl;
-            getDisk();
-        }
-        */
-
-        if(!this->sendReport()){
-            iter=0;
+            // aggiorna variabile membro 'update'
+            this->update.first= (*ris).first;
+            this->update.second= (*ris).second;
         }
 
         AdaptiveController::ready = true;
         lck.unlock();
         this->adaptive_controller->cv.notify_one();
 
-
         //every 10 iterations ask the nodes in case the server cant reach this network
         if(iter%10 == 0) {
-            vector<Message::node> ips = this->connections->requestNodes(this->nodeS);   // chiede al leader gli i ip dei follower nel suo gruppo
-            vector<Message::node> tmp = this->getStorage()->getNodes();
-            vector<Message::node> rem;
+            vector<Message::node> ips = this->connections->requestNodes(this->nodeS);   // chiede al Leader gli ip dei Follower nel suo gruppo
+            vector<Message::node> tmp = this->getStorage()->getNodes();                 // nodi già conosciuti dal Follower
+            vector<Message::node> rem;                                                  // nodi da rimuovere dai nodi conosciuti dal Follower (tmp -ips)
 
             for(auto node : tmp) {
                 bool found = false;
@@ -283,7 +271,8 @@ void AdaptiveFollower::timer(){
                 }
             }
 
-            this->getStorage()->updateNodes(ips,rem);               // elimina dallo storage i nodi che non vengono restituiti dal leader
+            this->getStorage()->updateNodes(ips,rem);       // aggiunge nodi nuovi (ips)        
+                                                            // elimina dallo storage i nodi che non vengono restituiti dal leader (rem)
         }
 
         //every leaderCheck iterations update the MNodes
@@ -295,9 +284,9 @@ void AdaptiveFollower::timer(){
                     if(res[j].ip==std::string("::1")||res[j].ip==std::string("127.0.0.1"))
                         res[j].ip = this->nodeS.ip;         // sostituzione ip locale del leader con ip esterno
                 }
-                this->node->setMNodes(res);                 // aggiornamento dei nodi conosciuti
+                this->node->setMNodes(res);                 // aggiornamento dei nodi leader conosciuti
                 cout << "Check server" << endl;
-                bool change = this->checkServer(res);       // controlla se c'è un nodo con latenza minore
+                bool change = this->checkServer(res);       // controlla se c'è un nodo con latenza minore e nel caso cambia Leader/gruppo
                 if(change) {
                     cout << "Changing server" << endl;
                     if(!selectServer(res)) {
@@ -336,6 +325,7 @@ void AdaptiveFollower::timer(){
 
         if (sleeptime > 0)
             sleeper.sleepFor(chrono::seconds(sleeptime));
+
         iter++;
     }
 }

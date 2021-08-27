@@ -10,21 +10,23 @@
 
 using namespace std;
 
+class AdaptiveFollower;
+
 class MetricsGenerator {
 
 public:
-    enum Trend {trSTABLE, trUNSTABLE, trCONSTANT, trINCREASING, trDECREASING};
+    enum Trend {trSTABLE, trUNSTABLE, last};
 
-    MetricsGenerator();
+    MetricsGenerator(AdaptiveFollower* node);
     ~MetricsGenerator();
 
     struct series_data {
         vector<float> free_cpu;
 
-        vector<int64_t> total_memory;
+        //vector<int64_t> total_memory;
         vector<float> free_memory;
 
-        vector<int64_t> total_disk;
+        //vector<int64_t> total_disk;
         vector<float> free_disk;
 
         vector<float> battery; 
@@ -33,10 +35,10 @@ public:
     struct currentVal_data {
         float free_cpu;
 
-        int64_t total_memory;
+        //int64_t total_memory;
         float free_memory;
 
-        int64_t total_disk;
+        //int64_t total_disk;
         float free_disk;
 
         float battery;
@@ -45,13 +47,16 @@ public:
     void start();
     void stop();
 
-    void initialize();
+    void initialize(vector<Metric> metrics);
 
     static map<Metric, Trend> trends;
     static currentVal_data currentVal;
+
     static map<Trend, series_data> series;
 
 private:
+    AdaptiveFollower* node;
+
     bool running;
 
     thread cpuThread;

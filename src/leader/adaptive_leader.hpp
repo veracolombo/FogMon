@@ -19,6 +19,7 @@ public:
     void stop();
 
     IAdaptiveLeaderConnections* getConnections();
+    IAdaptiveLeaderStorageMonitoring* getStorage();
 
 protected:
     void timerFun() override;
@@ -27,6 +28,7 @@ protected:
     AdaptiveLeaderFactory *factory;
 
     AdaptiveLeaderConnections *connections;
+    IAdaptiveLeaderStorageMonitoring *storage;
 };
 
 #endif

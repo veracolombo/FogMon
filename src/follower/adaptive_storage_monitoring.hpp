@@ -3,14 +3,19 @@
 
 #include "storage.hpp"
 #include "iadaptive_storage_monitoring.hpp"
+#include "adaptive_report.hpp"
 
 class AdaptiveStorageMonitoring : virtual public Storage, virtual public IAdaptiveStorageMonitoring {
 protected:
     virtual void createTables() override;
-    virtual void call_superclass_create_tables();
 public:
     AdaptiveStorageMonitoring();
     ~AdaptiveStorageMonitoring();
+
+    AdaptiveReport::battery_result getBattery();
+    std::vector<float> getLastValues(Metric metric, int limit);
+
+    void saveBattery(AdaptiveReport::battery_result battery, int window);
 };
 
 #endif

@@ -241,7 +241,7 @@ public:
     */
     bool getReports(std::vector<report_result> &reports);
 
-private:
+protected:
 
     /**
      * contains the rapidjson document to build the json

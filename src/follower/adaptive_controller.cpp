@@ -43,6 +43,7 @@ void AdaptiveController::saveStates(){
 }
 
 void AdaptiveController::statesTimer(){
+
     while(this->running){
 
         std::unique_lock<std::mutex> lck(mtx);
@@ -255,6 +256,7 @@ void AdaptiveController::toStringSeries(){
             case Metric::FREE_CPU:          cout << "Free CPU:"; break;
             case Metric::FREE_MEMORY:       cout << "Free Memory:"; break;
             case Metric::FREE_DISK:         cout << "Free Disk:"; break;
+            case Metric::BATTERY:           cout << "Battery:"; break;
         }
 
         for(int i=0; i<s.second.size(); i++){
@@ -269,13 +271,15 @@ void AdaptiveController::toStringSeries(){
 }
 
 void AdaptiveController::toStringStates(){
-    cout << "************ Actual state ************" << endl;
+    cout << "************ Current state ************" << endl;
 
     for(auto s : this->states){
         switch(s.first){
             case Metric::FREE_CPU:          cout << "Free CPU:"; break;
             case Metric::FREE_MEMORY:       cout << "Free Memory:"; break;
             case Metric::FREE_DISK:         cout << "Free Disk:"; break;
+            case Metric::BATTERY:           cout << "Battery:"; break;
+
         }
 
         for(int i=0; i<s.second.size(); i++){

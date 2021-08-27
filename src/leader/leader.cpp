@@ -32,16 +32,13 @@ void Leader::initialize(LeaderFactory* fact) {
         this->factory = fact;
     }
 
-    if(this->storage == NULL){
-        this->storage = this->factory->newStorage("monitoring.db", this->nodeS);
-    }
+    this->storage = this->factory->newStorage("monitoring.db", this->nodeS);
     Follower::storage = this->storage;
 
-    if(this->connections == NULL){
-        this->connections = this->factory->newConnections(this->nThreads);
-        this->connections->initialize(this);
-    }
+    this->connections = this->factory->newConnections(this->nThreads);
+    this->connections->initialize(this);
     Follower::connections = this->connections;
+    
     Follower::initialize(this->factory);
 }
 

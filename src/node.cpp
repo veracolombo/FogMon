@@ -137,6 +137,10 @@ bool Node::isFollower() {
     return !this->isLeader;
 }
 
+bool Node::isAdaptive() {
+    return this->adp;
+}
+
 extern "C"
 {
 #ifdef WIN32

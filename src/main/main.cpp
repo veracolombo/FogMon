@@ -186,9 +186,6 @@ int main(int argc, char *argv[]) {
 
     node.setParam(string("interface"), interfaceIp);
     node.setParam(string("session"), session);
-
-    MetricsGenerator* mg = new MetricsGenerator;
-    mg->start();
     
     node.start();
 

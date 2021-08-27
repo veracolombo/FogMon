@@ -8,11 +8,17 @@
 class AdaptiveLeaderStorageMonitoring : public LeaderStorage, public AdaptiveStorageMonitoring, virtual public IAdaptiveLeaderStorageMonitoring {
 protected:
     void createTables() override;
-    void call_superclass_create_tables() override;
 
 public:
     AdaptiveLeaderStorageMonitoring(Message::node node);
     ~AdaptiveLeaderStorageMonitoring();
+
+    std::vector<AdaptiveReport::adaptive_report_result> getAdaptiveReport(bool complete);
+    AdaptiveReport::adaptive_report_result getAdaptiveReport(Message::node node, bool complete);
+
+    //std::string addNode(Message::node node, AdaptiveReport::hardware_result hardware, AdaptiveReport::battery_result battery, Message::node *monitored = NULL);
+
+    virtual AdaptiveReport::battery_result getBattery(Message::node node);
 };
 
 #endif

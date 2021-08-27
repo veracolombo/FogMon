@@ -49,16 +49,6 @@ public:
 
     virtual void saveStates(vector<State> states, Metric metric) = 0;
 
-    virtual vector<float> getFreeCpu(int history) = 0;
-    virtual vector<float> getFreeMemory(int history) = 0;
-    virtual vector<float> getFreeDisk(int history) = 0;
-
-    virtual void saveCpu(int cores, float free_cpu, int window) = 0;
-    virtual void saveMemory(int64_t memory, float free_memory, int window) = 0;
-    virtual void saveDisk(int64_t disk, float free_disk, int window) = 0;
-
-    virtual vector<float> getLastValues(Metric metric, int history) = 0;
-
 protected:
 
     /**

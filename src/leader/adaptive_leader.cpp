@@ -13,17 +13,20 @@ AdaptiveLeader::~AdaptiveLeader() {}
 
 void AdaptiveLeader::start(std::vector<Message::node> mNodes){
     Leader::start(mNodes);
+    
+    this->metricsGenerator->start();
     this->adaptive_controller->start();
 }
 
 
 void AdaptiveLeader::stop(){
+    this->metricsGenerator->stop();
+    this->adaptive_controller->stop();
+
     Leader::stop();
-    /*
-    AdaptiveFollower::stop();
-    if(this->timerFunThread.joinable())
-        this->timerFunThread.join();
-    */
+
+    if(this->adaptiveStorage)
+        this->adaptiveStorage->close();
 }
 
 
@@ -34,31 +37,26 @@ void AdaptiveLeader::initialize(AdaptiveLeaderFactory* fact){
         this->factory = fact;
     }
 
-    this->connections = this->factory->newConnections(this->nThreads);
-    this->connections->initialize(this);
-    Leader::connections = this->connections;
-    AdaptiveFollower::connections = this->connections;
-    Follower::connections = this->connections;
-
     this->storage = this->factory->newStorage("monitoring.db", this->nodeS);
     Leader::storage = this->storage;
     AdaptiveFollower::storage = this->storage;
     Follower::storage = this->storage;
 
-    Leader::initialize(this->factory);
-
-    //this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
-    //AdaptiveFollower::adaptiveStorage = this->adaptiveStorage;
-
-    //this->adaptive_controller = new AdaptiveController(this);
-    //this->adaptive_controller->initialize();
-    //AdaptiveFollower::adaptive_controller = this->adaptive_controller;
-
+    this->connections = this->factory->newConnections(this->nThreads);
+    Leader::connections = this->connections;
+    AdaptiveFollower::connections = this->connections;
+    Follower::connections = this->connections;
+    this->connections->initialize(this);
+    
     AdaptiveFollower::initialize(this->factory);
 }
 
 IAdaptiveLeaderConnections* AdaptiveLeader::getConnections() {
     return this->connections;
+}
+
+IAdaptiveLeaderStorageMonitoring* AdaptiveLeader::getStorage() {
+    return this->storage;
 }
 
 
@@ -167,9 +165,11 @@ void AdaptiveLeader::timerFun(){
 
         /// *** LEADER ADEQUACY CHECK *** ///
         
+        /*
         if (!AdaptiveFollower::leaderAdequacy){
             // manda messaggio di notifica ai follower
             this->connections->sendChangeServer();
+            */
 
             /*
             vector<Message::node> mnodes = this->getStorage()->getMNodes();
@@ -182,7 +182,9 @@ void AdaptiveLeader::timerFun(){
             // demote to follower role
             this->changeRole(nodes);
             */
+           /*
         }
+        */
 
         // ******************************* //
         

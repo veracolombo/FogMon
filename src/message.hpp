@@ -269,7 +269,7 @@ public:
     */
     bool getData(leader_update& update);
 
-private:
+protected:
 
     /**
      * the type of the message

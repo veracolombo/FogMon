@@ -47,13 +47,6 @@ public:
     std::vector<Report::IoT> getIots();
 
     void addIot(IThing *iot);
-
-    std::vector<float> getLastValues(Metric metric, int limit);
-    /*
-    virtual std::vector<float> getFreeCpu(int limit);
-    virtual std::vector<float> getFreeMemory(int limit);
-    virtual std::vector<float> getFreeDisk(int limit);
-    */
 };
 
 

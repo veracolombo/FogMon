@@ -326,7 +326,9 @@ bool FollowerConnections::sendHello(Message::node ipS) {
 
 optional<pair<int64_t,Message::node>> FollowerConnections::sendUpdate(Message::node ipS, pair<int64_t,Message::node> update) {
     cout << "sendUpdate0" << endl;
+    cout << "openConnection(" << ipS.ip << ", " << ipS.port << ")" << endl;
     int Socket = openConnection(ipS.ip, ipS.port);
+    cout << "Socket = " << Socket << endl;
     cout << "sendUpdate0.5" << endl;
     if(Socket < 0) {
         return nullopt;

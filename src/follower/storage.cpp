@@ -91,32 +91,6 @@ Report::hardware_result Storage::getHardware() {
     return r;
 }
 
-
-vector<float> Storage::getLastValues(Metric metric, int limit){
-
-    char *zErrMsg = 0;
-    char buf[1024];
-    stringstream query;
-
-    if(metric == Metric::FREE_CPU){
-        query << "SELECT free_cpu FROM Hardware ORDER BY time DESC LIMIT " << limit;
-
-    }else if(metric == Metric::FREE_MEMORY){
-        query << "SELECT CASE WHEN memory = 0 THEN 0 ELSE free_memory/memory END FROM Hardware ORDER BY time DESC LIMIT " << limit;
-
-    }else if(metric == Metric::FREE_DISK){
-        query << "SELECT CASE WHEN disk = 0 THEN 0 ELSE free_disk/disk END FROM Hardware ORDER BY time DESC LIMIT " << limit; 
-    }
-
-    std::sprintf(buf, query.str().c_str());
-
-    vector<float> r;
-    int err = sqlite3_exec(this->db, buf, IStorage::VectorFloatCallback, &r, &zErrMsg);
-    isError(err, zErrMsg, "getLastValues");
-
-    return r;
-}
-
 /*
 vector<float> Storage::getFreeCpu(int limit){
     char *zErrMsg = 0;
