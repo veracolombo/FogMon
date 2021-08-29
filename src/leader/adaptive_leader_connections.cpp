@@ -19,8 +19,32 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
     string strIp = this->getSource(fd,m);
 
     bool handled = false;
-    
-    if(m.getType() == Message::Type::typeNOTIFY){
+
+    if(m.getType() == Message::Type::typeMREQUEST) {
+        if(m.getCommand() == Message::Command::commSET) {
+            if(m.getArgument() == Message::Argument::argREPORT) {
+
+                handled = true;
+                AdaptiveReport r;
+
+                // Too long reponding
+                Message res;
+                res.setType(Message::Type::typeMRESPONSE);
+                res.setCommand(Message::Command::commSET);
+                res.setArgument(Message::Argument::argPOSITIVE);
+
+                sendMessage(fd, res);
+
+                // Do this in another thread
+                if(m.getData(r)) {
+                    vector<AdaptiveReport::adaptive_report_result> results;
+                    if(r.getReports(results)) {
+                        this->parent->getStorage()->addReport(results, m.getSender());
+                    }
+                }
+            }
+        }
+    } else if(m.getType() == Message::Type::typeNOTIFY){
         if(m.getCommand() == Message::Command::commUPDATE){
             if(m.getArgument() == Message::Argument::argREPORT){
                 handled = true;
@@ -139,7 +163,6 @@ bool AdaptiveLeaderConnections::sendRequestReport(Message::node ip) {
     return ret;
 }
 
-/*
 bool AdaptiveLeaderConnections::sendMReport(Message::node ip, vector<AdaptiveReport::adaptive_report_result> report) {
     int Socket = this->openConnection(ip.ip, ip.port);
     if(Socket < 0) {
@@ -175,7 +198,6 @@ bool AdaptiveLeaderConnections::sendMReport(Message::node ip, vector<AdaptiveRep
     close(Socket);
     return ret;
 }
-*/
 
 bool AdaptiveLeaderConnections::sendChangeServer(){
     vector<Message::node> mnodes = this->parent->getStorage()->getMNodes();

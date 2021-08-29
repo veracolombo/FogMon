@@ -18,6 +18,9 @@ public:
 
     std::string addNode(Message::node node, AdaptiveReport::hardware_result hardware, AdaptiveReport::battery_result battery, Message::node *monitored = NULL);
 
+    void addReport(AdaptiveReport::adaptive_report_result result, Message::node *monitored = NULL);
+    void addReport(std::vector<AdaptiveReport::adaptive_report_result> results, Message::node ip);
+
     virtual AdaptiveReport::battery_result getBattery(Message::node node);
 };
 

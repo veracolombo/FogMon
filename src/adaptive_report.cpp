@@ -164,7 +164,6 @@ bool AdaptiveReport::getReport(adaptive_report_result &report) {
 }
 
 bool AdaptiveReport::getReports(std::vector<adaptive_report_result> &reports) {
-    cout << "getReports()" << endl;
 
     if( !this->doc.HasMember("reports") || !this->doc["reports"].IsArray()){
         return false;

@@ -92,6 +92,36 @@ std::string AdaptiveLeaderStorageMonitoring::addNode(Message::node node, Adaptiv
     return "";
 }
 
+void AdaptiveLeaderStorageMonitoring::addReport(AdaptiveReport::adaptive_report_result result, Message::node *monitored) {
+    if( this->addNode(result.source, result.hardware, result.battery, monitored) != "") {
+        this->addReportLatency(result.source, result.latency);        
+        this->addReportBandwidth(result.source, result.bandwidth);
+        this->addReportIot(result.source, result.iot);
+    }
+}
+
+void AdaptiveLeaderStorageMonitoring::addReport(std::vector<AdaptiveReport::adaptive_report_result> results, Message::node node) {                    
+    for(auto &result : results) {
+        if(result.source.ip == string("::1"))
+            result.source.ip = node.ip;
+        for(auto &test : result.latency) {
+            if(test.target.ip == string("::1"))
+                test.target.ip = node.ip;
+        }
+        for(auto &test : result.bandwidth) {
+            if(test.target.ip == string("::1"))
+                test.target.ip = node.ip;
+        }
+        Message::node leader(result.leader,"","");
+        this->addNode(result.source, result.hardware, result.battery, &leader);
+    }
+
+    for(auto result : results) {
+        Message::node leader(result.leader,"","");
+        this->addReport(result, &leader);
+    }
+}
+
 
 AdaptiveReport::battery_result AdaptiveLeaderStorageMonitoring::getBattery(Message::node node) {
     char *zErrMsg = 0;

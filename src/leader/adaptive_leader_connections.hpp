@@ -21,7 +21,7 @@ public:
 
     bool sendRequestReport(Message::node ip) override;
 
-    //bool sendMReport(Message::node ip, vector<AdaptiveReport::adaptive_report_result> report);
+    bool sendMReport(Message::node ip, vector<AdaptiveReport::adaptive_report_result> report);
     bool sendChangeServer();
 };
 

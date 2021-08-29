@@ -125,7 +125,7 @@ void AdaptiveLeader::timerFun(){
                 continue;
             }
             
-            vector<AdaptiveReport::report_result> report = this->getStorage()->getReport();
+            vector<AdaptiveReport::adaptive_report_result> report = this->getStorage()->getAdaptiveReport();
 
             if(this->connections->sendMReport(ips[i], report)) {
                 sent++;
