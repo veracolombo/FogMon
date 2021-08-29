@@ -1,5 +1,4 @@
 #include "condition.hpp"
-#include "adaptive_storage.hpp"
 #include "adaptive_follower.hpp"
 #include <iostream>
 

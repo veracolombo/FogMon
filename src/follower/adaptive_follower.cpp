@@ -59,11 +59,6 @@ void AdaptiveFollower::stop(){
     this->adaptive_controller->stop();
 
     Follower::stop();
-
-    /*
-    if(this->adaptiveStorage)
-        this->adaptiveStorage->close();
-    */
 }
 
 
@@ -113,12 +108,6 @@ IAdaptiveFollowerConnections* AdaptiveFollower::getConnections() {
 IAdaptiveStorageMonitoring* AdaptiveFollower::getStorage() {
     return this->storage;
 }
-
-/*
-IAdaptiveStorage* AdaptiveFollower::getAdaptiveStorage() {
-    return this->adaptiveStorage;
-}
-*/
 
 void AdaptiveFollower::getHardware(){
 

@@ -24,11 +24,6 @@ void AdaptiveLeader::stop(){
     this->adaptive_controller->stop();
 
     Leader::stop();
-
-    /*
-    if(this->adaptiveStorage)
-        this->adaptiveStorage->close();
-    */
 }
 
 
