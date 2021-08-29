@@ -18,7 +18,7 @@ void AdaptiveFollowerConnections::initialize(IAdaptiveFollower* parent) {
     this->parent = parent;
 }
 
-/*
+
 std::optional<std::pair<int64_t,Message::node>> AdaptiveFollowerConnections::sendUpdate(Message::node ipS, std::pair<int64_t,Message::node> update) {
     cout << "sendUpdate0" << endl;
     int Socket = openConnection(ipS.ip, ipS.port);
@@ -74,7 +74,6 @@ std::optional<std::pair<int64_t,Message::node>> AdaptiveFollowerConnections::sen
     close(Socket);
     return result;
 }
-*/
 
 
 void AdaptiveFollowerConnections::handler(int fd, Message &m){
@@ -82,6 +81,34 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
 
     bool handled = false;
 
+    if(m.getType() == Message::Type::typeREQUEST){
+        if(m.getCommand() == Message::Command::commGET){
+            if(m.getArgument() == Message::Argument::argREPORT){
+                handled = true;
+
+                //build report
+                Message res;
+                res.setType(Message::Type::typeRESPONSE);
+                res.setCommand(Message::Command::commGET);
+                res.setArgument(Message::Argument::argPOSITIVE);
+                AdaptiveReport r;
+                
+                r.setHardware(this->parent->getStorage()->getHardware());
+                r.setBattery(this->parent->getStorage()->getBattery());
+                r.setLatency(this->parent->getStorage()->getLatency(this->parent->node->sensitivity));
+                r.setBandwidth(this->parent->getStorage()->getBandwidth(this->parent->node->sensitivity));
+                r.setIot(this->parent->getStorage()->getIots());
+                res.setData(r);
+
+                //send report
+                if(this->sendMessage(fd, res)) {
+                    
+                }
+            }
+        }
+    }
+
+    /*
     if(m.getType() == Message::Type::typeNOTIFY){
         if(m.getCommand() == Message::Command::commSELECT_NEW_SERVER){
             if(m.getArgument() == Message::Argument::argMNODES){
@@ -100,6 +127,7 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
             }
         }
     }
+    */
 
     if(!handled)
         this->call_super_handler(fd, m);

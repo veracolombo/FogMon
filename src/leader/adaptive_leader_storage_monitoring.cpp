@@ -54,9 +54,8 @@ AdaptiveReport::adaptive_report_result AdaptiveLeaderStorageMonitoring::getAdapt
     return ar;
 }
 
-/*
+
 std::string AdaptiveLeaderStorageMonitoring::addNode(Message::node node, AdaptiveReport::hardware_result hardware, AdaptiveReport::battery_result battery, Message::node *monitored) {
-    
     if(hardware.lasttime == 0 || battery.lasttime == 0) { //these are directly measured
         return "";
     }
@@ -92,7 +91,7 @@ std::string AdaptiveLeaderStorageMonitoring::addNode(Message::node node, Adaptiv
     }
     return "";
 }
-*/
+
 
 AdaptiveReport::battery_result AdaptiveLeaderStorageMonitoring::getBattery(Message::node node) {
     char *zErrMsg = 0;

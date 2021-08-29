@@ -19,8 +19,7 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
     string strIp = this->getSource(fd,m);
 
     bool handled = false;
-    /*
-
+    
     if(m.getType() == Message::Type::typeNOTIFY){
         if(m.getCommand() == Message::Command::commUPDATE){
             if(m.getArgument() == Message::Argument::argREPORT){
@@ -68,7 +67,6 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
             }
         }
     }
-    */
 
     if(!handled)
         LeaderConnections::handler(fd, m);
@@ -79,6 +77,67 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
 
 
 void AdaptiveLeaderConnections::call_super_handler(int fd, Message &m) { }
+
+bool AdaptiveLeaderConnections::sendRequestReport(Message::node ip) {
+    cout << "sendRequestReport()" << endl;
+    int Socket = openConnection(ip.ip,ip.port);
+    
+    if(Socket < 0) {
+        return false;
+    }
+
+    fflush(stdout);
+    char buffer[10];
+
+    //build message
+    Message m;
+    m.setSender(this->parent->getMyNode());
+    m.setType(Message::Type::typeREQUEST);
+    m.setCommand(Message::Command::commGET);
+    m.setArgument(Message::Argument::argREPORT);
+
+    bool ret = false;
+
+    //send message
+    if(this->sendMessage(Socket, m)) {
+        Message res;
+        if(this->getMessage(Socket, res)) {
+            if( res.getType()==Message::Type::typeRESPONSE &&
+                res.getCommand() == Message::Command::commGET &&
+                res.getArgument() == Message::Argument::argPOSITIVE) {
+                //get report and save it
+                AdaptiveReport r;
+                if(m.getData(r)) {
+                    AdaptiveReport::hardware_result hardware;
+                    vector<AdaptiveReport::test_result> latency;
+                    vector<AdaptiveReport::test_result> bandwidth;
+                    vector<AdaptiveReport::IoT> iot;
+                    AdaptiveReport::battery_result battery;
+
+                    bool hw = r.getHardware(hardware);
+                    bool bt = r.getBattery(battery);
+
+                    if(hw || bt) {
+                        cout << "hw || bt" << endl;
+                        this->parent->getStorage()->addNode(ip, hardware, battery);
+                    }
+                    if(r.getLatency(latency)) {
+                        this->parent->getStorage()->addReportLatency(ip, latency);
+                    }
+                    if(r.getBandwidth(bandwidth)) {
+                        this->parent->getStorage()->addReportBandwidth(ip, bandwidth);
+                    }
+                    if(r.getIot(iot)) {
+                        this->parent->getStorage()->addReportIot(ip, iot);
+                    }
+                    ret = true;
+                }
+            }
+        }
+    }
+    close(Socket);
+    return ret;
+}
 
 /*
 bool AdaptiveLeaderConnections::sendMReport(Message::node ip, vector<AdaptiveReport::adaptive_report_result> report) {

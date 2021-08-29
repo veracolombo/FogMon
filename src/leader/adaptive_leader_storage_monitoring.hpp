@@ -16,7 +16,7 @@ public:
     std::vector<AdaptiveReport::adaptive_report_result> getAdaptiveReport(bool complete);
     AdaptiveReport::adaptive_report_result getAdaptiveReport(Message::node node, bool complete);
 
-    //std::string addNode(Message::node node, AdaptiveReport::hardware_result hardware, AdaptiveReport::battery_result battery, Message::node *monitored = NULL);
+    std::string addNode(Message::node node, AdaptiveReport::hardware_result hardware, AdaptiveReport::battery_result battery, Message::node *monitored = NULL);
 
     virtual AdaptiveReport::battery_result getBattery(Message::node node);
 };

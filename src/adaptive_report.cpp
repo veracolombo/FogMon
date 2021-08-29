@@ -1,5 +1,4 @@
 #include "adaptive_report.hpp"
-#include <iostream>
 
 using namespace rapidjson;
 using namespace std;

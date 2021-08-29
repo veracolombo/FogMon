@@ -2,6 +2,7 @@
 #define ADAPTIVE_REPORT_HPP_
 
 #include "report.hpp"
+#include <iostream>
 
 class AdaptiveReport : public Report {
 public:
@@ -31,6 +32,13 @@ public:
             this->var_battery = var_battery;
             this->lasttime = lasttime;
         }
+
+        void getString(){ 
+            std::cout << "mean_battery: " << this->mean_battery << std::endl;
+            std::cout << "var_battery: " << this->var_battery << std::endl;
+            std::cout << "lasttime: " << this->lasttime << std::endl;
+        }
+        
     }battery_result;
     
     /**
@@ -43,6 +51,24 @@ public:
         adaptive_report_result() {}
         adaptive_report_result(Message::node Source, hardware_result Hardware, battery_result Battery, std::vector<test_result> Latency, std::vector<test_result> Bandwidth, std::vector<IoT> Iot, std::string _leader)
         : report_result(Source, Hardware, Latency, Bandwidth, Iot, _leader), battery(Battery) {}
+
+        void getString() {
+            this->battery.getString();
+
+            std::cout << "cores: " << this->hardware.cores << std::endl;
+            std::cout << "mean_free_cpu: " << this->hardware.mean_free_cpu << std::endl;
+            std::cout << "var_free_cpu: " << this->hardware.var_free_cpu << std::endl << std::endl;
+
+            std::cout << "memory: " << this->hardware.memory << std::endl;
+            std::cout << "mean_free_memory: " << this->hardware.mean_free_memory << std::endl;
+            std::cout << "var_free_memory: " << this->hardware.var_free_memory << std::endl << std::endl;
+
+            std::cout << "disk: " << this->hardware.disk << std::endl;
+            std::cout << "mean_free_disk: " << this->hardware.mean_free_disk << std::endl;
+            std::cout << "var_free_disk: " << this->hardware.var_free_disk << std::endl << std::endl;
+
+            std::cout << "lasttime: " << this->hardware.lasttime << std::endl << std::endl << std::endl;
+        }
 
     }adaptive_report_result;
 
