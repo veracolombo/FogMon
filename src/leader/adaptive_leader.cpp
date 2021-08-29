@@ -1,7 +1,5 @@
 #include "adaptive_leader.hpp"
-
-#include "uiconnection.hpp"
-
+#include "adaptive_uiconnection.hpp"
 #include <iostream>
  
 AdaptiveLeader::AdaptiveLeader() {}
@@ -141,8 +139,8 @@ void AdaptiveLeader::timerFun(){
         if(iter % 4 == 0) {
             this->getStorage()->complete();
             {
-                vector<Report::report_result> report = this->getStorage()->getReport(true);
-                UIConnection conn(this->getMyNode(),this->node->interfaceIp, this->node->session);
+                vector<AdaptiveReport::adaptive_report_result> report = this->getStorage()->getAdaptiveReport(true);
+                AdaptiveUIConnection conn(this->getMyNode(),this->node->interfaceIp, this->node->session);
                 conn.sendTopology(report);
             }
             if((iter % (4*2)) == 0) {
