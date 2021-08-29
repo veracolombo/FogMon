@@ -2,7 +2,7 @@
 #define ADAPTIVE_FOLLOWER_HPP_
 
 #include "follower.hpp"                // parent
-#include "iadaptivestorage.hpp"
+//#include "iadaptivestorage.hpp"
 #include "adaptive_factory.hpp"  
 #include "adaptive_controller.hpp"
 #include "common.hpp"
@@ -42,13 +42,13 @@ public:
     void removeMetric(Metric metric);
     */
 
-    IAdaptiveStorage* getAdaptiveStorage();
+    //IAdaptiveStorage* getAdaptiveStorage();
 
     virtual bool changeServer(vector<Message::node> mNodes);
 
 protected:
     AdaptiveController* adaptive_controller;
-    IAdaptiveStorage* adaptiveStorage;
+    //IAdaptiveStorage* adaptiveStorage;
 
     AdaptiveFactory tFactory;
     AdaptiveFactory * factory;

@@ -15,16 +15,11 @@ map<Metric, bool> AdaptiveFollower::metrics = {
 
 bool AdaptiveFollower::leaderAdequacy = true;
 
-AdaptiveFollower::AdaptiveFollower() {}
+AdaptiveFollower::AdaptiveFollower() { }
 
 AdaptiveFollower::AdaptiveFollower(Message::node node, int nThreads) : Follower(node, nThreads) { }
 
-AdaptiveFollower::~AdaptiveFollower() {
-    try{
-        delete this->adaptiveStorage;
-        this->adaptiveStorage = NULL;
-    }catch(...) {}
-}
+AdaptiveFollower::~AdaptiveFollower() { }
 
 void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
     if(fact == NULL) {
@@ -36,7 +31,7 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
     this->metricsGenerator = new MetricsGenerator(this);
     this->metricsGenerator->initialize(this->getMetrics());
 
-    this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
+    //this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
 
     this->adaptive_controller = new AdaptiveController(this);
     this->adaptive_controller->initialize();
@@ -65,8 +60,10 @@ void AdaptiveFollower::stop(){
 
     Follower::stop();
 
+    /*
     if(this->adaptiveStorage)
         this->adaptiveStorage->close();
+    */
 }
 
 
@@ -117,9 +114,11 @@ IAdaptiveStorageMonitoring* AdaptiveFollower::getStorage() {
     return this->storage;
 }
 
+/*
 IAdaptiveStorage* AdaptiveFollower::getAdaptiveStorage() {
     return this->adaptiveStorage;
 }
+*/
 
 void AdaptiveFollower::getHardware(){
 

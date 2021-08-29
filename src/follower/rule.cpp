@@ -18,6 +18,7 @@ void Rule::initialize(string f_path, string r_path){
 }
 
 void Rule::run(){
+    
     Watch(this->env,FACTS);
     Watch(this->env,RULES);
     Watch(this->env,ACTIVATIONS);

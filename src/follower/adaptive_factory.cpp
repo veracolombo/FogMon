@@ -10,8 +10,10 @@ IAdaptiveStorageMonitoring* AdaptiveFactory::newStorage(std::string path) {
     return ret;
 }
 
+/*
 IAdaptiveStorage* AdaptiveFactory::newAdaptiveStorage(std::string path) {
     IAdaptiveStorage* ret = new AdaptiveStorage();
     ret->open(path);
     return ret;
 }
+*/

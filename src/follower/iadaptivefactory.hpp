@@ -7,7 +7,7 @@
 
 class IAdaptiveFactory {
 public:
-    virtual IAdaptiveStorage* newAdaptiveStorage(std::string path) = 0;
+    //virtual IAdaptiveStorage* newAdaptiveStorage(std::string path) = 0;
 };
 
 #endif

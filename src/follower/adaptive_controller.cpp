@@ -38,7 +38,7 @@ void AdaptiveController::addState(Metric metric, State state){
 
 void AdaptiveController::saveStates(){
     for(auto &s : this->states){
-        this->node->getAdaptiveStorage()->saveStates(s.second, s.first);
+        this->node->getStorage()->saveStates(s.second, s.first);
     }
 }
 

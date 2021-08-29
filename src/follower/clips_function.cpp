@@ -24,7 +24,7 @@ void ClipsFunction::GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *
     float mintr = (float)_mintr.integerValue->contents;
     float maxtr = (float)_maxtr.integerValue->contents;
 
-    int tr = (int)ceil(((maxtr-mintr)*(c/(n*w))) + mintr);
+    int tr = (int)ceil(((maxtr-mintr)*(c/(n*w))) + mintr) + 20;
 
     out->integerValue = CreateInteger(env,tr);
 }

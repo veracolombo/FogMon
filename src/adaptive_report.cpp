@@ -4,8 +4,7 @@
 using namespace rapidjson;
 using namespace std;
 
-AdaptiveReport::AdaptiveReport() {
-    doc.SetObject();
+AdaptiveReport::AdaptiveReport() : Report() {
 }
 
 AdaptiveReport::~AdaptiveReport() { }
@@ -33,23 +32,24 @@ void AdaptiveReport::setReport(adaptive_report_result report) {
 }
 
 void AdaptiveReport::setReports(std::vector<adaptive_report_result> reports) {
+
     Value arr(kArrayType);
+
     doc.RemoveMember("reports");
 
     Document::AllocatorType& allocator = doc.GetAllocator();
 
     for(auto test : reports) {
-        
+
         Value hw(kObjectType);
         Value lt(kArrayType);
         Value bw(kArrayType);
         Value th(kArrayType);
-        Value bt(kArrayType);
+        Value bt(kObjectType);
 
         {
-            Report::hardware_result &hardware = test.hardware;
+            AdaptiveReport::hardware_result &hardware = test.hardware;
             
-        
             Value cores(hardware.cores);
             Value mean_free_cpu(hardware.mean_free_cpu);
             Value var_free_cpu(hardware.var_free_cpu);
@@ -112,18 +112,17 @@ void AdaptiveReport::setReports(std::vector<adaptive_report_result> reports) {
 
         {
             AdaptiveReport::battery_result &battery = test.battery;
-            
     
             Value mean_battery(battery.mean_battery);
             Value var_battery(battery.var_battery);
 
             bt.AddMember("mean_battery", mean_battery, allocator);
             bt.AddMember("var_battery", var_battery, allocator);
-            hw.AddMember("lasttime", battery.lasttime, allocator);
+            bt.AddMember("lasttime", battery.lasttime, allocator);
         }
 
-
         Value obj(kObjectType);
+
         Value leader(test.leader.c_str(), allocator);
 
         obj.AddMember("source",test.source.getJson(allocator), allocator);
@@ -166,8 +165,11 @@ bool AdaptiveReport::getReport(adaptive_report_result &report) {
 }
 
 bool AdaptiveReport::getReports(std::vector<adaptive_report_result> &reports) {
-    if( !this->doc.HasMember("reports") || !this->doc["reports"].IsArray())
+    cout << "getReports()" << endl;
+
+    if( !this->doc.HasMember("reports") || !this->doc["reports"].IsArray()){
         return false;
+    }
     
     reports.clear();
 
@@ -177,12 +179,15 @@ bool AdaptiveReport::getReports(std::vector<adaptive_report_result> &reports) {
             !v.HasMember("latency") || !v["latency"].IsArray() ||
             !v.HasMember("bandwidth") || !v["bandwidth"].IsArray() ||
             !v.HasMember("iot") || !v["iot"].IsArray() ||
-            !v.HasMember("battery") || !v["battery"].IsArray() ||
+            !v.HasMember("battery") || !v["battery"].IsObject() ||
             !v.HasMember("source") || !v["source"].IsObject() ||
-            !v.HasMember("leader") || !v["leader"].IsString())
-            return false;
+            !v.HasMember("leader") || !v["leader"].IsString()){
+                cout << "here1" << endl;
+                return false;
+            }
         adaptive_report_result result;
-        memset(&result.hardware,0,sizeof(Report::hardware_result));
+        memset(&result.hardware,0,sizeof(AdaptiveReport::hardware_result));
+        memset(&result.battery,0,sizeof(AdaptiveReport::battery_result));
         result.source.setJson(v["source"]);
 
         Value &val = v["hardware"];
@@ -196,8 +201,10 @@ bool AdaptiveReport::getReports(std::vector<adaptive_report_result> &reports) {
             !val.HasMember("disk") || !val["disk"].IsInt64() ||
             !val.HasMember("mean_free_disk") || !val["mean_free_disk"].IsFloat() ||
             !val.HasMember("var_free_disk") || !val["var_free_disk"].IsFloat() ||
-            !val.HasMember("lasttime") || !val["lasttime"].IsInt64())
+            !val.HasMember("lasttime") || !val["lasttime"].IsInt64()){
+            cout << "here2" << endl;
             return false;
+            }
         {
             result.hardware.cores = val["cores"].GetInt();
             result.hardware.mean_free_cpu = val["mean_free_cpu"].GetFloat();
@@ -216,8 +223,10 @@ bool AdaptiveReport::getReports(std::vector<adaptive_report_result> &reports) {
                 !v.HasMember("target") || !v["target"].IsObject() ||
                 !v.HasMember("mean") || !v["mean"].IsFloat() ||
                 !v.HasMember("variance") || !v["variance"].IsFloat() ||
-                !v.HasMember("lasttime") || !v["lasttime"].IsInt64())
-                return false;
+                !v.HasMember("lasttime") || !v["lasttime"].IsInt64()){
+                    cout << "here3" << endl;
+                    return false;
+                }
             test_result test;
             test.target.setJson(v["target"]);
             test.mean = v["mean"].GetFloat();
@@ -232,8 +241,10 @@ bool AdaptiveReport::getReports(std::vector<adaptive_report_result> &reports) {
                 !v.HasMember("target") || !v["target"].IsObject() ||
                 !v.HasMember("mean") || !v["mean"].IsFloat() ||
                 !v.HasMember("variance") || !v["variance"].IsFloat() ||
-                !v.HasMember("lasttime") || !v["lasttime"].IsInt64())
-                return false;
+                !v.HasMember("lasttime") || !v["lasttime"].IsInt64()){
+                    cout << "here4" << endl;
+                    return false;
+                }
             test_result test;
             test.target.setJson(v["target"]);
             test.mean = v["mean"].GetFloat();
@@ -247,8 +258,10 @@ bool AdaptiveReport::getReports(std::vector<adaptive_report_result> &reports) {
             if( !v.IsObject() ||
                 !v.HasMember("id") || !v["id"].IsString() ||
                 !v.HasMember("desc") || !v["desc"].IsString() ||
-                !v.HasMember("latency") || !v["latency"].IsInt())
-                return false;
+                !v.HasMember("latency") || !v["latency"].IsInt()){
+                    cout << "here5" << endl;
+                    return false;
+                }
             IoT iot;
             iot.id = string(v["id"].GetString());
             iot.desc = string(v["latency"].GetString());
@@ -261,8 +274,10 @@ bool AdaptiveReport::getReports(std::vector<adaptive_report_result> &reports) {
 
         if( !val.HasMember("mean_battery") || !val["mean_battery"].IsFloat() ||
             !val.HasMember("var_battery") || !val["var_battery"].IsFloat() ||
-            !val.HasMember("lasttime") || !val["lasttime"].IsInt64())
-            return false;
+            !val.HasMember("lasttime") || !val["lasttime"].IsInt64()){
+                cout << "here6" << endl;
+                return false;
+            }
         {
             result.battery.mean_battery = val["mean_battery"].GetFloat();
             result.battery.var_battery = val["var_battery"].GetFloat();
@@ -275,8 +290,3 @@ bool AdaptiveReport::getReports(std::vector<adaptive_report_result> &reports) {
 
     return true;
 }
-
-
-
-
-

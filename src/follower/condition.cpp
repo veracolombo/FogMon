@@ -51,9 +51,10 @@ void Condition::NumMetricInStateFor(Environment *env, UDFContext *udfc, UDFValue
 }
 
 vector<tuple<string, int, int>> Condition::getData(){
-    IAdaptiveStorage* storage = new AdaptiveStorage();
-    storage->open("adaptive_storage.db");
+    IAdaptiveStorageMonitoring* storage = new AdaptiveStorageMonitoring();
+    storage->open("monitoring.db");
     vector<tuple<string, int, int>> data = storage->getStates();
+    storage->close();
 
     return data;
 }

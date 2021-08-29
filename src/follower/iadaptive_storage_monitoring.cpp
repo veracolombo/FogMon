@@ -1,5 +1,7 @@
 #include "iadaptive_storage_monitoring.hpp"
 #include "string.h"
+#include <vector>
+#include <tuple>
 
 using namespace std;
 
@@ -15,4 +17,15 @@ int IAdaptiveStorageMonitoring::getBatteryCallback(void *R, int argc, char **arg
         }
     }
     return 0;
+}
+
+int IAdaptiveStorageMonitoring::getStatesCallback(void *vec, int argc, char **argv, char **azColName){
+    vector<tuple<string, int, int>> *v = (vector<tuple<string, int, int>>*)vec;
+    tuple<string, int, int> state;
+
+    state = make_tuple(string(argv[0]), stoi(argv[1]), stoi(argv[2]));
+  
+    v->push_back(state);
+
+   return 0;
 }
