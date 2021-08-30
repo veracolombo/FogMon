@@ -13,6 +13,7 @@
 #include <mutex>                // std::mutex, std::unique_lock
 #include <condition_variable>   // std::condition_variable
 
+#include "iadaptivefollower.hpp"
 
 class AdaptiveFollower;
 
@@ -25,10 +26,10 @@ public:
     map<Metric, vector<State>> getStates();
     Rule* rule;
 
-    AdaptiveController(AdaptiveFollower* node);
+    AdaptiveController();
     ~AdaptiveController();
 
-    void initialize();
+    void initialize(IAdaptiveFollower* node);
 
     void start();
     void stop();
@@ -36,8 +37,8 @@ public:
     void toStringSeries();
     void toStringStates();
 
-private:
-    AdaptiveFollower* node;
+protected:
+    IAdaptiveFollower* node;
 
     int history = 5;
 

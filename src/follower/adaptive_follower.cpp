@@ -28,13 +28,13 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
         this->factory = fact;
     }
 
-    this->metricsGenerator = new MetricsGenerator(this);
-    this->metricsGenerator->initialize(this->getMetrics());
+    this->metricsGenerator = new MetricsGenerator();
+    this->metricsGenerator->initialize(this);
 
     //this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
 
-    this->adaptive_controller = new AdaptiveController(this);
-    this->adaptive_controller->initialize();
+    this->adaptive_controller = new AdaptiveController();
+    this->adaptive_controller->initialize(this);
 
     if(this->connections == NULL && this->storage == NULL){
         this->connections = this->factory->newConnections(this->nThreads);

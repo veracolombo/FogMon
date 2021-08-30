@@ -67,16 +67,17 @@ MetricsGenerator::currentVal_data MetricsGenerator::currentVal = {
     0.0
 };
 
-MetricsGenerator::MetricsGenerator(AdaptiveFollower* node) {
+MetricsGenerator::MetricsGenerator() {
     this->running = false;
-    this->node = node;
 }
 MetricsGenerator::~MetricsGenerator() { }
 
-void MetricsGenerator::initialize(vector<Metric> metrics) {
+void MetricsGenerator::initialize(IAdaptiveFollower* node) {
+    this->node = node;
+
     this->trends.clear();
 
-    for(auto &m : metrics){
+    for(auto &m : this->node->getMetrics()){
         Trend trend = static_cast<Trend>(rand() % last);
         this->trends[m] = trend;
     }
@@ -85,22 +86,18 @@ void MetricsGenerator::initialize(vector<Metric> metrics) {
 void MetricsGenerator::start() {
     this->running = true;
 
-    map<Metric, bool> metrics = this->node->metrics;
+    for(auto &m : this->node->getMetrics()){
+        if(m == FREE_CPU)
+            this->cpuThread = thread(&MetricsGenerator::cpu, this); continue;
+        
+        if(m == FREE_MEMORY)
+            this->memoryThread = thread(&MetricsGenerator::memory, this); continue;
 
-    if(metrics[FREE_CPU]){
-        this->cpuThread = thread(&MetricsGenerator::cpu, this);
-    }
+        if(m == FREE_DISK)
+            this->diskThread = thread(&MetricsGenerator::disk, this); continue;
 
-    if(metrics[FREE_MEMORY]){
-        this->memoryThread = thread(&MetricsGenerator::memory, this);
-    }
-
-    if(metrics[FREE_DISK]){
-        this->diskThread = thread(&MetricsGenerator::disk, this);
-    }
-
-    if(metrics[BATTERY]){
-        this->batteryThread = thread(&MetricsGenerator::battery, this);
+        if(m == BATTERY)
+            this->batteryThread = thread(&MetricsGenerator::battery, this);
     }
 }
 

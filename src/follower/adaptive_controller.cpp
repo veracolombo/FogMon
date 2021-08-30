@@ -4,15 +4,16 @@
 
 bool AdaptiveController::ready = false;
 
-AdaptiveController::AdaptiveController(AdaptiveFollower* node){
+AdaptiveController::AdaptiveController(){
     this->running = false;
-    this->node = node;
-    this->rule = new Rule();
 }
 
 AdaptiveController::~AdaptiveController() {}
 
-void AdaptiveController::initialize() {
+void AdaptiveController::initialize(IAdaptiveFollower* node) {
+    this->node = node;
+
+    this->rule = new Rule();
     this->rule->initialize("clips/facts.clp", "clips/rules.clp");
 }
 

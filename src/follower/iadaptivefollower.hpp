@@ -10,6 +10,7 @@ public:
     virtual IAdaptiveFollowerConnections* getConnections() = 0;
     virtual IAdaptiveStorageMonitoring* getStorage() = 0;
     
+    virtual vector<Metric> getMetrics() = 0;
 
     virtual bool changeServer(vector<Message::node> nodes) = 0;
 };

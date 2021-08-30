@@ -8,16 +8,16 @@
 #include <map>
 #include <thread>
 
-using namespace std;
+#include "iadaptivefollower.hpp"
 
-class AdaptiveFollower;
+using namespace std;
 
 class MetricsGenerator {
 
 public:
     enum Trend {trSTABLE, trUNSTABLE, last};
 
-    MetricsGenerator(AdaptiveFollower* node);
+    MetricsGenerator();
     ~MetricsGenerator();
 
     struct series_data {
@@ -47,7 +47,7 @@ public:
     void start();
     void stop();
 
-    void initialize(vector<Metric> metrics);
+    void initialize(IAdaptiveFollower *node);
 
     static map<Metric, Trend> trends;
     static currentVal_data currentVal;
@@ -55,7 +55,7 @@ public:
     static map<Trend, series_data> series;
 
 private:
-    AdaptiveFollower* node;
+    IAdaptiveFollower* node;
 
     bool running;
 
