@@ -8,13 +8,20 @@ AdaptiveController::AdaptiveController(){
     this->running = false;
 }
 
-AdaptiveController::~AdaptiveController() {}
+AdaptiveController::~AdaptiveController() {
+    try{
+        delete this->rule;
+        this->rule = NULL;
+    }catch(...) {}
+}
 
 void AdaptiveController::initialize(IAdaptiveFollower* node) {
     this->node = node;
 
     this->rule = new Rule();
-    this->rule->initialize("clips/facts.clp", "clips/rules.clp");
+    vector<string> paths;
+    paths.push_back("clips/rules.clp");
+    this->rule->initialize(paths);
 }
 
 void AdaptiveController::start() {

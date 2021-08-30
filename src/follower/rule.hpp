@@ -11,7 +11,7 @@ public:
     Rule();
     ~Rule();
 
-    void initialize(string f_path, string r_path);
+    void initialize(vector<string> paths);
     void run(); 
 
     Environment* getEnv();

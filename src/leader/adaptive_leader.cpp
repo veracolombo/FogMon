@@ -6,7 +6,9 @@ AdaptiveLeader::AdaptiveLeader() {}
 
 AdaptiveLeader::AdaptiveLeader(Message::node node, int nThreads) : Leader(node, nThreads), AdaptiveFollower(node, nThreads), Follower(node, nThreads) {}
 
-AdaptiveLeader::~AdaptiveLeader() {}
+AdaptiveLeader::~AdaptiveLeader() {
+    this->stop();
+}
 
 
 void AdaptiveLeader::start(std::vector<Message::node> mNodes){
@@ -42,6 +44,10 @@ void AdaptiveLeader::initialize(AdaptiveLeaderFactory* fact){
     AdaptiveFollower::connections = this->connections;
     Follower::connections = this->connections;
     this->connections->initialize(this);
+
+    this->adaptive_controller = new AdaptiveLeaderController();
+    AdaptiveFollower::adaptive_controller = this->adaptive_controller;
+    this->adaptive_controller->initialize(this);
     
     AdaptiveFollower::initialize(this->factory);
 }

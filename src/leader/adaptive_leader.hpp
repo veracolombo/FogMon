@@ -5,6 +5,7 @@
 #include "adaptive_follower.hpp"
 #include "adaptive_leader_connections.hpp"
 #include "adaptive_leader_factory.hpp"
+#include "adaptive_leader_controller.hpp"
 
 class AdaptiveLeader : virtual public IAdaptiveLeader, public Leader, public AdaptiveFollower {
 
@@ -22,6 +23,8 @@ public:
     IAdaptiveLeaderStorageMonitoring* getStorage();
 
 protected:
+    AdaptiveLeaderController *adaptive_controller;
+
     void timerFun() override;
 
     AdaptiveLeaderFactory tFactory;

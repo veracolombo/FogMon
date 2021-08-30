@@ -17,6 +17,7 @@ public:
     Condition();
     ~Condition();
 
+    //* da quanti istanti consecutivi la metrica M si trova nello stato S *//
     static void MetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *out);
     static void IsMetricEnabled(Environment *env, UDFContext *udfc, UDFValue *out);
 

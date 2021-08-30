@@ -12,9 +12,10 @@ Rule::~Rule(){
     DestroyEnvironment(this->env);
 }
 
-void Rule::initialize(string f_path, string r_path){
-    Load(this->env, f_path.c_str());
-    Load(this->env, r_path.c_str());
+void Rule::initialize(vector<string> paths){
+    for(auto &path : paths){
+        Load(this->env, path.c_str());
+    }
 }
 
 void Rule::run(){

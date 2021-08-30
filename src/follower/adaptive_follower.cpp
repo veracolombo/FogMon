@@ -19,7 +19,19 @@ AdaptiveFollower::AdaptiveFollower() { }
 
 AdaptiveFollower::AdaptiveFollower(Message::node node, int nThreads) : Follower(node, nThreads) { }
 
-AdaptiveFollower::~AdaptiveFollower() { }
+AdaptiveFollower::~AdaptiveFollower() {
+    this->stop();
+
+    try{
+        delete this->adaptive_controller;
+        this->adaptive_controller = NULL;
+    }catch(...) {}
+
+    try{
+        delete this->metricsGenerator;
+        this->metricsGenerator = NULL;
+    }catch(...) {}
+}
 
 void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
     if(fact == NULL) {
@@ -31,19 +43,22 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
     this->metricsGenerator = new MetricsGenerator();
     this->metricsGenerator->initialize(this);
 
-    //this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
+    if(this->adaptive_controller == NULL){
+        this->adaptive_controller = new AdaptiveController();
+        this->adaptive_controller->initialize(this);
+    }
 
-    this->adaptive_controller = new AdaptiveController();
-    this->adaptive_controller->initialize(this);
-
-    if(this->connections == NULL && this->storage == NULL){
+    if(this->connections == NULL){
         this->connections = this->factory->newConnections(this->nThreads);
         this->connections->initialize(this);
         Follower::connections = this->connections;
+    }
 
+    if(this->storage == NULL){
         this->storage = this->factory->newStorage("monitoring.db");
         Follower::storage = this->storage;
     }
+
     Follower::initialize(this->factory);
 }
 

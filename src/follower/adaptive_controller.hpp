@@ -31,8 +31,8 @@ public:
 
     void initialize(IAdaptiveFollower* node);
 
-    void start();
-    void stop();
+    virtual void start();
+    virtual void stop();
 
     void toStringSeries();
     void toStringStates();

@@ -98,7 +98,6 @@ int Condition::MetricInStateFor(Metric metric, State state){
 }
 
 int Condition::NumMetricInStateFor(State state, int time) {
-    cout << "nummetricinstatefor<()" << endl;
     int count = 0;
     for(auto &m : AdaptiveFollower::metrics){
         if(m.second){
@@ -107,6 +106,5 @@ int Condition::NumMetricInStateFor(State state, int time) {
             }
         }
     }
-    cout << "count= " << count << endl;
     return count;
 }

@@ -13,7 +13,7 @@ RUN make
 RUN cp $(ls ./Bin/*/*) /
 
 ADD src/follower/rules.clp /clips/rules.clp
-ADD src/follower/facts.clp /clips/facts.clp
+ADD src/leader/leader_rules.clp /clips/leader_rules.clp
 
 ADD . /compile
 WORKDIR /compile

@@ -87,17 +87,12 @@ void MetricsGenerator::start() {
     this->running = true;
 
     for(auto &m : this->node->getMetrics()){
-        if(m == FREE_CPU)
-            this->cpuThread = thread(&MetricsGenerator::cpu, this); continue;
-        
-        if(m == FREE_MEMORY)
-            this->memoryThread = thread(&MetricsGenerator::memory, this); continue;
-
-        if(m == FREE_DISK)
-            this->diskThread = thread(&MetricsGenerator::disk, this); continue;
-
-        if(m == BATTERY)
-            this->batteryThread = thread(&MetricsGenerator::battery, this);
+        switch(m){
+            case FREE_CPU:      this->cpuThread = thread(&MetricsGenerator::cpu, this); break;
+            case FREE_MEMORY:   this->memoryThread = thread(&MetricsGenerator::memory, this); break;
+            case FREE_DISK:     this->diskThread = thread(&MetricsGenerator::disk, this); break;
+            case BATTERY:       this->batteryThread = thread(&MetricsGenerator::battery, this); break;
+        }
     }
 }
 
