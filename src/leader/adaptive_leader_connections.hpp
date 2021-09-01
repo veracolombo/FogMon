@@ -7,6 +7,7 @@
 #include "iadaptiveleader.hpp"
 
 class AdaptiveLeaderConnections : public LeaderConnections, public AdaptiveFollowerConnections, virtual public IAdaptiveLeaderConnections {
+
 protected:
     void handler(int fd, Message &m);
     void call_super_handler(int fd, Message &m) override;
@@ -22,7 +23,9 @@ public:
     bool sendRequestReport(Message::node ip) override;
 
     bool sendMReport(Message::node ip, vector<AdaptiveReport::adaptive_report_result> report);
+
     bool sendChangeServer();
+    bool sendChangeTimeReport(Message::node ip, int newTimeReport);
 };
 
 #endif

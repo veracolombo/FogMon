@@ -82,6 +82,7 @@ Follower::~Follower() {
 }
 
 void Follower::start(vector<Message::node> mNodes) {
+    cout << "Follower::start()" << endl;
     IAgent::start(mNodes);
     this->server->start();
     srandom(time(nullptr));
@@ -97,7 +98,11 @@ void Follower::start(vector<Message::node> mNodes) {
         exit(1);
     }
 
+    cout << "calling getHardware()" << endl;
+
     this->getHardware();
+
+    cout << "getHardware() called" << endl;
 
     bool connected = false;
     for(int i=0; i<10; i++){
@@ -508,6 +513,8 @@ int Follower::testPing(string ip) {     // restituisce la latenza con il nodo pa
 }
 
 void Follower::getHardware() {
+
+    cout << "Follower::getHardware()" << endl;
 
     int status, i;
     sigar_t *sigar;

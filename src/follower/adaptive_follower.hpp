@@ -15,6 +15,9 @@ public:
     // metrics
     static map<Metric, bool> metrics;
 
+    //id and port 
+    static Message::node myNode;
+
     // leader adequacy
     static bool leaderAdequacy;
 
@@ -54,6 +57,7 @@ protected:
 
     MetricsGenerator *metricsGenerator;
 
+    void getLightIntensity();
     void getBattery();
     void getHardware() override;
 

@@ -41,8 +41,6 @@ protected:
     int readS(long fd, void *data, int len);
     int writeS(long fd, const char *data, int len);
 
-    int openConnection(std::string ipS, std::string port="5555");
-
     std::string getSource(int fd, Message &m);
 public:
     Connections(int nThread);
@@ -55,6 +53,10 @@ public:
 
     //put the request on a queue to be processed by another thread
     void request(int fd);
+
+    /********/
+    int openConnection(std::string ipS, std::string port="5555");
+    /*******/
 };
 
 #endif

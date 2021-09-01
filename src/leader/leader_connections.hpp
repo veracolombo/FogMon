@@ -35,10 +35,6 @@ public:
     bool sendEndSelection(Message::leader_update update, bool result);
 
     bool sendChangeRoles(Message::leader_update update);
-
-    ////////////////////////////////////////////////////
-    bool sendChangeTimeReport(Message::node ip, int newTimeReport);
-    ////////////////////////////////////////////////////
 };
 
 #endif

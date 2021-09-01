@@ -10,6 +10,8 @@
 class AdaptiveLeader : virtual public IAdaptiveLeader, public Leader, public AdaptiveFollower {
 
 public:
+    static AdaptiveLeader* myobj;
+
     AdaptiveLeader();
     AdaptiveLeader(Message::node node, int nThreads);
     ~AdaptiveLeader();

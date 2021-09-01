@@ -1,13 +1,21 @@
 #include "adaptive_leader.hpp"
 #include "adaptive_uiconnection.hpp"
 #include <iostream>
- 
-AdaptiveLeader::AdaptiveLeader() {}
 
-AdaptiveLeader::AdaptiveLeader(Message::node node, int nThreads) : Leader(node, nThreads), AdaptiveFollower(node, nThreads), Follower(node, nThreads) {}
+AdaptiveLeader* AdaptiveLeader::myobj = NULL;
+ 
+AdaptiveLeader::AdaptiveLeader() {
+    myobj = this;
+}
+
+AdaptiveLeader::AdaptiveLeader(Message::node node, int nThreads) : Leader(node, nThreads), AdaptiveFollower(node, nThreads), Follower(node, nThreads) {
+    myobj = this;
+}
 
 AdaptiveLeader::~AdaptiveLeader() {
     this->stop();
+
+    myobj = NULL;
 }
 
 
@@ -20,8 +28,14 @@ void AdaptiveLeader::start(std::vector<Message::node> mNodes){
 
 
 void AdaptiveLeader::stop(){
-    this->metricsGenerator->stop();
-    this->adaptive_controller->stop();
+
+    if(this->metricsGenerator){
+        this->metricsGenerator->stop();
+    }
+
+    if(this->adaptive_controller){
+        this->adaptive_controller->stop();
+    }
 
     Leader::stop();
 }
@@ -62,6 +76,9 @@ IAdaptiveLeaderStorageMonitoring* AdaptiveLeader::getStorage() {
 
 
 void AdaptiveLeader::timerFun(){
+    vector<Message::node> vn;
+    this->changeRole(vn);
+
     this->iter = 1;
     this->lastQuality = -random()%10-20;
     while(this->running) {

@@ -13,7 +13,6 @@ void AdaptiveLeaderConnections::initialize(IAdaptiveLeader* parent) {
     this->parent = parent;
 }
 
-
 void AdaptiveLeaderConnections::handler(int fd, Message &m){
     
     string strIp = this->getSource(fd,m);
@@ -218,4 +217,44 @@ bool AdaptiveLeaderConnections::sendChangeServer(){
     cout << "Sending changeServer()" << endl;
 
     return this->notifyAll(broadcast);
+}
+
+
+bool AdaptiveLeaderConnections::sendChangeTimeReport(Message::node ip, int newTimeReport){
+    int Socket = openConnection(ip.ip, ip.port);
+
+    if (Socket < 0){
+        return false;
+    }
+
+    fflush(stdout);
+    char buffer[10];
+
+    // build message
+    Message m;
+    m.setSender(this->parent->getMyNode());
+    m.setType(Message::Type::typePREQUEST);
+    m.setCommand(Message::Command::commSET);
+    m.setArgument(Message::Argument::argPARAM_TIME_REPORT);
+
+    m.setData(newTimeReport);
+
+    bool ret = false;
+
+    // send message
+    if (this->sendMessage(Socket, m)){
+        ret = true;
+        
+        Message res;
+        if (this->getMessage(Socket, res)){
+            if( res.getType()==Message::Type::typePRESPONSE &&
+                res.getCommand() == Message::Command::commSET &&
+                res.getArgument() == Message::Argument::argPOSITIVE) {
+                    ret = true;
+                }
+        }
+    }
+
+    close(Socket);
+    return ret;
 }

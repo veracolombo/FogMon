@@ -174,29 +174,7 @@ void FollowerConnections::handler(int fd, Message &m) {
                 cout << "I'm not a leader anymore!? (closed)" << endl;
             }
         }
-    }else if(m.getType() == Message::Type::typePREQUEST){
-        if(m.getCommand() == Message::Command::commSET) {
-            if(m.getArgument() == Message::Argument::argPARAM_TIME_REPORT){
-
-                int time_report_new;
-                m.getData(time_report_new);
-                cout << "Time Report update: " <<  time_report_new << endl;
-
-                Message res; 
-                    res.setType(Message::Type::typePRESPONSE);
-                    res.setCommand(Message::Command::commSET);
-
-                if (!m.getData(time_report_new)) {
-                    res.setArgument(Message::Argument::argNEGATIVE);
-                }else {
-                    res.setArgument(Message::Argument::argPOSITIVE);
-                    this->parent->node->timeReport = time_report_new;
-                }
-                this->sendMessage(fd, res);
-            }
-        }
     }
-     /////////////////////////////////////////////////////////////
 }
 
 vector<Message::node> FollowerConnections::requestNodes(Message::node ipS) {

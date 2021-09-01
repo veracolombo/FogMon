@@ -13,11 +13,15 @@ map<Metric, bool> AdaptiveFollower::metrics = {
     {Metric::BATTERY, true}
 };
 
+Message::node AdaptiveFollower::myNode = {"","",""};
 bool AdaptiveFollower::leaderAdequacy = true;
 
 AdaptiveFollower::AdaptiveFollower() { }
 
-AdaptiveFollower::AdaptiveFollower(Message::node node, int nThreads) : Follower(node, nThreads) { }
+AdaptiveFollower::AdaptiveFollower(Message::node node, int nThreads) : Follower(node, nThreads) {
+    cout << "AdaptiveFollower()" << endl;
+    myNode = node;
+}
 
 AdaptiveFollower::~AdaptiveFollower() {
     this->stop();
@@ -34,6 +38,7 @@ AdaptiveFollower::~AdaptiveFollower() {
 }
 
 void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
+    cout << "AdaptiveFollower::initialize()" << endl;
     if(fact == NULL) {
         this->factory = &this->tFactory;
     }else {
@@ -63,15 +68,22 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
 }
 
 void AdaptiveFollower::start(vector<Message::node> mNodes){
-    Follower::start(mNodes);
-    
+    cout << "AdaptiveFollower::start()" << endl;
     this->metricsGenerator->start();
+
+    Follower::start(mNodes);
+
     this->adaptive_controller->start();
 }
 
 void AdaptiveFollower::stop(){
-    this->metricsGenerator->stop();
-    this->adaptive_controller->stop();
+    if(this->metricsGenerator){
+        this->metricsGenerator->stop();
+    }
+
+    if(this->adaptive_controller){
+        this->adaptive_controller->stop();
+    }
 
     Follower::stop();
 }
@@ -125,7 +137,6 @@ IAdaptiveStorageMonitoring* AdaptiveFollower::getStorage() {
 }
 
 void AdaptiveFollower::getHardware(){
-
     Report::hardware_result hardware;
 
     sigar_t *sigar;
@@ -165,8 +176,7 @@ void AdaptiveFollower::getHardware(){
 
         hardware.cores = cpulist.number;
 
-        hardware.mean_free_cpu = MetricsGenerator::currentVal.free_cpu;
-
+        hardware.mean_free_cpu = MetricsGenerator::currentVal[FREE_CPU];
         
         //hardware.mean_free_cpu = ((float)diffIdle)/(totaldiff);
         
@@ -181,7 +191,8 @@ void AdaptiveFollower::getHardware(){
         //hardware.memory = MetricsGenerator::currentVal.total_memory;
         hardware.memory = mem.total;
 
-        hardware.mean_free_memory = MetricsGenerator::currentVal.free_memory;
+        hardware.mean_free_memory = MetricsGenerator::currentVal[FREE_MEMORY];
+
         //hardware.mean_free_memory = mem.actual_free;
     }
 
@@ -193,10 +204,9 @@ void AdaptiveFollower::getHardware(){
 
         hardware.disk = disk.total;
 
-        hardware.mean_free_disk = MetricsGenerator::currentVal.free_disk;
+        hardware.mean_free_disk = MetricsGenerator::currentVal[FREE_DISK];
 
         //hardware.mean_free_disk = disk.avail;
-        
     }
 
     if(metrics[FREE_CPU] ||
@@ -212,12 +222,15 @@ void AdaptiveFollower::getBattery(){
     AdaptiveReport::battery_result battery;
 
     if(metrics[BATTERY]){
-        battery.mean_battery = MetricsGenerator::currentVal.battery;
+        battery.mean_battery = MetricsGenerator::currentVal[BATTERY];
         this->storage->saveBattery(battery, this->node->hardwareWindow);
     }
 }
 
 void AdaptiveFollower::timer() {
+
+    cout << this->node->isFollower() << endl;
+
     int iter=0;
     while(this->running) {
 

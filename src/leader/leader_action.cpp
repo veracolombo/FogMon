@@ -1,6 +1,10 @@
 #include "leader_action.hpp"
-#include "connections.hpp"
+#include "adaptive_leader.hpp"
+#include <unistd.h>
 #include <iostream>
+#include "string.h"
+
+using namespace std;
 
 void LeaderAction::ChangeTimeReportLeader(Environment *env, UDFContext *udfc, UDFValue *out) {
     
@@ -11,66 +15,16 @@ void LeaderAction::ChangeTimeReportLeader(Environment *env, UDFContext *udfc, UD
     int time = _time.integerValue->contents;
     string ip = _ip.lexemeValue->contents;
 
-    cout << "changeTimeReportLeader" << endl;
+    AdaptiveLeader* node = AdaptiveLeader::myobj;
 
-    /*
-    int Socket = openConnection(ip,"5555");
+    Message::node follower;
+    for (auto &f : node->getStorage()->getMLRHardware(100, 0)){
+        if(f.ip == ip)
+            follower = f;
+    }
 
-    if(Socket < 0) {
+    if (follower.id == "" || follower.ip == "" || follower.port == "")
         return;
-    }
-
-    fflush(stdout);
-    char buffer[10];
-
-    //build message
-    Message m;
-    m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::typeREQUEST);
-    m.setCommand(Message::Command::commGET);
-    m.setArgument(Message::Argument::argREPORT);
-
-    bool ret = false;
-
-    //send message
-    if(this->sendMessage(Socket, m)) {
-        Message res;
-        if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::typeRESPONSE &&
-                res.getCommand() == Message::Command::commGET &&
-                res.getArgument() == Message::Argument::argPOSITIVE) {
-                //get report and save it
-                AdaptiveReport r;
-                if(m.getData(r)) {
-                    AdaptiveReport::hardware_result hardware;
-                    vector<AdaptiveReport::test_result> latency;
-                    vector<AdaptiveReport::test_result> bandwidth;
-                    vector<AdaptiveReport::IoT> iot;
-                    AdaptiveReport::battery_result battery;
-
-                    bool hw = r.getHardware(hardware);
-                    bool bt = r.getBattery(battery);
-
-                    if(hw || bt) {
-                        cout << "hw || bt" << endl;
-                        this->parent->getStorage()->addNode(ip, hardware, battery);
-                    }
-                    if(r.getLatency(latency)) {
-                        this->parent->getStorage()->addReportLatency(ip, latency);
-                    }
-                    if(r.getBandwidth(bandwidth)) {
-                        this->parent->getStorage()->addReportBandwidth(ip, bandwidth);
-                    }
-                    if(r.getIot(iot)) {
-                        this->parent->getStorage()->addReportIot(ip, iot);
-                    }
-                    ret = true;
-                }
-            }
-        }
-    }
-    close(Socket);
-    return ret;
-
-    */
+        
+    node->getConnections()->sendChangeTimeReport(follower, time);
 }
