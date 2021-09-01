@@ -303,7 +303,6 @@ void Storage::saveBandwidthTest(Message::node node, float kbps, int state, int w
 }
 
 void Storage::saveHardware(Report::hardware_result hardware, int window) {
-    cout << "saveHardware()" << endl;
     char *zErrMsg = 0;
     char buf[1024];
     std::sprintf(buf,"INSERT INTO Hardware (time, cores, free_cpu, memory, free_memory, disk, free_disk) VALUES (DATETIME('now'), %d, %f, %ld, %f, %" PRId64", %f)", hardware.cores, hardware.mean_free_cpu, hardware.memory, hardware.mean_free_memory, hardware.disk, hardware.mean_free_disk);

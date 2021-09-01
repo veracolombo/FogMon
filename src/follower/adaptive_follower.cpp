@@ -13,14 +13,15 @@ map<Metric, bool> AdaptiveFollower::metrics = {
     {Metric::BATTERY, true}
 };
 
-Message::node AdaptiveFollower::myNode = {"","",""};
 bool AdaptiveFollower::leaderAdequacy = true;
 
 AdaptiveFollower::AdaptiveFollower() { }
 
 AdaptiveFollower::AdaptiveFollower(Message::node node, int nThreads) : Follower(node, nThreads) {
-    cout << "AdaptiveFollower()" << endl;
-    myNode = node;
+    this->connections = NULL;
+    this->storage = NULL;
+    this->metricsGenerator = NULL;
+    this->adaptive_controller = NULL;
 }
 
 AdaptiveFollower::~AdaptiveFollower() {
@@ -38,7 +39,7 @@ AdaptiveFollower::~AdaptiveFollower() {
 }
 
 void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
-    cout << "AdaptiveFollower::initialize()" << endl;
+
     if(fact == NULL) {
         this->factory = &this->tFactory;
     }else {
@@ -68,7 +69,6 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
 }
 
 void AdaptiveFollower::start(vector<Message::node> mNodes){
-    cout << "AdaptiveFollower::start()" << endl;
     this->metricsGenerator->start();
 
     Follower::start(mNodes);
@@ -366,7 +366,7 @@ void AdaptiveFollower::TestTimer(){
             vector<Message::node> ips = this->storage->getLRLatency(this->node->maxPerLatency, this->node->timeLatency);
 
             for(auto node : ips) {
-                if(this->myNode.id == node.id)
+                if(this->getMyNode().id == node.id)
                     continue;
                 //start thread for latency tests
                 thread LatencyThread = thread([this,node]{
@@ -397,7 +397,7 @@ void AdaptiveFollower::TestTimer(){
                 int i=0;
                 int tested=0;
                 while(i < ips.size() && tested < this->node->maxPerBandwidth) {
-                    if(this->myNode.id == ips[i].id) {
+                    if(this->getMyNode().id == ips[i].id) {
                         i++;
                         continue;
                     }

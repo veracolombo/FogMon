@@ -48,16 +48,16 @@ void AdaptiveLeader::initialize(AdaptiveLeaderFactory* fact){
         this->factory = fact;
     }
 
-    this->storage = this->factory->newStorage("monitoring.db", this->nodeS);
-    Leader::storage = this->storage;
-    AdaptiveFollower::storage = this->storage;
-    Follower::storage = this->storage;
-
     this->connections = this->factory->newConnections(this->nThreads);
     Leader::connections = this->connections;
     AdaptiveFollower::connections = this->connections;
     Follower::connections = this->connections;
     this->connections->initialize(this);
+
+    this->storage = this->factory->newStorage("monitoring.db", this->nodeS);
+    Leader::storage = this->storage;
+    AdaptiveFollower::storage = this->storage;
+    Follower::storage = this->storage;
 
     this->adaptive_controller = new AdaptiveLeaderController();
     AdaptiveFollower::adaptive_controller = this->adaptive_controller;
@@ -76,9 +76,6 @@ IAdaptiveLeaderStorageMonitoring* AdaptiveLeader::getStorage() {
 
 
 void AdaptiveLeader::timerFun(){
-    vector<Message::node> vn;
-    this->changeRole(vn);
-
     this->iter = 1;
     this->lastQuality = -random()%10-20;
     while(this->running) {

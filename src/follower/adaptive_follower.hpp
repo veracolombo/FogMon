@@ -15,9 +15,6 @@ public:
     // metrics
     static map<Metric, bool> metrics;
 
-    //id and port 
-    static Message::node myNode;
-
     // leader adequacy
     static bool leaderAdequacy;
 
