@@ -1,6 +1,7 @@
 #include "selector.hpp"
 #include "leader.hpp"
 #include <cmath>
+#include <iostream>
 
 #include "uiconnection.hpp"
 
@@ -127,6 +128,7 @@ bool Selector::updateSelection(Message::leader_update update) {
 }
 
 bool Selector::checkSelection(bool qualityCheck, bool doit) {
+    std::cout << "checkSelection()" << std::endl;
 
     if(doit) {
         printf("STARTING SELECTION (forced)\n");

@@ -10,6 +10,7 @@ public:
     ~LeaderAction();
 
     static void ChangeTimeReportLeader(Environment *env, UDFContext *udfc, UDFValue *out);
+    static void SendChangeServer(Environment *env, UDFContext *udfc, UDFValue *out);
 };
 
 #endif

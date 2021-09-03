@@ -2,7 +2,7 @@ version: '3'
 services:
   leader_adp:
     build: .
-    command: --leader -i 131.114.72.76:8248 -s 10 --adp
+    command: --leader -i 131.114.72.76:8248 -s 10 --adp --bs
     stdin_open: true
     networks:
       fm_net_adp:
@@ -11,7 +11,7 @@ services:
 
   follower1_adp:
     build: .
-    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp
+    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp --btl
     stdin_open: true
     depends_on:
       - leader_adp
@@ -27,7 +27,7 @@ services:
           
   follower2_adp:
     build: .
-    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp
+    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp --btl
     stdin_open: true
     depends_on:
       - leader_adp
@@ -38,7 +38,7 @@ services:
 
   follower3_adp:
     build: .
-    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp
+    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp --btl
     stdin_open: true
     depends_on:
       - leader_adp

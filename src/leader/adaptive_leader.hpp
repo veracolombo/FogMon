@@ -24,6 +24,8 @@ public:
     IAdaptiveLeaderConnections* getConnections();
     IAdaptiveLeaderStorageMonitoring* getStorage();
 
+    Message::node getNodeS();
+
 protected:
     AdaptiveLeaderController *adaptive_controller;
 

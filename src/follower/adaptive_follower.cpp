@@ -69,10 +69,9 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
 }
 
 void AdaptiveFollower::start(vector<Message::node> mNodes){
-    this->metricsGenerator->start();
-
     Follower::start(mNodes);
 
+    this->metricsGenerator->start();
     this->adaptive_controller->start();
 }
 
@@ -430,8 +429,6 @@ void AdaptiveFollower::TestTimer(){
 }
 
 bool AdaptiveFollower::changeServer(vector<Message::node> mNodes) {
-    cout << "Changing server..." << endl;
-
     if(!this->node->isFollower()){
         if(!this->connections->sendHello(this->nodeS));
             return false;

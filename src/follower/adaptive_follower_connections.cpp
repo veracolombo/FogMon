@@ -127,10 +127,7 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
                 this->sendMessage(fd, res);
             }
         }
-    }
-
-    /*
-    if(m.getType() == Message::Type::typeNOTIFY){
+    }else if(m.getType() == Message::Type::typeNOTIFY){
         if(m.getCommand() == Message::Command::commSELECT_NEW_SERVER){
             if(m.getArgument() == Message::Argument::argMNODES){
                 handled = true;
@@ -148,7 +145,6 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
             }
         }
     }
-    */
 
     if(!handled)
         this->call_super_handler(fd, m);

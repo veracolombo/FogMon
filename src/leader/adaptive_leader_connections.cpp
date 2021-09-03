@@ -41,6 +41,31 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
                         this->parent->getStorage()->addReport(results, m.getSender());
                     }
                 }
+            } else if(m.getArgument() == Message::Argument::argROLES) {
+                Message::leader_update update;
+                //contains the list of new leaders
+                m.getData(update);
+
+                cout << "AdaptiveLeaderConnections::handler()" << endl;
+                for(auto &u : update.selected){
+                    cout << u.ip << endl;
+                }
+
+                cout << "Selected Leaders: "<< update.selected.size() << endl;
+                for(auto &node : update.selected) {
+                    if(node.ip == "::1" || node.ip == "127.0.0.1") {
+                        node.ip = strIp;
+                    }
+                    cout << node.ip << endl;
+                }
+                this->parent->changeRole(update.selected);
+
+                Message res;
+                res.setType(Message::Type::typeMRESPONSE);
+                res.setCommand(Message::Command::commSET);
+                res.setArgument(Message::Argument::argPOSITIVE);
+
+                sendMessage(fd, res);
             }
         }
     } else if(m.getType() == Message::Type::typeNOTIFY){
@@ -201,10 +226,20 @@ bool AdaptiveLeaderConnections::sendMReport(Message::node ip, vector<AdaptiveRep
 bool AdaptiveLeaderConnections::sendChangeServer(){
     vector<Message::node> mnodes = this->parent->getStorage()->getMNodes();
 
+    cout << "MNodes:" << endl;
+    for(auto &n : mnodes){
+        cout << n.ip << endl;
+    }
+
     vector<Message::node> nodes;
     for(int i=0; i<mnodes.size(); i++){
         if(mnodes[i].ip != this->parent->getMyNode().ip)
             nodes.push_back(mnodes[i]);
+    }
+
+    cout << "Nodes:" << endl;
+    for(auto &n : nodes){
+        cout << n.ip << endl;
     }
 
     Message broadcast;
@@ -258,3 +293,15 @@ bool AdaptiveLeaderConnections::sendChangeTimeReport(Message::node ip, int newTi
     close(Socket);
     return ret;
 }
+
+ bool AdaptiveLeaderConnections::sendRemoveLeader(Message::leader_update update) {
+    Message m;
+    m.setSender(this->parent->getMyNode());
+    m.setType(Message::Type::typeMREQUEST);
+    m.setCommand(Message::Command::commSET);
+    m.setArgument(Message::Argument::argROLES);
+
+    m.setData(update);
+
+    return this->notifyAllM(m);
+ }

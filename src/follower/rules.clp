@@ -35,22 +35,4 @@
  (DisableMetric "free_disk")
 )
 
-(defrule leader_adq_0 (declare (salience ?*max-priority*))
- (or
- (test (>= (MetricInStateFor "free_cpu" "alarming_high") 2))
- (test (>= (MetricInStateFor "free_memory" "alarming_high") 2))
- (test (>= (MetricInStateFor "free_disk" "alarming_high") 2))
- )
- =>
- (SetLeaderAdequacy 0)
-)
-
-(defrule leader_adq_1 (declare (salience ?*max-priority*))
- (test (>= (MetricInStateFor "free_cpu" "ok") 3))
- (test (>= (MetricInStateFor "free_memory" "ok") 3))
- (test (>= (MetricInStateFor "free_disk" "ok") 3))
- =>
- (SetLeaderAdequacy 1)
-)
-
 

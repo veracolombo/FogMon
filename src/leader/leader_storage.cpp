@@ -476,6 +476,11 @@ vector<Message::node> LeaderStorage::removeOldNodes(int seconds) {
 }
 
 void LeaderStorage::removeChangeRole(std::vector<Message::node> leaders) {
+    cout << "removeChangeRole()" << endl;
+    cout << "Leaders:" << endl;
+    for(auto &l : leaders){
+        cout << l.ip << endl;
+    }
     std::vector<Message::node> nodes = this->getMNodes();
     std::vector<Message::node> vec;
     for(auto node : nodes) {

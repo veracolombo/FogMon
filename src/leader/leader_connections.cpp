@@ -342,7 +342,7 @@ bool LeaderConnections::notifyAllM(Message &m) {
 bool LeaderConnections::sendRemoveNodes(std::vector<Message::node> ips) {
     Message broadcast;
 
-    broadcast.setSender(this->parent->getMyNode()); // non funziona !!
+    broadcast.setSender(this->parent->getMyNode());
     broadcast.setType(Message::Type::typeNOTIFY);
     broadcast.setCommand(Message::Command::commUPDATE);
     broadcast.setArgument(Message::Argument::argNODES);
@@ -556,6 +556,11 @@ bool LeaderConnections::sendEndSelection(Message::leader_update update, bool res
 }
 
 bool LeaderConnections::sendChangeRoles(Message::leader_update update) {
+    cout << "LeaderConnections::sendChangeRoles()" << endl;
+    for(auto &u : update.selected){
+        cout << u.ip << endl;
+    }
+
     Message broadcast;
     broadcast.setSender(this->parent->getMyNode());
     broadcast.setType(Message::Type::typeREQUEST);

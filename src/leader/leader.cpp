@@ -296,7 +296,13 @@ Message::node Leader::getMyNode() {
 }
 
 void Leader::changeRole(vector<Message::node> leaders) {
+    cout << "Leader::changeRole()" << endl;
+    for(auto &l : leaders){
+        cout << l.ip << endl;
+    }
+
     bool present = false;
+
     for(auto node : leaders) {
         if(node.id == this->getMyNode().id) {
             present = true;
@@ -318,6 +324,7 @@ void Leader::changeRole(vector<Message::node> leaders) {
         this->lastQuality = -random()%10-20;
         this->node->demote(leaders);
     }else {
+        cout << "removing leaders ..." << endl;
         this->storage->removeChangeRole(leaders);
         printf("E\n");
         fflush(stdout);

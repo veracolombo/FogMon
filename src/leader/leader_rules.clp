@@ -1,5 +1,5 @@
-(defrule ctr_l
- (test (IsBatteryTooLow "fogmon_follower2_adp_1.fogmon_fm_net_adp"))
+(defrule leader_adq_0 (declare (salience ?*min-priority*))
+ (test (>= (MetricInStateFor "battery" "too_low") 6))
  =>
- (ChangeTimeReportLeader 50 "fogmon_follower2_adp_1.fogmon_fm_net_adp")
+ (SendChangeServer)
 )

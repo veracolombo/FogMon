@@ -104,6 +104,9 @@ int main(int argc, char *argv[]) {
 
     bool leader = false;
     bool adp = false;   // adaptivity support
+
+    // metrics generator options
+    vector<string> mg_options;
     
     std::string interfaceIp = "";
     int session = 0;
@@ -150,6 +153,12 @@ int main(int argc, char *argv[]) {
 
     if(input.cmdOptionExists("--adp"))
         adp = true;
+    
+    if(input.cmdOptionExists("--btl")){
+        mg_options.push_back("btl");
+    }else if(input.cmdOptionExists("--bs")){
+        mg_options.push_back("bs");
+    }
 
     if(input.cmdOptionExists("-i"))
         interfaceIp = input.getCmdOption("-i");
@@ -186,6 +195,8 @@ int main(int argc, char *argv[]) {
 
     node.setParam(string("interface"), interfaceIp);
     node.setParam(string("session"), session);
+
+    node.setParam(string("mg_options"), mg_options);
     
     node.start();
 

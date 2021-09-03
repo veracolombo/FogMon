@@ -3,6 +3,7 @@
 
 #include <string>
 #include <thread>
+#include <vector>
 #include "message.hpp"
 
 class IAgent;
@@ -20,6 +21,9 @@ public:
     bool setParam(std::string name, int value);
     
     bool setParam(std::string name, std::string value);
+
+    // metrics generator options
+    bool setParam(std::string name, std::vector<std::string> value);
 
     //promote to leader if follower
     virtual void promote(std::vector<Message::node> nodes);
@@ -54,7 +58,7 @@ public:
     std::string interfaceIp;
     int session;
 
-    int hardwareSamplingRate;
+    std::vector<std::string> mg_options;
 
 protected:
     IAgent * agent;

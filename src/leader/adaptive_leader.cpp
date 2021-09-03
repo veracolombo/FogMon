@@ -79,6 +79,7 @@ void AdaptiveLeader::timerFun(){
     this->iter = 1;
     this->lastQuality = -random()%10-20;
     while(this->running) {
+
         //routine for Nodes a
         auto t_start = std::chrono::high_resolution_clock::now();
         
@@ -156,14 +157,14 @@ void AdaptiveLeader::timerFun(){
             auto elapsed_time2 = std::chrono::duration_cast<std::chrono::duration<float>>(t_end2-t_start).count();
             cout << "timerFun4 " << elapsed_time2 << endl;
         }
-        if(iter % 4 == 0) {
+        if(iter % 2 == 0) {
             this->getStorage()->complete();
             {
                 vector<AdaptiveReport::adaptive_report_result> report = this->getStorage()->getAdaptiveReport(true);
                 AdaptiveUIConnection conn(this->getMyNode(),this->node->interfaceIp, this->node->session);
                 conn.sendTopology(report);
             }
-            if((iter % (4*2)) == 0) {
+            if((iter % (2*2)) == 0) {
                 this->lastQuality +=1;
                 bool param = this->lastQuality >= 2;
                 if (param)
@@ -217,4 +218,8 @@ void AdaptiveLeader::timerFun(){
         //elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
         //std::cout << "timerFun2: "<< elapsed_time << " s"<< endl;
     }
+}
+
+Message::node AdaptiveLeader::getNodeS() {
+    return this->nodeS;
 }

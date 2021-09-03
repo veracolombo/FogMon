@@ -28,6 +28,9 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
             { MetricsGenerator::Trend::trUNSTABLE,
                 { 0.60, 0.80, 0.60, 0.90 }
             },
+            { MetricsGenerator::Trend::trTOO_LOW,
+                { 0.2 }
+            }
         }
     },
 
@@ -38,6 +41,9 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
             },
             { MetricsGenerator::Trend::trUNSTABLE,
                 { 3500000.0, 2500000.0, 300000.0, 1500000.0 }
+            },
+            { MetricsGenerator::Trend::trTOO_LOW,
+                { 0.2 }
             }
         }
     },
@@ -49,6 +55,9 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
             },
             { MetricsGenerator::Trend::trUNSTABLE,
                 { 100000000.0, 200000000.0, 90000000.0 }
+            },
+            { MetricsGenerator::Trend::trTOO_LOW,
+                { 0.2 }
             }
         }
     },
@@ -60,6 +69,9 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
             },
             { MetricsGenerator::Trend::trUNSTABLE,
                 { 0.70, 0.55, 0.80, 0.95 }
+            },
+            { MetricsGenerator::Trend::trTOO_LOW,
+                { 0.2 }
             }
         }
     },
@@ -71,6 +83,9 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
             },
             { MetricsGenerator::Trend::trUNSTABLE,
                 { 0.50, 0.30, 0.70 }
+            },
+            { MetricsGenerator::Trend::trTOO_LOW,
+                { 0.2 }
             }
         }
     }
@@ -98,15 +113,31 @@ MetricsGenerator::~MetricsGenerator() {
 void MetricsGenerator::initialize(IAdaptiveFollower* node) {
     this->node = node;
 
-    for(auto &t : this->trends){
-        Trend trend = static_cast<Trend>(rand() % last);
-        t.second = trend;
-    }
-
     this->metricsThreads = new thread[this->trends.size()];
 }
 
 void MetricsGenerator::start() {
+
+    if(!this->node->node->mg_options.empty()){
+        for(auto &op : this->node->node->mg_options){
+            if(op == "btl")
+                this->trends[BATTERY] = trTOO_LOW;
+            else if(op == "bs")
+                this->trends[BATTERY] = trSTABLE;
+        }
+
+        for(auto &t : this->trends){
+            if(t.first != BATTERY){
+                Trend trend = static_cast<Trend>(rand() % last);
+                t.second = trend;
+            }
+        }
+    }else{
+        for(auto &t : this->trends){
+            Trend trend = static_cast<Trend>(rand() % last);
+            t.second = trend;
+        }
+    }
 
     //check if threads are already running
     for(int i=0; i<this->trends.size(); i++) {
@@ -115,7 +146,6 @@ void MetricsGenerator::start() {
             return;
         }
     }
-
     //start
     this->running = true;
 

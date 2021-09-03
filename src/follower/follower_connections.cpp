@@ -148,6 +148,12 @@ void FollowerConnections::handler(int fd, Message &m) {
                 Message::leader_update update;
                 //contains the list of new leaders
                 m.getData(update);
+
+                cout << "FollowerConnections::handler()" << endl;
+                for(auto &u : update.selected){
+                    cout << u.ip << endl;
+                }
+
                 cout << "Selected Leaders: "<< update.selected.size() << endl;
                 for(auto &node : update.selected) {
                     if(node.ip == "::1" || node.ip == "127.0.0.1") {

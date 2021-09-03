@@ -62,7 +62,7 @@ protected:
     void stable(float delta_max = 0.1, float tol = 0.8);
     void increasing(float tol = 0.8);
     void decreasing(float tol = 0.8);
-    void alarms(float tol=0.8, float too_high=1, float too_low=0.4, float alarming_high=1, float alarming_low=0.3);
+    void alarms(float tol=0.8, float too_high=1, float too_low=0.3, float alarming_high=1, float alarming_low=0.4);
 
     friend class AdaptiveFollower;  // to wake up main thread
 };

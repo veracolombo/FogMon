@@ -19,7 +19,7 @@ Node::Node(string port, bool isLeader, int threads, bool adp) {
     this->maxPerBandwidth = 1;
     this->leaderCheck = 10;
 
-    this->timePropagation = 20;
+    this->timePropagation = 10;
     this->timesilent = 120;
     this->interfaceIp = "";
     this->session = 0;
@@ -56,14 +56,17 @@ Node::~Node() {
 }
 
 void Node::start() {
+    cout << "start()" << endl;
     this->agent->start(mNodes);
 }
 
 void Node::stop() {
+    cout << "stop()" << endl;
     this->agent->stop();
 }
 
 void Node::create() {
+    cout << "create() " << endl;
     if(isLeader) {
         if(adp){
             cout << "Starting Adaptive Leader..." << endl;
@@ -105,6 +108,7 @@ void Node::promote(std::vector<Message::node> nodes) {
 }
 
 void Node::demote(std::vector<Message::node> nodes) {
+    cout << "demote()" << endl;
     if(isLeader) {
         
         isLeader = false;
@@ -117,6 +121,7 @@ void Node::demote(std::vector<Message::node> nodes) {
 }
 
 void Node::restart(std::vector<Message::node> nodes) {
+    cout << "restart" << endl;
     sleep(1);
     sleep(1);
     this->stop();
@@ -175,6 +180,17 @@ string Node::genId() {
     return newUUID();
 }
 
+
+bool Node::setParam(std::string name, std::vector<std::string> value){
+    if(name == string("mg_options")) {
+        this->mg_options = value;
+        std::cout<< "setParam()" << std::endl;
+    }else{
+        return false;
+    }
+    return true;
+}
+
 bool Node::setParam(std::string name, std::string value){
     if(name == string("interface")) {
         this->interfaceIp = value;
@@ -215,8 +231,6 @@ bool Node::setParam(std::string name, int value) {
         this->leaderFormula = value;
     }else if(name == string("session")) {
         this->session = value;
-    }else if(name == string("hardware-sampling-rate")){
-        this->hardwareSamplingRate = value;
     }else
         return this->agent->setParam(name,value);
     cout << "setting: "<<name << " = "<< value << endl;

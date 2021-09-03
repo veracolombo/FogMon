@@ -96,6 +96,7 @@ void UserFunctions(
 
     // leader //
     AddUDF(env, "ChangeTimeReportLeader","v",2,2,"ls",LeaderAction::ChangeTimeReportLeader,"ChangeTimeReportLeader",NULL);
+    AddUDF(env, "SendChangeServer","v",0,0,NULL,LeaderAction::SendChangeServer,"SendChangeServer",NULL);
 
     // helper
     AddUDF(env, "GetTimeReport", "l",5,5,"l",ClipsFunction::GetTimeReport,"GetTimeReport",NULL);

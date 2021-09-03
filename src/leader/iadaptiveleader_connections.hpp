@@ -14,6 +14,8 @@ public:
 
     virtual bool sendChangeTimeReport(Message::node ip, int newTimeReport) = 0;
     virtual bool sendChangeServer() = 0;
+
+    virtual bool sendRemoveLeader(Message::leader_update update) = 0;
 };
 
 #endif

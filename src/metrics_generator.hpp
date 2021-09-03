@@ -15,7 +15,7 @@ using namespace std;
 class MetricsGenerator {
 
 public:
-    enum Trend {trSTABLE, trUNSTABLE, last};
+    enum Trend {trSTABLE, trUNSTABLE, trTOO_LOW, last};
 
     MetricsGenerator();
     ~MetricsGenerator();

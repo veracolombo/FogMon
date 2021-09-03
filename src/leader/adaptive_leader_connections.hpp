@@ -26,6 +26,8 @@ public:
 
     bool sendChangeServer();
     bool sendChangeTimeReport(Message::node ip, int newTimeReport);
+
+    bool sendRemoveLeader(Message::leader_update update);
 };
 
 #endif

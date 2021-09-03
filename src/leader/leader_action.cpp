@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <iostream>
 #include "string.h"
+#include <vector>
 
 using namespace std;
 
@@ -27,4 +28,30 @@ void LeaderAction::ChangeTimeReportLeader(Environment *env, UDFContext *udfc, UD
         return;
         
     node->getConnections()->sendChangeTimeReport(follower, time);
+}
+
+void LeaderAction::SendChangeServer(Environment *env, UDFContext *udfc, UDFValue *out) {
+
+    AdaptiveLeader* node = AdaptiveLeader::myobj;
+
+    //node->getConnections()->sendChangeServer();
+
+    vector<Message::node> mnodes = node->getStorage()->getMNodes();
+
+    vector<Message::node> nodes;
+    for(int i=0; i<mnodes.size(); i++){
+        if(mnodes[i].id != node->getMyNode().id)
+            nodes.push_back(mnodes[i]);
+    }
+
+    Message::leader_update update;
+    update.selected = nodes;
+
+    cout << "LeaderAction::sendChangeServer() " << endl;
+    for(auto &n : update.selected){
+        cout << n.ip << endl;
+    }
+
+    node->getConnections()->sendChangeRoles(update);
+    node->getConnections()->sendRemoveLeader(update);
 }
