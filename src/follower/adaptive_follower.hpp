@@ -30,6 +30,7 @@ public:
 
     IAdaptiveFollowerConnections* getConnections();
     IAdaptiveStorageMonitoring* getStorage();
+    AdaptiveController* getAdaptiveController();
 
     
     vector<Metric> getMetrics();
@@ -44,6 +45,7 @@ public:
     virtual bool changeServer(vector<Message::node> mNodes);
 
 protected:
+
     AdaptiveController* adaptive_controller;
 
     AdaptiveFactory tFactory;

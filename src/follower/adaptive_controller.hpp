@@ -13,9 +13,7 @@
 #include <mutex>                // std::mutex, std::unique_lock
 #include <condition_variable>   // std::condition_variable
 
-#include "iadaptivefollower.hpp"
-
-class AdaptiveFollower;
+class IAdaptiveFollower;
 
 class AdaptiveController {
     
@@ -64,6 +62,5 @@ protected:
     void decreasing(float tol = 0.8);
     void alarms(float tol=0.8, float too_high=1, float too_low=0.3, float alarming_high=1, float alarming_low=0.4);
 
-    friend class AdaptiveFollower;  // to wake up main thread
 };
 #endif

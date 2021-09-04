@@ -2,8 +2,9 @@
 #define ADAPTIVE_LEADER_CONTROLLER_HPP_
 
 #include "adaptive_controller.hpp"
-#include "iadaptiveleader.hpp"
 #include "sleeper.hpp"
+
+class IAdaptiveLeader;
 
 class AdaptiveLeaderController : public AdaptiveController {
 

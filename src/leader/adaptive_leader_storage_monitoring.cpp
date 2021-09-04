@@ -135,3 +135,6 @@ AdaptiveReport::battery_result AdaptiveLeaderStorageMonitoring::getBattery(Messa
 
     return r;
 }
+
+void AdaptiveLeaderStorageMonitoring::addReportStates(Message::node node, map<Metric, vector<State>> states) {
+}

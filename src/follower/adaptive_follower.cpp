@@ -135,6 +135,10 @@ IAdaptiveStorageMonitoring* AdaptiveFollower::getStorage() {
     return this->storage;
 }
 
+AdaptiveController* AdaptiveFollower::getAdaptiveController() {
+    return this->adaptive_controller;
+}
+
 void AdaptiveFollower::getHardware(){
     Report::hardware_result hardware;
 

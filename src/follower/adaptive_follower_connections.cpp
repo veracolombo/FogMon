@@ -40,6 +40,7 @@ std::optional<std::pair<int64_t,Message::node>> AdaptiveFollowerConnections::sen
     AdaptiveReport r;
     r.setHardware(this->parent->getStorage()->getHardware());
     r.setBattery(this->parent->getStorage()->getBattery());
+    r.setStates(this->parent->getAdaptiveController()->getStates());
     r.setIot(this->parent->getStorage()->getIots());
 
     int64_t now = this->parent->getStorage()->getTime();
@@ -52,6 +53,7 @@ std::optional<std::pair<int64_t,Message::node>> AdaptiveFollowerConnections::sen
         r.setLatency(this->parent->getStorage()->getLatency(0));
         r.setBandwidth(this->parent->getStorage()->getBandwidth(0));
     }
+
     m.setData(r);
 
     std::optional<std::pair<int64_t,Message::node>> result = nullopt;

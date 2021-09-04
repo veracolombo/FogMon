@@ -74,6 +74,10 @@ IAdaptiveLeaderStorageMonitoring* AdaptiveLeader::getStorage() {
     return this->storage;
 }
 
+AdaptiveLeaderController* AdaptiveLeader::getAdaptiveController() {
+    return this->adaptive_controller;
+}
+
 
 void AdaptiveLeader::timerFun(){
     this->iter = 1;
@@ -218,8 +222,4 @@ void AdaptiveLeader::timerFun(){
         //elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
         //std::cout << "timerFun2: "<< elapsed_time << " s"<< endl;
     }
-}
-
-Message::node AdaptiveLeader::getNodeS() {
-    return this->nodeS;
 }

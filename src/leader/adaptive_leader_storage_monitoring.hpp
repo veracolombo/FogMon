@@ -21,6 +21,8 @@ public:
     void addReport(AdaptiveReport::adaptive_report_result result, Message::node *monitored = NULL);
     void addReport(std::vector<AdaptiveReport::adaptive_report_result> results, Message::node ip);
 
+    void addReportStates(Message::node node, std::map<Metric, std::vector<State>> states);
+
     virtual AdaptiveReport::battery_result getBattery(Message::node node);
 };
 

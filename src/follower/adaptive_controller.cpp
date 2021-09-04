@@ -1,5 +1,5 @@
 #include "adaptive_controller.hpp"
-#include "adaptive_follower.hpp"
+#include "iadaptivefollower.hpp"
 #include <iostream>
 
 bool AdaptiveController::ready = false;

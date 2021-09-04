@@ -36,8 +36,10 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
 
                 // Do this in another thread
                 if(m.getData(r)) {
+                    cout << "here" << endl;
                     vector<AdaptiveReport::adaptive_report_result> results;
                     if(r.getReports(results)) {
+                        cout << "here2" << endl;
                         this->parent->getStorage()->addReport(results, m.getSender());
                     }
                 }
@@ -88,6 +90,7 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
                     vector<AdaptiveReport::test_result> bandwidth;
                     vector<AdaptiveReport::IoT> iot;
                     AdaptiveReport::battery_result battery;
+                    map<Metric, vector<State>> states;
 
                     bool hw = r.getHardware(hardware);
                     bool bt = r.getBattery(battery);
@@ -103,6 +106,9 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
                     }
                     if(r.getIot(iot)) {
                         this->parent->getStorage()->addReportIot(m.getSender(), iot);
+                    }
+                    if(r.getStates(states)){
+                        this->parent->getStorage()->addReportStates(m.getSender(), states);
                     }
                 }else {
                     Message res;
