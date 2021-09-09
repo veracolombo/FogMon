@@ -44,6 +44,9 @@ public:
 
     virtual bool changeServer(vector<Message::node> mNodes);
 
+    virtual void disableMetrics(vector<Metric> metrics);
+    virtual void enableMetrics(vector<Metric> metrics);
+
 protected:
 
     AdaptiveController* adaptive_controller;

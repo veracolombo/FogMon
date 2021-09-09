@@ -93,6 +93,7 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
                 res.setType(Message::Type::typeRESPONSE);
                 res.setCommand(Message::Command::commGET);
                 res.setArgument(Message::Argument::argPOSITIVE);
+
                 AdaptiveReport r;
                 
                 r.setHardware(this->parent->getStorage()->getHardware());
@@ -106,6 +107,27 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
                 if(this->sendMessage(fd, res)) {
                     
                 }
+            }
+        }else if(m.getCommand() == Message::Command::commDISABLE){
+            if(m.getArgument() == Message::Argument::argMETRICS){
+                handled = true;
+
+                Message res;
+                res.setType(Message::Type::typeRESPONSE);
+                res.setCommand(Message::Command::commDISABLE);
+                res.setArgument(Message::Argument::argPOSITIVE);
+
+                vector<int> data;
+                m.getData(data);
+
+                vector<Metric> metrics;
+                for(auto &d : data){
+                    metrics.push_back(static_cast<Metric>(d));
+                }
+
+                this->parent->disableMetrics(metrics);
+
+                this->sendMessage(fd, res);
             }
         }
     } else if(m.getType() == Message::Type::typePREQUEST){
@@ -136,8 +158,6 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
 
                 vector<Message::node> res;
                 m.getData(res);
-
-                cout << "Message changeServer() received" << endl; 
                 
                 if(!this->parent->changeServer(res)){
                     cout << "Server not changed" << endl;

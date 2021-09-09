@@ -468,3 +468,15 @@ bool AdaptiveFollower::changeServer(vector<Message::node> mNodes) {
     }
     return false;
 }
+
+void AdaptiveFollower::disableMetrics(vector<Metric> metrics) {
+    for(auto &m : metrics){
+        this->metrics[m] = false;
+    }
+}
+
+void AdaptiveFollower::enableMetrics(vector<Metric> metrics){
+    for(auto &m : metrics){
+        this->metrics[m] = true;
+    }
+}

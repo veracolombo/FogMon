@@ -17,8 +17,7 @@ public:
     ~LeaderCondition();
 
     static void IsBatteryTooLow(Environment *env, UDFContext *udfc, UDFValue *out);
-   
-    //static vector<tuple<string, float>> getBattery();
+    static void IsFollowerBatteryTooLow(Environment * env, UDFContext *udfc, UDFValue *out);
 };
 
 #endif

@@ -14,6 +14,7 @@ RUN cp $(ls ./Bin/*/*) /
 
 ADD src/follower/rules.clp /clips/rules.clp
 ADD src/leader/leader_rules.clp /clips/leader_rules.clp
+ADD src/leader/leader_facts.clp /clips/leader_facts.clp
 
 ADD . /compile
 WORKDIR /compile

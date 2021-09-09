@@ -311,3 +311,45 @@ bool AdaptiveLeaderConnections::sendChangeTimeReport(Message::node ip, int newTi
 
     return this->notifyAllM(m);
  }
+
+bool AdaptiveLeaderConnections::sendDisableMetrics(Message::node ip, vector<Metric> metrics) {
+    int Socket = openConnection(ip.ip, ip.port);
+
+    if (Socket < 0){
+        return false;
+    }
+
+    fflush(stdout);
+    char buffer[10];
+
+    Message m;
+    m.setSender(this->parent->getMyNode());
+    m.setType(Message::Type::typeREQUEST);
+    m.setCommand(Message::Command::commDISABLE);
+    m.setArgument(Message::Argument::argMETRICS);
+
+    vector<int> vc;
+    for(auto &m : metrics){
+        vc.push_back(static_cast<int>(m));
+    }
+
+    m.setData(vc);
+
+    bool ret = false;
+
+    // send message
+    if (this->sendMessage(Socket, m)){
+        
+        Message res;
+        if (this->getMessage(Socket, res)){
+            if( res.getType()==Message::Type::typeRESPONSE &&
+                res.getCommand() == Message::Command::commDISABLE &&
+                res.getArgument() == Message::Argument::argPOSITIVE) {
+                    ret = true;
+                }
+        }
+    }
+
+    close(Socket);
+    return ret;
+}

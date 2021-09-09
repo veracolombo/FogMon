@@ -1,6 +1,6 @@
 version: '3'
 services:
-  leader_adp:
+  leader:
     build: .
     command: --leader -i 131.114.72.76:8248 -s 10 --adp --bs
     stdin_open: true
@@ -9,12 +9,12 @@ services:
     expose:
       - "1024-65535"
 
-  follower1_adp:
+  follower:
     build: .
-    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp --btl
+    command: -C leader -i 131.114.72.76:8248 -s 10 --adp --btl
     stdin_open: true
     depends_on:
-      - leader_adp
+      - leader
     networks:
       fm_net_adp:
     expose:
@@ -24,28 +24,7 @@ services:
   #      limits:
   #        cpus: '0.50'
   #        memory: 50M
-          
-  follower2_adp:
-    build: .
-    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp --btl
-    stdin_open: true
-    depends_on:
-      - leader_adp
-    networks:
-      fm_net_adp:
-    expose:
-      - "1024-65535"
-
-  follower3_adp:
-    build: .
-    command: -C leader_adp -i 131.114.72.76:8248 -s 10 --adp --btl
-    stdin_open: true
-    depends_on:
-      - leader_adp
-    networks:
-      fm_net_adp:
-    expose:
-      - "1024-65535"
+        
 
 networks:
   fm_net_adp:

@@ -24,6 +24,9 @@ public:
     void addReportStates(Message::node node, std::map<Metric, std::vector<State>> states);
 
     virtual AdaptiveReport::battery_result getBattery(Message::node node);
+
+    virtual std::vector<std::tuple<std::string, Metric, State>> getFollowerStates();
+    virtual Message::node getMNode(std::string id);
 };
 
 #endif

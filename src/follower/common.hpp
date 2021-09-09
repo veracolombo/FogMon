@@ -16,8 +16,7 @@ const std::map<std::string, Metric> lMetrics = {{"free_cpu", Metric::FREE_CPU},
                                                 {"connected_iots", Metric::CONNECTED_IOTS},
                                                 {"battery", Metric::BATTERY},
                                                 {"total_memory", Metric::TOTAL_MEMORY},
-                                                {"total_disk", Metric::TOTAL_DISK},
-                                                {"light_intensity", Metric::LIGHT_INTENSITY}};
+                                                {"total_disk", Metric::TOTAL_DISK}};
 
 const std::map<std::string, State> lStates = {{"stable", State::STABLE},
                                                   {"unstable", State::UNSTABLE},
@@ -28,5 +27,25 @@ const std::map<std::string, State> lStates = {{"stable", State::STABLE},
                                                   {"too_high", State::TOO_HIGH},
                                                   {"too_low", State::TOO_LOW},
                                                   {"ok", State::OK}};
+
+const std::map<Metric, std::string> Metric2String ={{Metric::FREE_CPU, "free_cpu"},
+                                                    {Metric::FREE_MEMORY, "free_memory"},
+                                                    {Metric::FREE_DISK, "free_disk"},
+                                                    {Metric::LATENCY, "latency"},
+                                                    {Metric::BANDWIDTH, "bandwidth"},
+                                                    {Metric::CONNECTED_IOTS, "connected_iots"},
+                                                    {Metric::BATTERY, "battery"},
+                                                    {Metric::TOTAL_MEMORY, "total_memory"},
+                                                    {Metric::TOTAL_DISK, "total_disk"}};
+
+const std::map<State, std::string> State2String ={{State::STABLE, "stable"},
+                                                    {State::UNSTABLE, "unstable"},
+                                                    {State::INCREASING, "increasing"},
+                                                    {State::DECREASING, "decreasing"},
+                                                    {State::ALARMING_HIGH, "alarming_high"},
+                                                    {State::ALARMING_LOW, "alarming_low"},
+                                                    {State::TOO_HIGH, "too_high"},
+                                                    {State::TOO_LOW, "too_low"},
+                                                    {State::OK, "ok"}};
 
 #endif

@@ -14,6 +14,9 @@ public:
 
     virtual vector<Metric> getMetrics() = 0;
     virtual bool changeServer(vector<Message::node> nodes) = 0;
+
+    virtual void disableMetrics(vector<Metric> metrics) = 0;
+    virtual void enableMetrics(vector<Metric> metrics) = 0;
 };
 
 #endif

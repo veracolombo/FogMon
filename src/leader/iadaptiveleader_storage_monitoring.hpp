@@ -3,7 +3,6 @@
 
 #include "leader_storage.hpp"
 #include "adaptive_storage_monitoring.hpp"
-#include <map>
 
 class IAdaptiveLeaderStorageMonitoring : virtual public ILeaderStorage, virtual public IAdaptiveStorageMonitoring  {
 
@@ -20,6 +19,14 @@ public:
     virtual void addReportStates(Message::node node, std::map<Metric, std::vector<State>> states) = 0;
 
     virtual AdaptiveReport::battery_result getBattery(Message::node ip) = 0;
+
+    // follower states
+    virtual std::vector<std::tuple<std::string, Metric, State>> getFollowerStates() = 0;
+    virtual Message::node getMNode(std::string id) = 0;
+
+protected:
+    static int getFollowerStatesCallback(void *vec, int argc, char **argv, char **azColName);
+    static int getNodeCallback(void *R, int argc, char **argv, char **azColName);
 };
 
 #endif

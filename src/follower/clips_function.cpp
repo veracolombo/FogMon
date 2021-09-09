@@ -1,5 +1,6 @@
 #include "clips_function.hpp"
 #include "adaptive_follower.hpp"
+#include "adaptive_leader.hpp"
 #include <cmath>
 #include <iostream>
 
@@ -37,4 +38,17 @@ void ClipsFunction::GetNumActiveMetrics(Environment *env, UDFContext *udfc, UDFV
             count += 1;
     
     out->integerValue = CreateInteger(env,count);
+}
+
+void ClipsFunction::LoadFacts(Environment *env, UDFContext *udfc, UDFValue *out){
+
+    AdaptiveLeader* node = AdaptiveLeader::myobj;
+
+    vector<tuple<string, Metric, State>> data = node->getStorage()->getFollowerStates();
+
+    string s;
+    for(auto &m : data){
+        s = "(metric_state (node " + get<0>(m) +  ") (metric " + Metric2String.at(get<1>(m)) + ") (state " + State2String.at(get<2>(m)) + "))";
+        AssertString(env, s.c_str());
+    }
 }

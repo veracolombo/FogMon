@@ -11,6 +11,7 @@ public:
 
     static void GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *out);
     static void GetNumActiveMetrics(Environment *env, UDFContext *udfc, UDFValue *out);
+    static void LoadFacts(Environment *env, UDFContext *udfc, UDFValue *out);
 };
 
 #endif

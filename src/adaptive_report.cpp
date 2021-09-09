@@ -35,8 +35,8 @@ void AdaptiveReport::setStates(map<Metric, vector<State>> states) {
     Document::AllocatorType& allocator = doc.GetAllocator();
 
     for(auto &s : states){
-
         Value a(kArrayType);
+
         for(int i=0; i<s.second.size(); i++){
             a.PushBack(s.second[i], allocator);
         }
@@ -76,7 +76,7 @@ bool AdaptiveReport::getStates(map<Metric, vector<State>>& states) {
 
     vc.clear();
 
-    if(val.HasMember("fre_disk")){
+    if(val.HasMember("free_disk")){
         for(auto &v : val["free_disk"].GetArray())
             vc.push_back(static_cast<State>(v.GetInt()));
         states[FREE_DISK] = vc;

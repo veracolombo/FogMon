@@ -252,3 +252,25 @@ string Message::getString() {
     std::string str (s.GetString());
     return str;
 }
+
+/////////////////////////////////////////////////////////////
+void Message::setData(std::vector<int> metrics) {
+    Value arr(kArrayType);
+    Document::AllocatorType& allocator = doc.GetAllocator();
+    
+    for(auto metric : metrics) {
+        arr.PushBack(metric, allocator);
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+    this->data = arr;
+}
+
+bool Message::getData(std::vector<int>& metrics) {
+    if(!this->data.IsArray())
+        return false;
+    for (auto& v : this->data.GetArray()) {
+        if(!v.IsInt())
+            return false;
+        metrics.push_back(v.GetInt());
+    }
+    return true;
+}

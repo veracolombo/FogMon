@@ -16,6 +16,8 @@ public:
     virtual bool sendChangeServer() = 0;
 
     virtual bool sendRemoveLeader(Message::leader_update update) = 0;
+
+    virtual bool sendDisableMetrics(Message::node ip, vector<Metric> metrics) = 0;
 };
 
 #endif

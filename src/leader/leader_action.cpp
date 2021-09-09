@@ -55,3 +55,44 @@ void LeaderAction::SendChangeServer(Environment *env, UDFContext *udfc, UDFValue
     node->getConnections()->sendChangeRoles(update);
     node->getConnections()->sendRemoveLeader(update);
 }
+
+void LeaderAction::SendDisableMetrics(Environment *env, UDFContext *udfc, UDFValue *out){
+    cout << "SendDisableMetrics()" << endl;
+    //get arguments
+    UDFValue _id; UDFValue _metrics; 
+    UDFNthArgument(udfc, 1, SYMBOL_BIT, &_id);
+    UDFNthArgument(udfc, 2, MULTIFIELD_BIT, &_metrics);
+
+    string id = _id.lexemeValue->contents;
+
+    string s;
+    vector<Metric> metrics;
+
+    for(int i=0; i<_metrics.multifieldValue->length; i++){
+        s = (_metrics.multifieldValue->contents[i]).lexemeValue->contents;
+        metrics.push_back(lMetrics.at(s));
+    }
+
+    AdaptiveLeader* node = AdaptiveLeader::myobj;
+    Message::node follower = node->getStorage()->getMNode(id);
+
+    node->getConnections()->sendDisableMetrics(follower, metrics);
+}
+
+void LeaderAction::SendActivateMetrics(Environment *env, UDFContext *udfc, UDFValue *out){
+    //get arguments
+    UDFValue _id; UDFValue _metrics; 
+    UDFNthArgument(udfc, 1, SYMBOL_BIT, &_id);
+    UDFNthArgument(udfc, 2, MULTIFIELD_BIT, &_metrics);
+
+    string id = _id.lexemeValue->contents;
+
+    string s;
+    vector<Metric> metrics;
+
+    for(int i=0; i<_metrics.multifieldValue->length; i++){
+        s = (_metrics.multifieldValue->contents[i]).lexemeValue->contents;
+        metrics.push_back(lMetrics.at(s));
+    }
+
+}

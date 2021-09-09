@@ -19,6 +19,7 @@ void AdaptiveLeaderStorageMonitoring::createTables(){
                             "CREATE TABLE IF NOT EXISTS MNodes (id STRING PRIMARY KEY, ip STRING NOT NULL, port STRING NOT NULL, cores INTEGER, mean_free_cpu REAL, var_free_cpu REAL, memory INTEGER, mean_free_memory FLOAT, var_free_memory FLOAT, disk INTEGER, mean_free_disk FLOAT, var_free_disk FLOAT, mean_battery FLOAT, var_battery FLOAT, lasttime TIMESTAMP, monitoredBy STRING REFERENCES MMNodes(id) NOT NULL, UNIQUE(ip, port))",
                             "CREATE TABLE IF NOT EXISTS MLinks (idA STRING REFERENCES MNodes(id) NOT NULL, idB STRING REFERENCES MNodes(id) NOT NULL, meanL FLOAT, varianceL FLOAT, lasttimeL TIMESTAMP, meanB FLOAT, varianceB FLOAT, lasttimeB TIMESTAMP, PRIMARY KEY(idA,idB))",
                             "CREATE TABLE IF NOT EXISTS MIots (id STRING PRIMARY KEY, desc STRING, ms INTEGER, idNode STRING REFERENCES MNodes(id) NOT NULL)",
+                            "CREATE TABLE IF NOT EXISTS MStates (id STRING, metric INTEGER, state INTEGER)",
                             "DELETE FROM MMNodes",
                             string("INSERT OR IGNORE INTO MMNodes (id, ip, port) VALUES (\"")+ this->nodeM.id+ string("\", \"::1\", \""+ this->nodeM.port +"\")")};
     
@@ -137,4 +138,72 @@ AdaptiveReport::battery_result AdaptiveLeaderStorageMonitoring::getBattery(Messa
 }
 
 void AdaptiveLeaderStorageMonitoring::addReportStates(Message::node node, map<Metric, vector<State>> states) {
+    if(states.empty()){
+        return;
+    }
+
+    char *zErrMsg = 0;
+    stringstream query;
+
+    query << "DELETE FROM MStates WHERE id = \"" << node.id << "\"";
+
+    int err = sqlite3_exec(this->db, query.str().c_str(), 0, 0, &zErrMsg);
+    isError(err, zErrMsg, "addReportStates1");
+
+    query.str("");
+    for(auto &m : states){
+        for(auto &s : m.second){
+            query << "INSERT OR REPLACE INTO MStates (id, metric, state) VALUES (\"" << node.id << "\", " << m.first << ", " << s << ")";
+            
+            err = sqlite3_exec(this->db, query.str().c_str(), 0, 0, &zErrMsg);
+            isError(err, zErrMsg, "addReportStates2");
+
+            query.str("");
+        }
+    }
+}
+
+/*
+std::vector<Message::node> AdaptiveLeaderStorageMonitoring::getFollowerIdBatteryTooLow() {
+    cout << "getFollowerIdBatteryTooLow()" << endl;
+    char *zErrMsg = 0;
+    stringstream query;
+
+    query << "SELECT S.id, N.ip, N.port FROM MStates AS S INNER JOIN MNodes AS N ON S.id = N.id WHERE S.metric = " << static_cast<int>(BATTERY) << " AND S.state = " << static_cast<int>(TOO_LOW); 
+
+    vector<Message::node> nodes;
+
+    int err = sqlite3_exec(this->db, query.str().c_str(), VectorNodeCallback, &nodes, &zErrMsg);
+    isError(err, zErrMsg, "getFollowerIdBatteryTooLow");
+
+    return nodes;
+}
+*/
+
+vector<tuple<string, Metric, State>> AdaptiveLeaderStorageMonitoring::getFollowerStates() {
+    char *zErrMsg = 0;
+    stringstream query;
+
+    query << "SELECT * FROM MStates";
+
+    vector<tuple<string, Metric, State>> data;
+
+    int err = sqlite3_exec(this->db, query.str().c_str(), getFollowerStatesCallback, &data, &zErrMsg);
+    isError(err, zErrMsg, "getFollowerStates()");
+
+    return data;
+}
+
+Message::node AdaptiveLeaderStorageMonitoring::getMNode(std::string id) {
+    char *zErrMsg = 0;
+    stringstream query;
+
+    query << "SELECT id, ip, port FROM MNodes WHERE id = \"" << id << "\"";
+
+    Message::node node;
+
+    int err = sqlite3_exec(this->db, query.str().c_str(), getNodeCallback, &node, &zErrMsg);
+    isError(err, zErrMsg, "getMNode()");
+
+    return node;
 }

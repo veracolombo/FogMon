@@ -28,6 +28,8 @@ public:
     bool sendChangeTimeReport(Message::node ip, int newTimeReport);
 
     bool sendRemoveLeader(Message::leader_update update);
+
+    bool sendDisableMetrics(Message::node ip, vector<Metric> metrics);
 };
 
 #endif

@@ -36,7 +36,6 @@ int Follower::nUpdate = 0;
 Follower::Follower() {}
 
 Follower::Follower(Message::node node, int nThreads) : IAgent() {
-    cout << "Follower()" << endl;
     this->nThreads = nThreads;
 
     this->storage = NULL;

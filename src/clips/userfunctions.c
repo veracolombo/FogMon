@@ -87,6 +87,7 @@ void UserFunctions(
 
     // leader //
     AddUDF(env, "IsBatteryTooLow","b",1,1,"s",LeaderCondition::IsBatteryTooLow,"IsBatteryTooLow",NULL);
+    AddUDF(env, "IsFollowerBatteryTooLow","m",0,0,NULL,LeaderCondition::IsFollowerBatteryTooLow,"IsFollowerBatteryTooLow",NULL);
 
     // actions
     AddUDF(env, "ChangeTimeReport","v",1,1,"l",Action::ChangeTimeReport,"ChangeTimeReport",NULL);
@@ -97,9 +98,10 @@ void UserFunctions(
     // leader //
     AddUDF(env, "ChangeTimeReportLeader","v",2,2,"ls",LeaderAction::ChangeTimeReportLeader,"ChangeTimeReportLeader",NULL);
     AddUDF(env, "SendChangeServer","v",0,0,NULL,LeaderAction::SendChangeServer,"SendChangeServer",NULL);
+    AddUDF(env, "SendDisableMetrics","v",1,10,"ym",LeaderAction::SendDisableMetrics,"SendDisableMetrics",NULL);
 
     // helper
     AddUDF(env, "GetTimeReport", "l",5,5,"l",ClipsFunction::GetTimeReport,"GetTimeReport",NULL);
     AddUDF(env, "GetNumActiveMetrics",NULL,0,0,"l",ClipsFunction::GetNumActiveMetrics,"GetNumActiveMetrics",NULL);
- 
+    AddUDF(env, "LoadFacts","v",0,0,NULL,ClipsFunction::LoadFacts,"LoadFacts",NULL);
 }
