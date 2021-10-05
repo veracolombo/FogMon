@@ -508,9 +508,6 @@ int Follower::testPing(string ip) {     // restituisce la latenza con il nodo pa
 }
 
 void Follower::getHardware() {
-
-    cout << "Follower::getHardware()" << endl;
-
     int status, i;
     sigar_t *sigar;
     sigar_cpu_t cpuT1;
@@ -659,10 +656,10 @@ void Follower::timer() {
 
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
-        int sleeptime = Node::timeReport-elapsed_time;
+        int sleeptime = this->node->timeReport-elapsed_time;
         
         
-        cout << "Time report: " << Node::timeReport << endl;
+        //cout << "Time report: " << this->node->timeReport << endl;
         
 
         if (sleeptime > 0)

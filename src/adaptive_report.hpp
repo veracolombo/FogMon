@@ -45,10 +45,11 @@ public:
         battery_result battery;
 
         std::map<Metric, std::vector<State>> states;
+        std::vector<Metric> metrics;
         
         adaptive_report_result() : report_result() {}
-        adaptive_report_result(Message::node Source, hardware_result Hardware, battery_result Battery, std::vector<test_result> Latency, std::vector<test_result> Bandwidth, std::vector<IoT> Iot, std::string _leader, std::map<Metric, std::vector<State>> States)
-        : report_result(Source, Hardware, Latency, Bandwidth, Iot, _leader), battery(Battery), states(States) {}
+        adaptive_report_result(Message::node Source, hardware_result Hardware, battery_result Battery, std::vector<test_result> Latency, std::vector<test_result> Bandwidth, std::vector<IoT> Iot, std::string _leader, std::map<Metric, std::vector<State>> States, std::vector<Metric> Metrics)
+        : report_result(Source, Hardware, Latency, Bandwidth, Iot, _leader), battery(Battery), states(States), metrics(Metrics) {}
 
     }adaptive_report_result;
 
@@ -67,6 +68,9 @@ public:
 
     void setStates(std::map<Metric, std::vector<State>> states);
     bool getStates(std::map<Metric, std::vector<State>>& states);
+
+    void setMetrics(std::vector<Metric> metrics);
+    bool getMetrics(std::vector<Metric>& metrics);
 
     /**
      * set the report given a report structure

@@ -21,19 +21,20 @@ void AdaptiveLeaderController::initialize(IAdaptiveLeader* node) {
     this->leader_rule = new Rule();
     vector<string> paths;
     paths.push_back("clips/leader_rules.clp");
-    paths.push_back("clips/leader_facts.clp");
     this->rule->initialize(paths);
 }
 
 void AdaptiveLeaderController::start() {
     AdaptiveController::start();
 
+    this->running = true;
     this->leaderRulesThread = thread(&AdaptiveLeaderController::leaderRulesTimer, this);
 }
 
 void AdaptiveLeaderController::stop() {
     AdaptiveController::stop();
 
+    this->running = false;
     if(this->leaderRulesThread.joinable()){
         this->leaderRulesThread.join();
     }

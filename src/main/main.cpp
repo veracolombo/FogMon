@@ -15,7 +15,6 @@ using namespace std;
 #include <unistd.h>
 
 #include "clips.h"
-#include "metrics_generator.hpp"
 
 void handler(int sig) {
   void *array[10];
@@ -107,6 +106,9 @@ int main(int argc, char *argv[]) {
 
     // metrics generator options
     vector<string> mg_options;
+
+    // metrics enabled/disabled options
+    vector<string> m_en_dis_options;
     
     std::string interfaceIp = "";
     int session = 0;
@@ -153,12 +155,51 @@ int main(int argc, char *argv[]) {
 
     if(input.cmdOptionExists("--adp"))
         adp = true;
-    
-    if(input.cmdOptionExists("--btl")){
+
+    if(input.cmdOptionExists("--cu")){
+        mg_options.push_back("cu");
+    }else if(input.cmdOptionExists("--btl")){
         mg_options.push_back("btl");
     }else if(input.cmdOptionExists("--bs")){
         mg_options.push_back("bs");
+    }else if(input.cmdOptionExists("--bok")){
+        mg_options.push_back("bok");
+    }else if(input.cmdOptionExists("--boktl")){
+        mg_options.push_back("boktl");
+    }else if(input.cmdOptionExists("--cspike")){
+        mg_options.push_back("cspike");
     }
+
+    
+    // enable/disable metrics
+    if(input.cmdOptionExists("--b")){
+        m_en_dis_options.push_back("b");
+    }
+
+    if(input.cmdOptionExists("--c")){
+        m_en_dis_options.push_back("c");
+    }
+
+    if(input.cmdOptionExists("--d")){
+        m_en_dis_options.push_back("d");
+    }
+
+    if(input.cmdOptionExists("--m")){
+        m_en_dis_options.push_back("m");
+    }
+
+    if(input.cmdOptionExists("--lt")){
+        m_en_dis_options.push_back("lt");
+    }
+
+    if(input.cmdOptionExists("--bw")){
+        m_en_dis_options.push_back("bw");
+    }
+
+    if(input.cmdOptionExists("--ciots")){
+        m_en_dis_options.push_back("ciots");
+    }
+    //
 
     if(input.cmdOptionExists("-i"))
         interfaceIp = input.getCmdOption("-i");
@@ -197,6 +238,7 @@ int main(int argc, char *argv[]) {
     node.setParam(string("session"), session);
 
     node.setParam(string("mg_options"), mg_options);
+    node.setParam(string("m_en_dis_options"), m_en_dis_options);
     
     node.start();
 

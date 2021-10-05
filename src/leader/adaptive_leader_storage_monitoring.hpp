@@ -22,11 +22,16 @@ public:
     void addReport(std::vector<AdaptiveReport::adaptive_report_result> results, Message::node ip);
 
     void addReportStates(Message::node node, std::map<Metric, std::vector<State>> states);
+    void addReportMetrics(Message::node node, std::vector<Metric> metrics);
 
     virtual AdaptiveReport::battery_result getBattery(Message::node node);
 
-    virtual std::vector<std::tuple<std::string, Metric, State>> getFollowerStates();
+    virtual std::vector<std::tuple<std::string, Metric, State>> getMStates();
+    virtual std::vector<std::tuple<std::string, Metric>> getMMetrics();
     virtual Message::node getMNode(std::string id);
+
+    virtual void removeOldNodesMStates(std::vector<Message::node> nodes);
+    virtual void removeOldNodesMMetrics(std::vector<Message::node> nodes);
 };
 
 #endif

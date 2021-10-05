@@ -9,6 +9,8 @@
 #include "common.hpp"
 
 class Report;
+class AdaptiveReport;
+
 /**
  * The actual message builder for communications
 */
@@ -22,7 +24,7 @@ public:
     /**
      * possible commands for the messages
     */
-    enum Command {commGET, commSET, commHELLO, commMHELLO, commNODELIST, commMNODELIST, commUPDATE, commSTART, commSELECTION_INIT, commSELECTION_START, commSELECTION, commSELECTION_END, commSELECT_NEW_SERVER, commDISABLE};
+    enum Command {commGET, commSET, commHELLO, commMHELLO, commNODELIST, commMNODELIST, commUPDATE, commSTART, commSELECTION_INIT, commSELECTION_START, commSELECTION, commSELECTION_END, commSELECT_NEW_SERVER, commDISABLE, commENABLE};
     /**
      * possible arguments for the messages
     */
@@ -271,7 +273,7 @@ public:
     bool getData(leader_update& update);
 
 
-    /////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////
 
     /**
      * set the data as a vector of nodes

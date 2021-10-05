@@ -51,7 +51,17 @@ void AdaptiveReport::setStates(map<Metric, vector<State>> states) {
     doc.AddMember("states", obj, allocator);
 }
 
+void AdaptiveReport::setMetrics(vector<Metric> metrics){
+    Value arr(kArrayType);
+    doc.RemoveMember("metrics");
 
+    Document::AllocatorType& allocator = doc.GetAllocator();
+
+    for(auto m : metrics) {
+        arr.PushBack(m, allocator);
+    }
+    doc.AddMember("metrics", arr, allocator);
+}
 
 bool AdaptiveReport::getStates(map<Metric, vector<State>>& states) {
     if(!this->doc.HasMember("states") || !this->doc["states"].IsObject())
@@ -89,6 +99,22 @@ bool AdaptiveReport::getStates(map<Metric, vector<State>>& states) {
             vc.push_back(static_cast<State>(v.GetInt()));
         states[BATTERY] = vc;
     }
+
+    return true;
+}
+
+bool AdaptiveReport::getMetrics(vector<Metric>& metrics){
+    if( !this->doc.HasMember("metrics") || !this->doc["metrics"].IsArray())
+        return false;
+
+    Value &val = doc["metrics"];
+
+    vector<Metric> vc;
+
+    for(auto &v : val.GetArray()){
+        vc.push_back(static_cast<Metric>(v.GetInt()));
+    }
+    metrics = vc;
 
     return true;
 }

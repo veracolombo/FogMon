@@ -20,18 +20,47 @@ AdaptiveLeader::~AdaptiveLeader() {
 
 
 void AdaptiveLeader::start(std::vector<Message::node> mNodes){
+    
+    for(auto &m : this->node->m_en_dis_options){
+        if(m == "b"){
+            AdaptiveFollower::metrics[BATTERY] = true;
+        }
+        if(m == "c"){
+            AdaptiveFollower::metrics[FREE_CPU] = true;
+        }
+        if(m == "d"){
+            AdaptiveFollower::metrics[FREE_DISK] = true;
+        }
+        if(m == "m"){
+            AdaptiveFollower::metrics[FREE_MEMORY] = true;
+        }
+        if(m == "lt"){
+            AdaptiveFollower::metrics[LATENCY] = true;
+        }
+        if(m == "bw"){
+            AdaptiveFollower::metrics[BANDWIDTH] = true;
+        }
+        if(m == "ciots"){
+            AdaptiveFollower::metrics[CONNECTED_IOTS] = true;
+        }
+    }
+
+    this->getBattery();
+
     Leader::start(mNodes);
     
-    this->metricsGenerator->start();
+    //this->metricsGenerator->start();
     this->adaptive_controller->start();
 }
 
 
 void AdaptiveLeader::stop(){
 
+    /*
     if(this->metricsGenerator){
         this->metricsGenerator->stop();
     }
+    */
 
     if(this->adaptive_controller){
         this->adaptive_controller->stop();
@@ -89,6 +118,7 @@ void AdaptiveLeader::timerFun(){
         
         //check database for reports
         vector<Message::node> ips = this->getStorage()->getMLRHardware(100, this->node->timesilent);
+
         vector<Message::node> rem;
         for(auto&& node : ips) {
             bool res = this->connections->sendRequestReport(node);
@@ -128,6 +158,11 @@ void AdaptiveLeader::timerFun(){
         int num_leaders = 0;
         rem = this->getStorage()->removeOldLNodes(time, num_leaders, force); // remove old leaders that do not update in a logarithmic time
         tmp = this->getStorage()->removeOldNodes(this->node->timesilent); // remove followers that do not update in heartbeat time
+        
+        // remove nodes from MStates
+        this->getStorage()->removeOldNodesMStates(tmp);
+        this->getStorage()->removeOldNodesMMetrics(tmp);
+        
         //inform other nodes of the removals
         rem.insert(rem.end(),tmp.begin(),tmp.end());
         if (rem.size() > 0) {
@@ -181,35 +216,7 @@ void AdaptiveLeader::timerFun(){
             auto elapsed_time2 = std::chrono::duration_cast<std::chrono::duration<float>>(t_end2-t_start).count();
             cout << "timerFun5 " << elapsed_time2 << endl;
         }
-    
-
-        /// *** LEADER ADEQUACY CHECK *** ///
         
-        /*
-        if (!AdaptiveFollower::leaderAdequacy){
-            // manda messaggio di notifica ai follower
-            this->connections->sendChangeServer();
-            */
-
-            /*
-            vector<Message::node> mnodes = this->getStorage()->getMNodes();
-            vector<Message::node> nodes;
-            for(int i=0; i<mnodes.size(); i++){
-                if(mnodes[i].ip != this->getMyNode().ip)
-                    nodes.push_back(mnodes[i]);
-            }
-
-            // demote to follower role
-            this->changeRole(nodes);
-            */
-           /*
-        }
-        */
-
-        // ******************************* //
-        
-
-       
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
         //std::cout << "timerFun1: "<< elapsed_time << " s"<< endl;
@@ -217,9 +224,5 @@ void AdaptiveLeader::timerFun(){
         if (sleeptime > 0)
             sleeper.sleepFor(chrono::seconds(sleeptime));
         iter++;
-        
-        //t_end = std::chrono::high_resolution_clock::now();
-        //elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
-        //std::cout << "timerFun2: "<< elapsed_time << " s"<< endl;
     }
 }

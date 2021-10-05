@@ -9,9 +9,15 @@
 #include "iadaptivefollower.hpp"
 #include "metrics_generator.hpp"
 
+#include <iostream>
+#include <fstream>
+
+
 class AdaptiveFollower : virtual public IAdaptiveFollower, virtual public Follower {
 
 public:
+    static AdaptiveFollower* myobj;
+
     // metrics
     static map<Metric, bool> metrics;
 
@@ -32,20 +38,18 @@ public:
     IAdaptiveStorageMonitoring* getStorage();
     AdaptiveController* getAdaptiveController();
 
-    
     vector<Metric> getMetrics();
     void setMetrics(vector<Metric> metrics);
     
-
-    /*
     void addMetric(Metric metric);
     void removeMetric(Metric metric);
-    */
 
     virtual bool changeServer(vector<Message::node> mNodes);
 
     virtual void disableMetrics(vector<Metric> metrics);
     virtual void enableMetrics(vector<Metric> metrics);
+
+    ofstream f;
 
 protected:
 
@@ -59,13 +63,16 @@ protected:
 
     MetricsGenerator *metricsGenerator;
 
-    void getLightIntensity();
     void getBattery();
     void getHardware() override;
 
     void timer() override;
     void TestTimer() override;
-    
+
+    void startBandwidthTest();
+    void stopBandwidthTest();
+
+    static bool test_ready;
 };
 
 #endif

@@ -13,7 +13,7 @@ public:
     static void SendChangeServer(Environment *env, UDFContext *udfc, UDFValue *out);
 
     static void SendDisableMetrics(Environment *env, UDFContext *udfc, UDFValue *out);
-    static void SendActivateMetrics(Environment *env, UDFContext *udfc, UDFValue *out);
+    static void SendEnableMetrics(Environment *env, UDFContext *udfc, UDFValue *out);
 };
 
 #endif

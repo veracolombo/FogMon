@@ -38,6 +38,8 @@ public:
     */
     virtual void saveBattery(AdaptiveReport::battery_result battery, int window) = 0;
 
+    virtual std::vector<std::tuple<std::string, int, int>> getCurrentStates() = 0;
+
 protected:
     static int getBatteryCallback(void *R, int argc, char **argv, char **azColName);
     static int getStatesCallback(void *vec, int argc, char **argv, char **azColName);

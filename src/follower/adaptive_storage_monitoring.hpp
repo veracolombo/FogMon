@@ -20,6 +20,8 @@ public:
     void saveStates(std::vector<State> states, Metric metric);
 
     void saveBattery(AdaptiveReport::battery_result battery, int window);
+
+    std::vector<std::tuple<std::string, int, int>> getCurrentStates();
 };
 
 #endif

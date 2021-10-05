@@ -7,29 +7,43 @@ map<Metric, MetricsGenerator::Trend> MetricsGenerator::trends = {
 
     {FREE_CPU, MetricsGenerator::Trend::trSTABLE},
 
-    //{TOTAL_MEMORY, MetricsGenerator::Trend::trCONSTANT},
+    {TOTAL_MEMORY, MetricsGenerator::Trend::trSTABLE},
     {FREE_MEMORY, MetricsGenerator::Trend::trSTABLE},
 
-    //{TOTAL_DISK, MetricsGenerator::trCONSTANT},
+    {TOTAL_DISK, MetricsGenerator::trSTABLE},
     {FREE_DISK, MetricsGenerator::Trend::trSTABLE},
 
-    {BATTERY, MetricsGenerator::Trend::trSTABLE},
-
-    {LIGHT_INTENSITY, MetricsGenerator::Trend::trSTABLE}
-
+    {BATTERY, MetricsGenerator::Trend::trSTABLE}
 };
 
 map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::series = {
     { FREE_CPU, 
         { 
             { MetricsGenerator::Trend::trSTABLE,
-                { 0.80, 0.85 } 
+                { 0.80, 0.83, 0.81, 0.82, 0.83, 0.81 } 
             },
             { MetricsGenerator::Trend::trUNSTABLE,
-                { 0.60, 0.80, 0.60, 0.90 }
+                { 0.80, 0.85, 0.60, 0.65, 0.50, 0.70 }
             },
             { MetricsGenerator::Trend::trTOO_LOW,
                 { 0.2 }
+            },
+            { MetricsGenerator::Trend::trOK,
+                { 0.8 }
+            },
+            { MetricsGenerator::Trend::trOK_TOO_LOW_OK,
+                { 0.2, 0.8}
+            },
+            { MetricsGenerator::Trend::trSPIKE,
+                { 0.90, 0.901, 0.899, 0.90, 0.901, 0.90, 0.899, 0.90, 0.901, 0.90, 0.911, 0.898, 0.90, 0.911, 0.90, 0.898, 0.60, 0.59, 0.899, 0.90, 0.901, 0.899}
+            }
+        }
+    },
+
+    { TOTAL_MEMORY,
+        {
+            { MetricsGenerator::Trend::trSTABLE,
+                { 16000.0 }
             }
         }
     },
@@ -37,13 +51,27 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
     { FREE_MEMORY,
         {
             { MetricsGenerator::Trend::trSTABLE,
-                { 3500000.0, 3400000.0, 3600000.0, 3550000.0 }
+                { 15000.0, 15050.0 }
             },
             { MetricsGenerator::Trend::trUNSTABLE,
-                { 3500000.0, 2500000.0, 300000.0, 1500000.0 }
+                { 15000.0, 10000.0 }
             },
             { MetricsGenerator::Trend::trTOO_LOW,
-                { 0.2 }
+                { 1.0 }
+            },
+            { MetricsGenerator::Trend::trOK,
+                { 15000.0 }
+            },
+            { MetricsGenerator::Trend::trOK_TOO_LOW_OK,
+                { 15000.0, 1.0 }
+            }
+        }
+    },
+
+    { TOTAL_DISK,
+        {
+            { MetricsGenerator::Trend::trSTABLE,
+                { 500000.0 }
             }
         }
     },
@@ -51,13 +79,19 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
     { FREE_DISK,
         {
             { MetricsGenerator::Trend::trSTABLE,
-                { 100000000.0, 150000000.0, 125000000.0 }
+                { 400000.0, 400050.0 }
             },
             { MetricsGenerator::Trend::trUNSTABLE,
-                { 100000000.0, 200000000.0, 90000000.0 }
+                { 400000.0, 300000.0 }
             },
             { MetricsGenerator::Trend::trTOO_LOW,
-                { 0.2 }
+                { 100000.0 }
+            },
+            { MetricsGenerator::Trend::trOK,
+                { 400000.0 }
+            },
+            { MetricsGenerator::Trend::trOK_TOO_LOW_OK,
+                { 400000.0, 100000.0 }
             }
         }
     },
@@ -72,20 +106,12 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
             },
             { MetricsGenerator::Trend::trTOO_LOW,
                 { 0.2 }
-            }
-        }
-    },
-
-    { LIGHT_INTENSITY,
-        {
-            { MetricsGenerator::Trend::trSTABLE,
-                { 0.50, 0.55 }
             },
-            { MetricsGenerator::Trend::trUNSTABLE,
-                { 0.50, 0.30, 0.70 }
+            { MetricsGenerator::Trend::trOK,
+                { 0.8 }
             },
-            { MetricsGenerator::Trend::trTOO_LOW,
-                { 0.2 }
+            { MetricsGenerator::Trend::trOK_TOO_LOW_OK,
+                { 0.8, 0.2, 0.2, 0.2, 0.8, 0.8, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2 }
             }
         }
     }
@@ -95,10 +121,11 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
 map<Metric, float> MetricsGenerator::currentVal = {
 
     {FREE_CPU, 0.0},
+    {TOTAL_MEMORY, 0.0},
     {FREE_MEMORY, 0.0},
+    {TOTAL_DISK, 0.0},
     {FREE_DISK, 0.0},
-    {BATTERY, 0.0},
-    {LIGHT_INTENSITY, 0.0}
+    {BATTERY, 0.0}
     
 };
 
@@ -124,20 +151,39 @@ void MetricsGenerator::start() {
                 this->trends[BATTERY] = trTOO_LOW;
             else if(op == "bs")
                 this->trends[BATTERY] = trSTABLE;
+            else if(op == "bok")
+                this->trends[BATTERY] = trOK;
+            else if(op == "boktl")
+                this->trends[BATTERY] = trOK_TOO_LOW_OK;
+            else if(op == "cu")
+                this->trends[FREE_CPU] = trUNSTABLE;
+            else if(op == "cspike")
+                this->trends[FREE_CPU] = trSPIKE;
         }
-
+        /*
         for(auto &t : this->trends){
             if(t.first != BATTERY){
+                
+                if(t.first == TOTAL_MEMORY || t.first == TOTAL_DISK)
+                    continue;
+
                 Trend trend = static_cast<Trend>(rand() % last);
                 t.second = trend;
             }
         }
-    }else{
+        */
+    }
+    /*
+    else{
         for(auto &t : this->trends){
+            if(t.first == TOTAL_MEMORY || t.first == TOTAL_DISK)
+                    continue;
+
             Trend trend = static_cast<Trend>(rand() % last);
             t.second = trend;
         }
     }
+    */
 
     //check if threads are already running
     for(int i=0; i<this->trends.size(); i++) {
@@ -168,20 +214,30 @@ void MetricsGenerator::stop() {
 }
 
 void MetricsGenerator::metricsRoutine(Metric metric, Trend trend) {
+    //cout << "metricsRoutine()" << endl;
     int idx = 0;
 
     while(this->running){
+        //cout << "Metric: " << Metric2String.at(metric) << endl;
+        //cout << "Trend: " << trend << endl;
+
         auto t_start = std::chrono::high_resolution_clock::now();
+
+        //cout << "here" << endl;
 
         currentVal.at(metric) = series.at(metric).at(trend)[idx];
         idx++;
 
+        //cout << "here2" << endl;
+
         if(idx == series.at(metric).at(trend).size())
             idx = 0;
 
+        //cout << "here3" << endl;
+
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
-        int sleeptime = 1-elapsed_time;
+        int sleeptime = 30-elapsed_time;
 
         if(sleeptime > 0)
             sleeper.sleepFor(chrono::seconds(sleeptime));

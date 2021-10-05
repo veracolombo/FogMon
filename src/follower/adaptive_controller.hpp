@@ -44,19 +44,21 @@ protected:
     map<Metric, vector<State>> states;
 
     //threads
-    std::thread statesThread;
+    //std::thread statesThread;
 
-    static bool ready;
-    std::mutex mtx;
-    std::condition_variable cv;
+    //static bool ready;
+    //std::mutex mtx;
+    //std::condition_variable cv;
 
-    bool running;
+    //bool running;
 
     void statesTimer();
 
     void addState(Metric metric, State state);
     void saveStates();
 
+    //delta max = 0.01
+    // tol = 1
     void stable(float delta_max = 0.1, float tol = 0.8);
     void increasing(float tol = 0.8);
     void decreasing(float tol = 0.8);

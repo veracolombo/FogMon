@@ -131,3 +131,24 @@ void AdaptiveStorageMonitoring::saveBattery(AdaptiveReport::battery_result batte
     err = sqlite3_exec(this->db, buf, 0, 0, &zErrMsg);
     isError(err, zErrMsg, "saveBattery2");
 }
+
+std::vector<std::tuple<string, int, int>> AdaptiveStorageMonitoring::getCurrentStates() {
+    vector<tuple<string, int, int>> states = this->getStates();
+
+    vector<tuple<string, int, int>> res;
+
+    if(states.empty()){
+        return res;
+    }
+
+    string currtime = get<0>(states.at(0));
+    for(auto &s: states){
+        if(get<0>(s) == currtime){
+            res.push_back(s);
+        }else{
+            break;
+        }
+    }
+    
+    return res;
+}
