@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 services:
   leader:
     build:
@@ -12,11 +12,13 @@ services:
     #  - ./monitoring_logs:/monitoring_logs
     expose:
       - "1024-65535"
-    #deploy:
-    #  resources:
-    #    limits:
-    #      cpus: '0.50'
-    #      memory: 50M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+    cap_add:
+      - NET_ADMIN
 
   follower1:
     build:
@@ -32,11 +34,13 @@ services:
     #  - ./monitoring_logs:/monitoring_logs
     expose:
       - "1024-65535"
-    #deploy:
-    #  resources:
-    #    limits:
-    #      cpus: '0.50'
-    #      memory: 50M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+    cap_add:
+      - NET_ADMIN
 
   #leader2:
   #  build: .

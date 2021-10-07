@@ -29,6 +29,7 @@ WORKDIR /
 #
 
 COPY start-my-p2p.sh /
+RUN chmod +x /start-my-p2p.sh 
 
 RUN dnf install -y iproute
 ENTRYPOINT ["/FogMon"]
