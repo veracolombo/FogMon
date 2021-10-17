@@ -25,12 +25,8 @@ RUN cp ./FogMon /
 RUN cp ./libsqlitefunctions.so /
 WORKDIR /
 
-#RUN rm -Rf /compile
-#
-
-COPY start-my-p2p.sh /
-RUN chmod +x /start-my-p2p.sh 
+RUN rm -Rf /compile
 
 RUN dnf install -y iproute
-ENTRYPOINT ["/FogMon"]
+ENTRYPOINT []
 CMD []
