@@ -144,18 +144,26 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
 
 
                     if(hw || bt) {
-                        /*
+
+                        auto now = std::chrono::system_clock::now();
+                        auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+                        
+                        //auto in_time_t = std::chrono::system_clock::to_time_t(now);
+                        //std::stringstream datetime;
+                        //datetime << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
+
+
                         if(m.getSender().id != this->parent->getMyNode().id){
-                            this->f.open("monitoring_logs/CPU_leader_nad.csv", ios_base::out | ios_base::app);
+                            this->f.open("monitoring_logs/CPU_leader_adp.csv", ios_base::out | ios_base::app);
 
                             if(this->f.is_open()){
-                                this->f << hardware.mean_free_cpu << "\n"; 
+                                this->f << hardware.mean_free_cpu << " " << std::to_string(UTC) << "\n"; 
                                 this->f.close();
                             } else{
                                 cout << "Unable to open file." << endl;
                             }
                         }
-                        */
+                        
                         this->parent->getStorage()->addNode(m.getSender(), hardware, battery);
                     }
                     if(r.getLatency(latency)) {

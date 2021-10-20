@@ -131,17 +131,16 @@ void AdaptiveFollower::start(vector<Message::node> mNodes){
         this->pAssoloSnd = NULL;
     }
 
-    //this->metricsGenerator->start();
+    this->metricsGenerator->start();
     this->adaptive_controller->start();
 }
 
 void AdaptiveFollower::stop(){
 
-    /*
+    
     if(this->metricsGenerator){
         this->metricsGenerator->stop();
     }
-    */
     
     if(this->adaptive_controller){
         this->adaptive_controller->stop();
@@ -232,26 +231,31 @@ void AdaptiveFollower::getHardware(){
             unsigned long long totaldiff = cpuT2.total - cpuT1.total + cpuT2.user - cpuT1.user + cpuT2.sys - cpuT1.sys;
 
             hardware.cores = cpulist.number;
-
-            //hardware.mean_free_cpu = MetricsGenerator::currentVal[FREE_CPU];
             
-            hardware.mean_free_cpu = ((float)diffIdle)/(totaldiff);
+            auto now = std::chrono::system_clock::now();
+            auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+            
+            hardware.mean_free_cpu = MetricsGenerator::currentVal[FREE_CPU];
+            //hardware.mean_free_cpu = ((float)diffIdle)/(totaldiff);
 
-            /*
+            
             if(this->node->isFollower()){
-                this->f.open("monitoring_logs/CPU_follower_nad.csv", ios_base::out | ios_base::app);
+                this->f.open("monitoring_logs/CPU_follower_adp.csv", ios_base::out | ios_base::app);
             
                 if(this->f.is_open()){
-                    this->f << hardware.mean_free_cpu << " " << this->node->timeReport <<"\n"; 
+                    this->f << hardware.mean_free_cpu << " " << this->node->timeReport << " " << std::to_string(UTC) <<"\n"; 
                     this->f.close();
                 } else{
                     cout << "Unable to open file." << endl;
                 }
             }
-            */
+            
 
             sigar_cpu_list_destroy(sigar, &cpulist);
         }
+
+
+
 
         if(metrics[FREE_MEMORY]){
 
@@ -396,6 +400,9 @@ void AdaptiveFollower::timer() {
         //     this->startIperf();
         // }
 
+
+
+        
         if(this->metrics[BANDWIDTH]){
             if(iter % 3 == 0) {
                 string out = this->pIperf->readoutput();
@@ -405,6 +412,7 @@ void AdaptiveFollower::timer() {
                 this->startIperf();
             }
         }
+        
 
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
@@ -511,6 +519,7 @@ void AdaptiveFollower::TestTimer(){
             this->stopBandwidthTest();
         }
         
+        
     
         if(lt)
             for(auto &LatencyThread : LatencyThreads)
@@ -519,6 +528,7 @@ void AdaptiveFollower::TestTimer(){
         
         if(bw)   
             BandwidthThread.join();
+        
         
         
 

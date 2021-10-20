@@ -49,19 +49,18 @@ void AdaptiveLeader::start(std::vector<Message::node> mNodes){
 
     Leader::start(mNodes);
     
-    //this->metricsGenerator->start();
+    this->metricsGenerator->start();
     this->adaptive_controller->start();
 }
 
 
 void AdaptiveLeader::stop(){
 
-    /*
+    
     if(this->metricsGenerator){
         this->metricsGenerator->stop();
     }
-    */
-
+    
     if(this->adaptive_controller){
         this->adaptive_controller->stop();
     }

@@ -8,6 +8,8 @@
 #include <map>
 #include <thread>
 
+#include <fstream>
+
 #include "iadaptivefollower.hpp"
 
 using namespace std;
@@ -29,6 +31,8 @@ public:
     static map<Metric, Trend> trends;
     static map<Metric, float> currentVal;
     static map<Metric, map<Trend, vector<float>>> series;
+
+    ofstream f;
 
 private:
     IAdaptiveFollower* node;

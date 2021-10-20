@@ -225,7 +225,22 @@ void MetricsGenerator::metricsRoutine(Metric metric, Trend trend) {
 
         //cout << "here" << endl;
 
+        auto now = std::chrono::system_clock::now();
+        auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+        
         currentVal.at(metric) = series.at(metric).at(trend)[idx];
+
+        if(metric==FREE_CPU){
+            this->f.open("monitoring_logs/CPU_real.csv", ios_base::out | ios_base::app);
+            
+            if(this->f.is_open()){
+                this->f << currentVal.at(metric) << " " << std::to_string(UTC) << "\n"; 
+                this->f.close();
+            } else{
+                cout << "Unable to open file." << endl;
+            }
+        }
+
         idx++;
 
         //cout << "here2" << endl;
@@ -237,7 +252,7 @@ void MetricsGenerator::metricsRoutine(Metric metric, Trend trend) {
 
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
-        int sleeptime = 30-elapsed_time;
+        int sleeptime = 1-elapsed_time;
 
         if(sleeptime > 0)
             sleeper.sleepFor(chrono::seconds(sleeptime));

@@ -86,6 +86,7 @@ void Follower::start(vector<Message::node> mNodes) {
     this->server->start();
     srandom(time(nullptr));
 
+
     if(this->startEstimate() != 0) {
         fprintf(stderr,"Cannot start the estimate\n");
         this->stop();
@@ -655,6 +656,7 @@ void Follower::timer() {
             this->startIperf();
         }
         
+        
 
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
@@ -744,6 +746,7 @@ void Follower::TestTimer() {
                 i++;
             }
         });
+        
     
 
         for(auto &LatencyThread : LatencyThreads) {
