@@ -6,10 +6,14 @@ AdaptiveLeader* AdaptiveLeader::myobj = NULL;
  
 AdaptiveLeader::AdaptiveLeader() {
     myobj = this;
+    this->metrics_generator = false;
+    this->received_cpu_logs = false;
 }
 
 AdaptiveLeader::AdaptiveLeader(Message::node node, int nThreads) : Leader(node, nThreads), AdaptiveFollower(node, nThreads), Follower(node, nThreads) {
     myobj = this;
+    this->metrics_generator = false;
+    this->received_cpu_logs = false;
 }
 
 AdaptiveLeader::~AdaptiveLeader() {
@@ -20,36 +24,25 @@ AdaptiveLeader::~AdaptiveLeader() {
 
 
 void AdaptiveLeader::start(std::vector<Message::node> mNodes){
-    
-    for(auto &m : this->node->m_en_dis_options){
-        if(m == "b"){
-            AdaptiveFollower::metrics[BATTERY] = true;
-        }
-        if(m == "c"){
-            AdaptiveFollower::metrics[FREE_CPU] = true;
-        }
-        if(m == "d"){
-            AdaptiveFollower::metrics[FREE_DISK] = true;
-        }
-        if(m == "m"){
-            AdaptiveFollower::metrics[FREE_MEMORY] = true;
-        }
-        if(m == "lt"){
-            AdaptiveFollower::metrics[LATENCY] = true;
-        }
-        if(m == "bw"){
-            AdaptiveFollower::metrics[BANDWIDTH] = true;
-        }
-        if(m == "ciots"){
-            AdaptiveFollower::metrics[CONNECTED_IOTS] = true;
-        }
-    }
+
+   for(auto &op : this->node->options){
+       if(op == "metrics_generator"){
+           this->metrics_generator = true;
+       }else if(op == "cpu_logs"){
+           this->cpu_logs = true;
+       }else if(op == "received_cpu_logs"){
+           this->received_cpu_logs = true;
+       }
+   }
 
     this->getBattery();
 
     Leader::start(mNodes);
     
-    this->metricsGenerator->start();
+    if(this->metrics_generator){
+        this->metricsGenerator->start();
+    }
+
     this->adaptive_controller->start();
 }
 
@@ -224,4 +217,8 @@ void AdaptiveLeader::timerFun(){
             sleeper.sleepFor(chrono::seconds(sleeptime));
         iter++;
     }
+}
+
+bool AdaptiveLeader::getReceivedCpuLogs() {
+    return this->received_cpu_logs;
 }

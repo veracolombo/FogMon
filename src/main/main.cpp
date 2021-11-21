@@ -106,9 +106,7 @@ int main(int argc, char *argv[]) {
 
     // metrics generator options
     vector<string> mg_options;
-
-    // metrics enabled/disabled options
-    vector<string> m_en_dis_options;
+    vector<string> options;
     
     std::string interfaceIp = "";
     int session = 0;
@@ -153,53 +151,61 @@ int main(int argc, char *argv[]) {
     if(input.cmdOptionExists("--leader"))
         leader = true;
 
-    if(input.cmdOptionExists("--adp"))
-        adp = true;
-
-    if(input.cmdOptionExists("--cu")){
-        mg_options.push_back("cu");
-    }else if(input.cmdOptionExists("--btl")){
-        mg_options.push_back("btl");
-    }else if(input.cmdOptionExists("--bs")){
-        mg_options.push_back("bs");
-    }else if(input.cmdOptionExists("--bok")){
-        mg_options.push_back("bok");
-    }else if(input.cmdOptionExists("--boktl")){
-        mg_options.push_back("boktl");
-    }else if(input.cmdOptionExists("--cspike")){
-        mg_options.push_back("cspike");
+    if(input.cmdOptionExists("--wb")){             // Without bandwidth
+        options.push_back("wb");
     }
 
+    if(input.cmdOptionExists("--adp")){                         // Adaptive FogMon: utilizes AdaptiveFollower amd AdaptiveLeader classes
+        adp = true;                                             // instead of Follower and Leader classes.
+
+
+        //*** EXPERIMENTS CONFIG ***//
+
+        if(input.cmdOptionExists("--ex1")){                     // Experiment 1 (Effectiveness)
+
+            if (!leader){                                       
+
+                if(input.cmdOptionExists("--dm")){              // Experiment 1.1: disable metrics
+                    options.push_back("clips-exp1-dm");
+                }
     
-    // enable/disable metrics
-    if(input.cmdOptionExists("--b")){
-        m_en_dis_options.push_back("b");
+                if(input.cmdOptionExists("--ctr")){             // Experiment 1.2: change time report
+                    options.push_back("clips-exp1-ctr");
+                }
+            }
+        }else if(input.cmdOptionExists("--ex2")){               // Experiment 2 (Efficiency)
+
+            if(input.cmdOptionExists("--ad")){                  // 1st config: adaptive or 2nd config: non-adaptive
+                options.push_back("clips-exp2");
+            }
+
+            if(leader){
+                options.push_back("received_cpu_logs");         // enable received CPU data logs on Leader
+
+            }else{
+                options.push_back("cpu_logs");                  // enable CPU data logs on Follower
+                options.push_back("generated_cpu_logs");        // enable CPU data logs on metrics generator
+
+                options.push_back("metrics_generator");         // enable metrics generator on Follower
+
+                // generate metrics on follower
+                if(input.cmdOptionExists("--unstable")){        // Experiment 2.1: unstable metric
+                    mg_options.push_back("cpu_unstable");
+                }else if(input.cmdOptionExists("--stable")){    // Experiment 2.2: stable metric
+                    mg_options.push_back("cpu_stable");
+                }else if(input.cmdOptionExists("--spike")){     // Experiment 2.3: spike
+                    mg_options.push_back("cpu_spike");
+                }else if(input.cmdOptionExists("--random")){    // Experiment 3.4: random metric
+                    mg_options.push_back("cpu_random");
+                }else if(input.cmdOptionExists("--stbunstb")){  // Experiment 3.5: stable-unstable metric
+                    mg_options.push_back("cpu_stbunstb");
+                }
+            }
+        }
+
+        //*** END EXPERIMENTS CONFIG ***//
     }
 
-    if(input.cmdOptionExists("--c")){
-        m_en_dis_options.push_back("c");
-    }
-
-    if(input.cmdOptionExists("--d")){
-        m_en_dis_options.push_back("d");
-    }
-
-    if(input.cmdOptionExists("--m")){
-        m_en_dis_options.push_back("m");
-    }
-
-    if(input.cmdOptionExists("--lt")){
-        m_en_dis_options.push_back("lt");
-    }
-
-    if(input.cmdOptionExists("--bw")){
-        m_en_dis_options.push_back("bw");
-    }
-
-    if(input.cmdOptionExists("--ciots")){
-        m_en_dis_options.push_back("ciots");
-    }
-    //
 
     if(input.cmdOptionExists("-i"))
         interfaceIp = input.getCmdOption("-i");
@@ -237,8 +243,8 @@ int main(int argc, char *argv[]) {
     node.setParam(string("interface"), interfaceIp);
     node.setParam(string("session"), session);
 
-    node.setParam(string("mg_options"), mg_options);
-    node.setParam(string("m_en_dis_options"), m_en_dis_options);
+    node.setParam(string("mg_options"), mg_options);            // Metrics generator options
+    node.setParam(string("options"), options);                  // Node's options for experiments (both Leader and Follower)
     
     node.start();
 

@@ -73,6 +73,9 @@ protected:
     void stopBandwidthTest();
 
     static bool test_ready;
+
+    bool metrics_generator;
+    bool cpu_logs;
 };
 
 #endif

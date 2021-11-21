@@ -32,13 +32,15 @@ void ClipsFunction::GetTimeReportMean(Environment *env, UDFContext *udfc, UDFVal
 
 void ClipsFunction::GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *out) {
     
-    UDFValue _s; UDFValue _t; 
+    UDFValue _s; UDFValue _t; UDFValue _tr;
 
     UDFNthArgument(udfc, 1, STRING_BIT, &_s);
     UDFNthArgument(udfc, 2, INTEGER_BIT, &_t);
+    UDFNthArgument(udfc, 3, INTEGER_BIT, &_tr);
 
     const char* state = _s.lexemeValue->contents;
     int x = _t.integerValue->contents;
+    int tr = _tr.integerValue->contents;
 
     float a=0;
     float b=0;
@@ -47,28 +49,35 @@ void ClipsFunction::GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *
 
     int res = 0;
 
+
+    /*
+    (a, b)          -> time report (interval of possible values)
+    (min_x, max_x)  -> number of previous samples with the same state (interval of possible values)
+    x               -> number of previous samples with the same state
+    */
+
     if(state == State2String.at(UNSTABLE)){
 
-        if(x <= 5){
-            a=-15;
-            b=-5;
+        if(x <= 5 && tr > 4){
+            b=-4;
             min_x=1;
             max_x=5;
+            a= - ( floor(- ( (b - (-(tr-1))) * ( (3 - min_x) / (max_x - min_x) ) + (-(tr-1)) )) );
             res = floor(- ( (b - a) * ( (x - min_x) / (max_x - min_x) ) + a ));
-        }else{
-            res = 5;
+        }else{ // if metric is unstable since more than 5 samples or time report is = 4
+            res = 4;    // set to minumum
         }
 
     } else if(state == State2String.at(STABLE)){
 
-        if(x<=10){
-            a=20;
+        if(x <= 10 && tr < 60) {
             b=60;
             min_x=1;
             max_x=10;
+            a= floor(( (b - (tr+1)) * ( (2 - min_x) / (max_x - min_x) ) + (tr+1) ));;
             res = floor(( (b - a) * ( (x - min_x) / (max_x - min_x) ) + a ));
-        }else{
-            res = 60;
+        }else{ // if metric is stable since more than 10 samples or time report is = 60
+            res = 60;   // set to maximum
         }
     }
 

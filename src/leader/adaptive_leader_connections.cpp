@@ -153,7 +153,8 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
                         //datetime << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
 
 
-                        if(m.getSender().id != this->parent->getMyNode().id){
+                        if(this->parent->getReceivedCpuLogs() &&
+                           m.getSender().id != this->parent->getMyNode().id){
                             this->f.open("monitoring_logs/CPU_leader_adp.csv", ios_base::out | ios_base::app);
 
                             if(this->f.is_open()){

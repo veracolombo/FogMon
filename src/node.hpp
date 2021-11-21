@@ -59,6 +59,7 @@ public:
     int session;
 
     std::vector<std::string> mg_options;
+    std::vector<std::string> options;
     std::vector<std::string> m_en_dis_options;
 
 protected:

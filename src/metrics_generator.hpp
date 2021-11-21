@@ -17,7 +17,7 @@ using namespace std;
 class MetricsGenerator {
 
 public:
-    enum Trend {trSTABLE, trUNSTABLE, trTOO_LOW, trOK, trOK_TOO_LOW_OK, trSPIKE, last};
+    enum Trend {trSTABLE, trUNSTABLE, trTOO_LOW, trOK, trOK_TOO_LOW_OK, trSPIKE, trRAND, trSTUN, last};
 
     MetricsGenerator();
     ~MetricsGenerator();
@@ -43,6 +43,8 @@ private:
     void metricsRoutine(Metric metric, Trend trend);
 
     Sleeper sleeper;
+
+    bool generated_cpu_logs;
 };
 
 #endif

@@ -175,8 +175,10 @@ string Node::genId() {
 
 
 bool Node::setParam(std::string name, std::vector<std::string> value){
-    if(name == string("mg_options")) {
+    if(name == string("mg_options")){
         this->mg_options = value;
+    } else if(name == string("options")) {
+        this->options = value;
     }else if(name == string("m_en_dis_options")){
         this->m_en_dis_options = value;
     } else{

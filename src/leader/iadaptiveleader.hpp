@@ -12,6 +12,8 @@ public:
     virtual IAdaptiveLeaderConnections* getConnections() = 0;
     virtual IAdaptiveLeaderStorageMonitoring* getStorage() = 0;
     virtual AdaptiveLeaderController* getAdaptiveController() = 0;
+
+    virtual bool getReceivedCpuLogs() = 0;
 };
 
 #endif

@@ -2,6 +2,8 @@
 #include "adaptive_follower.hpp"
 #include <iostream>
 
+#include <stdlib.h>     /* srand, rand */   
+
 
 map<Metric, MetricsGenerator::Trend> MetricsGenerator::trends = {
 
@@ -20,7 +22,7 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
     { FREE_CPU, 
         { 
             { MetricsGenerator::Trend::trSTABLE,
-                { 0.80, 0.83, 0.81, 0.82, 0.83, 0.81 } 
+                { 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83 } 
             },
             { MetricsGenerator::Trend::trUNSTABLE,
                 { 0.80, 0.85, 0.60, 0.65, 0.50, 0.70 }
@@ -35,7 +37,10 @@ map<Metric, map<MetricsGenerator::Trend, vector<float>>> MetricsGenerator::serie
                 { 0.2, 0.8}
             },
             { MetricsGenerator::Trend::trSPIKE,
-                { 0.90, 0.901, 0.899, 0.90, 0.901, 0.90, 0.899, 0.90, 0.901, 0.90, 0.911, 0.898, 0.90, 0.911, 0.90, 0.898, 0.60, 0.59, 0.899, 0.90, 0.901, 0.899}
+                { 0.90, 0.901, 0.899, 0.90, 0.901, 0.90, 0.899, 0.90, 0.901, 0.90, 0.911, 0.898, 0.90, 0.911, 0.90, 0.898, 0.60, 0.59, 0.899, 0.90, 0.901, 0.899 }
+            },
+            { MetricsGenerator::Trend::trSTUN,
+                {  0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.71, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.69, 0.70, 0.70, 0.70, 0.70, 0.68, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.73, 0.70, 0.70, 0.70, 0.70, 0.70, 0.69, 0.70, 0.69, 0.70, 0.70, 0.70, 0.70, 0.68, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70,0.70, 0.70, 0.72, 0.70, 0.70, 0.70, 0.71, 0.70, 0.69, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.70, 0.74, 0.70, 0.70, 0.70, 0.73, 0.70, 0.70, 0.70, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80, 0.60, 0.90, 0.50, 0.80 }
             }
         }
     },
@@ -131,6 +136,7 @@ map<Metric, float> MetricsGenerator::currentVal = {
 
 MetricsGenerator::MetricsGenerator() {
     this->running = false;
+    this->generated_cpu_logs = false;
 }
 MetricsGenerator::~MetricsGenerator() {
     this->stop();
@@ -147,7 +153,17 @@ void MetricsGenerator::start() {
 
     if(!this->node->node->mg_options.empty()){
         for(auto &op : this->node->node->mg_options){
-            if(op == "btl")
+            if(op == "cpu_unstable"){
+                this->trends[FREE_CPU] = trUNSTABLE;
+            }else if(op == "cpu_stable"){
+                this->trends[FREE_CPU] = trSTABLE;
+            }else if(op == "cpu_spike"){
+                this->trends[FREE_CPU] = trSPIKE;
+            }else if(op == "cpu_random"){
+                this->trends[FREE_CPU] = trRAND;
+            }else if(op == "cpu_stbunstb"){
+                this->trends[FREE_CPU] = trSTUN;
+            }else if(op == "btl")
                 this->trends[BATTERY] = trTOO_LOW;
             else if(op == "bs")
                 this->trends[BATTERY] = trSTABLE;
@@ -155,10 +171,6 @@ void MetricsGenerator::start() {
                 this->trends[BATTERY] = trOK;
             else if(op == "boktl")
                 this->trends[BATTERY] = trOK_TOO_LOW_OK;
-            else if(op == "cu")
-                this->trends[FREE_CPU] = trUNSTABLE;
-            else if(op == "cspike")
-                this->trends[FREE_CPU] = trSPIKE;
         }
         /*
         for(auto &t : this->trends){
@@ -172,6 +184,14 @@ void MetricsGenerator::start() {
             }
         }
         */
+    }
+
+    if(!this->node->node->options.empty()){
+        for(auto &op : this->node->node->options){
+            if(op == "generated_cpu_logs"){
+                this->generated_cpu_logs = true;
+            }
+        }
     }
     /*
     else{
@@ -227,10 +247,18 @@ void MetricsGenerator::metricsRoutine(Metric metric, Trend trend) {
 
         auto now = std::chrono::system_clock::now();
         auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
-        
-        currentVal.at(metric) = series.at(metric).at(trend)[idx];
 
-        if(metric==FREE_CPU){
+        if(metric == FREE_CPU && trend == trRAND){
+            currentVal.at(metric) = ((double) rand() / (RAND_MAX));
+        } else{
+            currentVal.at(metric) = series.at(metric).at(trend)[idx];
+            idx++;
+
+            if(idx == series.at(metric).at(trend).size())
+                idx = 0;
+        }
+
+        if(metric == FREE_CPU && generated_cpu_logs){
             this->f.open("monitoring_logs/CPU_real.csv", ios_base::out | ios_base::app);
             
             if(this->f.is_open()){
@@ -241,18 +269,9 @@ void MetricsGenerator::metricsRoutine(Metric metric, Trend trend) {
             }
         }
 
-        idx++;
-
-        //cout << "here2" << endl;
-
-        if(idx == series.at(metric).at(trend).size())
-            idx = 0;
-
-        //cout << "here3" << endl;
-
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
-        int sleeptime = 1-elapsed_time;
+        int sleeptime = 3-elapsed_time;
 
         if(sleeptime > 0)
             sleeper.sleepFor(chrono::seconds(sleeptime));

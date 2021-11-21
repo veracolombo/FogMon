@@ -26,6 +26,8 @@ public:
 
     AdaptiveLeaderController* getAdaptiveController();
 
+    bool getReceivedCpuLogs();
+
 protected:
     AdaptiveLeaderController *adaptive_controller;
 
@@ -36,6 +38,8 @@ protected:
 
     AdaptiveLeaderConnections *connections;
     IAdaptiveLeaderStorageMonitoring *storage;
+
+    bool received_cpu_logs;
 };
 
 #endif

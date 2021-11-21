@@ -17,12 +17,43 @@ void AdaptiveController::initialize(IAdaptiveFollower* node) {
     this->node = node;
 
     this->rule = new Rule();
-    vector<string> paths;
-    paths.push_back("clips/rules.clp");
-    this->rule->initialize(paths);
+    //vector<string> paths;
+
+
+    //paths.push_back("clips/rules-exp2.clp");
+    //this->rule->initialize(paths);
 }
 
 void AdaptiveController::start() {
+
+    vector<string> paths;
+
+    bool ex1_dm = false; bool ex1_ctr = false;
+
+    for(auto &op : this->node->node->options){
+        if(op == "clips-exp1-dm")
+            ex1_dm = true;
+
+        if(op == "clips-exp1-ctr"){
+            cout << "here" << endl;
+            ex1_ctr = true;
+        }
+        
+        if(op == "clips-exp2"){
+            paths.push_back("clips/rules-exp2.clp");
+        }
+    }
+
+    if(ex1_dm && ex1_ctr){
+        paths.push_back("clips/rules-exp1-dm-ctr.clp");
+    }else if(ex1_dm){
+        paths.push_back("clips/rules-exp1-dm.clp");
+    }else if(ex1_ctr){
+        paths.push_back("clips/rules-exp1-ctr.clp");
+    }
+
+    this->rule->initialize(paths);
+
     //this->running = true;
     //this->statesThread = thread(&AdaptiveController::statesTimer, this);
 }
@@ -67,7 +98,7 @@ void AdaptiveController::statesTimer(){
         vector<float> res;
 
         while(!stop && i<data.size()){
-            if(data[i] != 0){
+            if(data[i] != 0.0){
                 res.push_back(data[i]);
             }else{
                 stop = true;
@@ -105,8 +136,10 @@ void AdaptiveController::stable(float delta_max, float tol){
         State first_sample = State::NONE;
         if(abs(s.second[0] - s.second[1] < delta_max)){
             first_sample = State::STABLE;
+        }else{
+            first_sample = State::UNSTABLE;
         }
-
+        
         int stables = 0;
 
         for(int i=0; i<k; i++){

@@ -108,5 +108,5 @@ void UserFunctions(
     AddUDF(env, "GetNumActiveMetrics",NULL,0,0,"l",ClipsFunction::GetNumActiveMetrics,"GetNumActiveMetrics",NULL);
     AddUDF(env, "LoadFactsLeader","v",0,0,NULL,ClipsFunction::LoadFactsLeader,"LoadFactsLeader",NULL);
     AddUDF(env, "LoadFactsFollower","v",0,0,NULL,ClipsFunction::LoadFactsFollower,"LoadFactsFollower",NULL);
-    AddUDF(env, "GetTimeReport", "l",2,2,"sl",ClipsFunction::GetTimeReport,"GetTimeReport",NULL);
+    AddUDF(env, "GetTimeReport", "l",3,3,"sl",ClipsFunction::GetTimeReport,"GetTimeReport",NULL);
 }
