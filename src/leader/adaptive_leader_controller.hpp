@@ -21,8 +21,6 @@ public:
 protected:
     IAdaptiveLeader* node;
 
-    bool running;
-
     //threads
     std::thread leaderRulesThread;
 

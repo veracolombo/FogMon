@@ -17,7 +17,7 @@ using namespace std;
 class MetricsGenerator {
 
 public:
-    enum Trend {trSTABLE, trUNSTABLE, trTOO_LOW, trOK, trOK_TOO_LOW_OK, trSPIKE, last};
+    enum Trend {trSTABLE, trUNSTABLE, trTOO_LOW, last};
 
     MetricsGenerator();
     ~MetricsGenerator();
@@ -27,9 +27,19 @@ public:
 
     void initialize(IAdaptiveFollower *node);
 
-    
+    /*
+    Trend desiderato per una determinata metrica
+    */
     static map<Metric, Trend> trends;
+
+    /*
+    Valore che assume la metrica all'istante corrente
+    */
     static map<Metric, float> currentVal;
+
+    /*
+    Serie di dati da generare per una coppia (Metrica, Trend)
+    */
     static map<Metric, map<Trend, vector<float>>> series;
 
     ofstream f;
@@ -38,6 +48,10 @@ private:
     IAdaptiveFollower* node;
 
     bool running;
+
+    /*
+    Un thread per ciascuna metrica
+    */
     thread *metricsThreads;
 
     void metricsRoutine(Metric metric, Trend trend);

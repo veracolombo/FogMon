@@ -36,8 +36,10 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
 
                 // Do this in another thread
                 if(m.getData(r)) {
+                    cout << "here" << endl;
                     vector<AdaptiveReport::adaptive_report_result> results;
                     if(r.getReports(results)) {
+                        cout << "here2" << endl;
                         this->parent->getStorage()->addReport(results, m.getSender());
                     }
                 }
@@ -69,60 +71,12 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
             }
         }
     } else if(m.getType() == Message::Type::typeNOTIFY){
-        if(m.getCommand() == Message::Command::commHELLO){
-            handled = true;
-
-            //get report
-            AdaptiveReport r;
-            if(m.getData(r)) {
-                Report::hardware_result hardware;
-                r.getHardware(hardware);
-
-                AdaptiveReport::battery_result battery;
-                r.getBattery(battery);
-
-                Message::node sender = m.getSender();
-                //sender.id = "";
-                //if(sender.ip == "::1" && sender.port == this->parent->getMyNode().port) {
-                //    sender.id = this->parent->getMyNode().id;
-                //}
-
-                //set new node online                
-                sender.id = this->parent->getStorage()->addNode(sender, hardware, battery);
-                
-                vector<Message::node> vec = this->parent->getStorage()->getNodes();
-
-                //get nodelist
-                Message res;
-                res.setType(Message::Type::typeRESPONSE);
-                res.setCommand(Message::Command::commHELLO);
-                res.setArgument(Message::Argument::argPOSITIVE);
-
-                res.setData(sender, vec);
-                
-                sendMessage(fd, res);
-
-                //inform all the other nodes about it
-                //
-                Message broadcast;
-                broadcast.setType(Message::Type::typeNOTIFY);
-                broadcast.setCommand(Message::Command::commUPDATE);
-                broadcast.setArgument(Message::Argument::argNODES);
-                vector<Message::node> v;
-                v.push_back(sender);
-                vector<Message::node> v2;
-                broadcast.setData(v ,v2);
-
-                this->notifyAll(broadcast);
-            }
-
-        }else if(m.getCommand() == Message::Command::commUPDATE){
+        if(m.getCommand() == Message::Command::commUPDATE){
             if(m.getArgument() == Message::Argument::argREPORT){
                 handled = true;
                 //get the report
                 //the report should be only a part of it
                 AdaptiveReport r;
-
                 if(m.getData(r)) {
                     Message res;
                     res.setType(Message::Type::typeRESPONSE);
@@ -137,13 +91,12 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
                     vector<AdaptiveReport::IoT> iot;
                     AdaptiveReport::battery_result battery;
                     map<Metric, vector<State>> states;
-                    vector<Metric> metrics;
 
                     bool hw = r.getHardware(hardware);
                     bool bt = r.getBattery(battery);
 
-
                     if(hw || bt) {
+<<<<<<< HEAD
 
                         auto now = std::chrono::system_clock::now();
                         auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
@@ -164,6 +117,8 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
                             }
                         }
                         
+=======
+>>>>>>> parent of 1917f40 (modifiche)
                         this->parent->getStorage()->addNode(m.getSender(), hardware, battery);
                     }
                     if(r.getLatency(latency)) {
@@ -177,9 +132,6 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
                     }
                     if(r.getStates(states)){
                         this->parent->getStorage()->addReportStates(m.getSender(), states);
-                    }
-                    if(r.getMetrics(metrics)){
-                        this->parent->getStorage()->addReportMetrics(m.getSender(), metrics);
                     }
                 }else {
                     Message res;
@@ -203,8 +155,8 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
 
 void AdaptiveLeaderConnections::call_super_handler(int fd, Message &m) { }
 
-
-bool AdaptiveLeaderConnections::sendRequestReport(Message::node ip){
+bool AdaptiveLeaderConnections::sendRequestReport(Message::node ip) {
+    cout << "sendRequestReport()" << endl;
     int Socket = openConnection(ip.ip,ip.port);
     
     if(Socket < 0) {
@@ -233,16 +185,17 @@ bool AdaptiveLeaderConnections::sendRequestReport(Message::node ip){
                 //get report and save it
                 AdaptiveReport r;
                 if(m.getData(r)) {
-                    Report::hardware_result hardware;
-                    vector<Report::test_result> latency;
-                    vector<Report::test_result> bandwidth;
-                    vector<Report::IoT> iot;
+                    AdaptiveReport::hardware_result hardware;
+                    vector<AdaptiveReport::test_result> latency;
+                    vector<AdaptiveReport::test_result> bandwidth;
+                    vector<AdaptiveReport::IoT> iot;
                     AdaptiveReport::battery_result battery;
-                    
+
                     bool hw = r.getHardware(hardware);
                     bool bt = r.getBattery(battery);
 
                     if(hw || bt) {
+                        cout << "hw || bt" << endl;
                         this->parent->getStorage()->addNode(ip, hardware, battery);
                     }
                     if(r.getLatency(latency)) {
@@ -414,48 +367,6 @@ bool AdaptiveLeaderConnections::sendDisableMetrics(Message::node ip, vector<Metr
         if (this->getMessage(Socket, res)){
             if( res.getType()==Message::Type::typeRESPONSE &&
                 res.getCommand() == Message::Command::commDISABLE &&
-                res.getArgument() == Message::Argument::argPOSITIVE) {
-                    ret = true;
-                }
-        }
-    }
-
-    close(Socket);
-    return ret;
-}
-
-bool AdaptiveLeaderConnections::sendEnableMetrics(Message::node ip, vector<Metric> metrics) {
-    int Socket = openConnection(ip.ip, ip.port);
-
-    if (Socket < 0){
-        return false;
-    }
-
-    fflush(stdout);
-    char buffer[10];
-
-    Message m;
-    m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::typeREQUEST);
-    m.setCommand(Message::Command::commENABLE);
-    m.setArgument(Message::Argument::argMETRICS);
-
-    vector<int> vc;
-    for(auto &m : metrics){
-        vc.push_back(static_cast<int>(m));
-    }
-
-    m.setData(vc);
-
-    bool ret = false;
-
-    // send message
-    if (this->sendMessage(Socket, m)){
-        
-        Message res;
-        if (this->getMessage(Socket, res)){
-            if( res.getType()==Message::Type::typeRESPONSE &&
-                res.getCommand() == Message::Command::commENABLE &&
                 res.getArgument() == Message::Argument::argPOSITIVE) {
                     ret = true;
                 }

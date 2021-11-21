@@ -2,8 +2,10 @@
 #include "iadaptivefollower.hpp"
 #include <iostream>
 
+bool AdaptiveController::ready = false;
+
 AdaptiveController::AdaptiveController(){
-    //this->running = false;
+    this->running = false;
 }
 
 AdaptiveController::~AdaptiveController() {
@@ -23,17 +25,15 @@ void AdaptiveController::initialize(IAdaptiveFollower* node) {
 }
 
 void AdaptiveController::start() {
-    //this->running = true;
-    //this->statesThread = thread(&AdaptiveController::statesTimer, this);
+    this->running = true;
+    this->statesThread = thread(&AdaptiveController::statesTimer, this);
 }
 
 void AdaptiveController::stop() {
-    /*
     this->running = false;
     if(this->statesThread.joinable()){
         this->statesThread.join();
     }
-    */
 }
 
 map<Metric, vector<State>> AdaptiveController::getStates(){
@@ -52,45 +52,55 @@ void AdaptiveController::saveStates(){
 
 void AdaptiveController::statesTimer(){
 
-    this->series.clear();
-    this->states.clear();
+    while(this->running){
 
-    vector<Metric> met = this->node->getMetrics(); 
+        std::unique_lock<std::mutex> lck(mtx);
+        cv.wait(lck, [] { return ready; });
 
-    for(auto const &m : met) {
+        this->series.clear();
+        this->states.clear();
 
-        vector<float> data;
-        data = this->node->getStorage()->getLastValues(m, this->history);
+        vector<Metric> met = this->node->getMetrics(); 
 
-        int i=0;
-        bool stop = false;
-        vector<float> res;
+        for(auto const &m : met) {
 
-        while(!stop && i<data.size()){
-            if(data[i] != 0){
-                res.push_back(data[i]);
-            }else{
-                stop = true;
+            vector<float> data;
+            data = this->node->getStorage()->getLastValues(m, this->history);
+
+            int i=0;
+            bool stop = false;
+            vector<float> res;
+
+            while(!stop && i<data.size()){
+                if(data[i] != 0){
+                    res.push_back(data[i]);
+                }else{
+                    stop = true;
+                }
+                i++;
             }
-            i++;
-        }
            
-        if(!res.empty()){
-            this->series[m] = res;
+            if(!res.empty()){
+                this->series[m] = res;
+            }
         }
-    }
 
-    this->stable();
-    this->increasing();
-    this->decreasing();
-    this->alarms();
+        this->stable();
+        this->increasing();
+        this->decreasing();
+        this->alarms();
 
-    this->saveStates();
+        this->saveStates();
         
-    this->rule->run();         // trigger to CLIPS rules engine
+        this->rule->run();         // trigger to CLIPS rules engine
 
-    this->toStringSeries();
-    this->toStringStates();
+        this->toStringSeries();
+        this->toStringStates();
+
+        ready = false;
+        lck.unlock();
+        cv.notify_one();
+    }
 }
 
 void AdaptiveController::stable(float delta_max, float tol){

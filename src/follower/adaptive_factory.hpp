@@ -4,6 +4,7 @@
 #include "factory.hpp"
 #include "adaptive_follower_connections.hpp"
 #include "adaptive_storage_monitoring.hpp"
+#include "metrics_generator.hpp"
 
 class AdaptiveFactory : virtual public Factory {
 public:

@@ -10,11 +10,9 @@ public:
     ~Action();
 
     static void ChangeTimeReport(Environment *env, UDFContext *udfc, UDFValue *out);
-    static void ChangeTimeTests(Environment *env, UDFContext *udfc, UDFValue *out);
-    static void ChangeTimeLatency(Environment *env, UDFContext *udfc, UDFValue *out);
     
-    static void DisableMetrics(Environment *env, UDFContext *udfc, UDFValue *out);
-    static void EnableMetrics(Environment *env, UDFContext *udfc, UDFValue *out);
+    static void EnableMetric(Environment *env, UDFContext *udfc, UDFValue *out);
+    static void DisableMetric(Environment *env, UDFContext *udfc, UDFValue *out);
 
     static void SetLeaderAdequacy(Environment *env, UDFContext *udfc, UDFValue *out);
 };

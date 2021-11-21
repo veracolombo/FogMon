@@ -3,33 +3,25 @@
 #include <iostream>
 #include <sigar.h>
 
-AdaptiveFollower* AdaptiveFollower::myobj = NULL;
-
-bool AdaptiveFollower::test_ready = true;
-
 map<Metric, bool> AdaptiveFollower::metrics = {
-    {Metric::FREE_CPU, false},
+    {Metric::FREE_CPU, true},
     {Metric::FREE_MEMORY, false},
     {Metric::FREE_DISK, false},
-    {Metric::LATENCY, false},
-    {Metric::BANDWIDTH, false},
-    {Metric::CONNECTED_IOTS, false},
-    {Metric::BATTERY, false}
+    {Metric::LATENCY, true},
+    {Metric::BANDWIDTH, true},
+    {Metric::CONNECTED_IOTS, true},
+    {Metric::BATTERY, true}
 };
 
 bool AdaptiveFollower::leaderAdequacy = true;
 
-AdaptiveFollower::AdaptiveFollower() {
-    myobj = this;
-}
+AdaptiveFollower::AdaptiveFollower() { }
 
 AdaptiveFollower::AdaptiveFollower(Message::node node, int nThreads) : Follower(node, nThreads) {
     this->connections = NULL;
     this->storage = NULL;
     this->metricsGenerator = NULL;
     this->adaptive_controller = NULL;
-
-    myobj = this;
 }
 
 AdaptiveFollower::~AdaptiveFollower() {
@@ -40,13 +32,10 @@ AdaptiveFollower::~AdaptiveFollower() {
         this->adaptive_controller = NULL;
     }catch(...) {}
 
-    
     try{
         delete this->metricsGenerator;
         this->metricsGenerator = NULL;
     }catch(...) {}
-
-    myobj = NULL;   
 }
 
 void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
@@ -80,68 +69,17 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
 }
 
 void AdaptiveFollower::start(vector<Message::node> mNodes){
-
-    for(auto &m : this->node->m_en_dis_options){
-        if(m == "b"){
-            AdaptiveFollower::metrics[BATTERY] = true;
-        }
-        if(m == "c"){
-            AdaptiveFollower::metrics[FREE_CPU] = true;
-        }
-        if(m == "d"){
-            AdaptiveFollower::metrics[FREE_DISK] = true;
-        }
-        if(m == "m"){
-            AdaptiveFollower::metrics[FREE_MEMORY] = true;
-        }  
-        if(m == "lt"){
-            AdaptiveFollower::metrics[LATENCY] = true;
-        }
-        if(m == "bw"){
-            AdaptiveFollower::metrics[BANDWIDTH] = true;
-        }
-        if(m == "ciots"){
-            AdaptiveFollower::metrics[CONNECTED_IOTS] = true;
-        }
-    }
-
-    this->getBattery();
-
     Follower::start(mNodes);
-
-    if(!AdaptiveFollower::metrics[LATENCY] && 
-       !AdaptiveFollower::metrics[BANDWIDTH] && 
-       !AdaptiveFollower::metrics[CONNECTED_IOTS]) {
-
-        if(this->timerTestThread.joinable())
-        {
-            this->timerTestThread.join();
-        }
-    }
-
-    if(!AdaptiveFollower::metrics[BANDWIDTH]){
-        if(this->pIperf)
-            delete this->pIperf;
-        if(this->pAssoloRcv)
-            delete this->pAssoloRcv;
-        if(this->pAssoloSnd)
-            delete this->pAssoloSnd;
-        this->pIperf = NULL;
-        this->pAssoloRcv = NULL;
-        this->pAssoloSnd = NULL;
-    }
 
     this->metricsGenerator->start();
     this->adaptive_controller->start();
 }
 
 void AdaptiveFollower::stop(){
-
-    
     if(this->metricsGenerator){
         this->metricsGenerator->stop();
     }
-    
+
     if(this->adaptive_controller){
         this->adaptive_controller->stop();
     }
@@ -173,6 +111,22 @@ void AdaptiveFollower::setMetrics(vector<Metric> metrics){
     }
 }
 
+
+/*
+void AdaptiveFollower::addMetric(Metric metric){
+    for(auto m : this->metrics){
+        if(m == metric){
+            return;
+        }
+    }
+    this->metrics.push_back(metric);
+}
+
+void AdaptiveFollower::removeMetric(Metric metric){
+    this->metrics.erase(std::remove(this->metrics.begin(), this->metrics.end(), metric), this->metrics.end());
+}
+*/
+
 IAdaptiveFollowerConnections* AdaptiveFollower::getConnections() {
     return this->connections;
 }
@@ -186,141 +140,109 @@ AdaptiveController* AdaptiveFollower::getAdaptiveController() {
 }
 
 void AdaptiveFollower::getHardware(){
+    Report::hardware_result hardware;
 
-    if(metrics[FREE_CPU] || metrics[FREE_MEMORY] || metrics[FREE_DISK]){
-            
-        Report::hardware_result hardware;
+    sigar_t *sigar;
+    sigar_open(&sigar);
 
-        sigar_t *sigar;
-        sigar_open(&sigar);
+    if(metrics[FREE_CPU]){
+        int status, i;
+        sigar_cpu_t cpuT1;
+        sigar_cpu_t cpuT2;
+        sigar_cpu_list_t cpulist;               // number of cores
 
-        if(metrics[FREE_CPU]){
-
-            cout << "Mesauring CPU..." << endl;
-
-            int status, i;
-            sigar_cpu_t cpuT1;
-            sigar_cpu_t cpuT2;
-            sigar_cpu_list_t cpulist;               // number of cores
-
-            status = sigar_cpu_list_get(sigar, &cpulist);
-            if (status != SIGAR_OK) {
-                printf("cpu_list error: %d (%s)\n",
-                    status, sigar_strerror(sigar, status));
-                exit(1);
-            }
-
-            status = sigar_cpu_get(sigar, &cpuT1);
-            if (status != SIGAR_OK) {
-                printf("cpu error: %d (%s)\n",
-                    status, sigar_strerror(sigar, status));
-                exit(1);
-            }
-
-            sleeper.sleepFor(chrono::seconds(1));
-
-            status = sigar_cpu_get(sigar, &cpuT2);
-            if (status != SIGAR_OK) {
-                printf("cpu error: %d (%s)\n",
-                    status, sigar_strerror(sigar, status));
-                exit(1);
-            }
-
-
-            unsigned long long diffIdle = cpuT2.idle - cpuT1.idle;
-            unsigned long long totaldiff = cpuT2.total - cpuT1.total + cpuT2.user - cpuT1.user + cpuT2.sys - cpuT1.sys;
-
-            hardware.cores = cpulist.number;
-            
-            auto now = std::chrono::system_clock::now();
-            auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
-            
-            hardware.mean_free_cpu = MetricsGenerator::currentVal[FREE_CPU];
-            //hardware.mean_free_cpu = ((float)diffIdle)/(totaldiff);
-
-            
-            if(this->node->isFollower()){
-                this->f.open("monitoring_logs/CPU_follower_adp.csv", ios_base::out | ios_base::app);
-            
-                if(this->f.is_open()){
-                    this->f << hardware.mean_free_cpu << " " << this->node->timeReport << " " << std::to_string(UTC) <<"\n"; 
-                    this->f.close();
-                } else{
-                    cout << "Unable to open file." << endl;
-                }
-            }
-            
-
-            sigar_cpu_list_destroy(sigar, &cpulist);
+        status = sigar_cpu_list_get(sigar, &cpulist);
+        if (status != SIGAR_OK) {
+            printf("cpu_list error: %d (%s)\n",
+                status, sigar_strerror(sigar, status));
+            exit(1);
         }
 
-
-
-
-        if(metrics[FREE_MEMORY]){
-
-            cout << "Measuring memory... " << endl;
-
-            sigar_mem_t mem;
-            sigar_mem_get(sigar,&mem);
-
-            //hardware.memory = MetricsGenerator::currentVal[TOTAL_MEMORY];
-            hardware.memory = mem.total;
-
-            //hardware.mean_free_memory = MetricsGenerator::currentVal[FREE_MEMORY];
-
-            hardware.mean_free_memory = mem.actual_free;
+        status = sigar_cpu_get(sigar, &cpuT1);
+        if (status != SIGAR_OK) {
+            printf("cpu error: %d (%s)\n",
+                status, sigar_strerror(sigar, status));
+            exit(1);
         }
 
-        if(metrics[FREE_DISK]){
+        sleeper.sleepFor(chrono::seconds(1));
 
-            cout << "Measuring disk..." << endl;
-
-            sigar_file_system_usage_t disk;
-            sigar_file_system_usage_get(sigar,"/",&disk);
-
-            //hardware.disk = MetricsGenerator::currentVal[TOTAL_DISK];
-
-            hardware.disk = disk.total;
-
-            //hardware.mean_free_disk = MetricsGenerator::currentVal[FREE_DISK];
-
-            hardware.mean_free_disk = disk.avail;
+        status = sigar_cpu_get(sigar, &cpuT2);
+        if (status != SIGAR_OK) {
+            printf("cpu error: %d (%s)\n",
+                status, sigar_strerror(sigar, status));
+            exit(1);
         }
 
-    
+        unsigned long long diffIdle = cpuT2.idle - cpuT1.idle;
+        unsigned long long totaldiff = cpuT2.total - cpuT1.total + cpuT2.user - cpuT1.user + cpuT2.sys - cpuT1.sys;
+
+        hardware.cores = cpulist.number;
+
+        hardware.mean_free_cpu = MetricsGenerator::currentVal[FREE_CPU];
+        
+        //hardware.mean_free_cpu = ((float)diffIdle)/(totaldiff);
+        
+
+        sigar_cpu_list_destroy(sigar, &cpulist);
+    }
+
+    if(metrics[FREE_MEMORY]){
+        sigar_mem_t mem;
+        sigar_mem_get(sigar,&mem);
+
+        //hardware.memory = MetricsGenerator::currentVal.total_memory;
+        hardware.memory = mem.total;
+
+        hardware.mean_free_memory = MetricsGenerator::currentVal[FREE_MEMORY];
+
+        //hardware.mean_free_memory = mem.actual_free;
+    }
+
+    if(metrics[FREE_DISK]){
+        sigar_file_system_usage_t disk;
+        sigar_file_system_usage_get(sigar,"/",&disk);
+
+        //hardware.disk = MetricsGenerator::currentVal.total_disk;
+
+        hardware.disk = disk.total;
+
+        hardware.mean_free_disk = MetricsGenerator::currentVal[FREE_DISK];
+
+        //hardware.mean_free_disk = disk.avail;
+    }
+
+    if(metrics[FREE_CPU] ||
+       metrics[FREE_MEMORY] ||
+       metrics[FREE_DISK])
         this->storage->saveHardware(hardware, this->node->hardwareWindow);          // save hardware data on DB
 
-        sigar_close(sigar);
-    }
+    sigar_close(sigar);
 }
 
 void AdaptiveFollower::getBattery(){
-
-    cout << "Measuring battery..." << endl;
     
     AdaptiveReport::battery_result battery;
 
-    if(this->node->isFollower()){
-        battery.mean_battery = 0.2; //MetricsGenerator::currentVal[BATTERY];
-    }else{
-        battery.mean_battery = 0.8;
+    if(metrics[BATTERY]){
+        battery.mean_battery = MetricsGenerator::currentVal[BATTERY];
+        this->storage->saveBattery(battery, this->node->hardwareWindow);
     }
-    this->storage->saveBattery(battery, this->node->hardwareWindow);
 }
 
 void AdaptiveFollower::timer() {
 
-    int iter=0;
+    cout << this->node->isFollower() << endl;
 
+    int iter=0;
     while(this->running) {
 
         auto t_start = std::chrono::high_resolution_clock::now();
 
+        std::unique_lock<std::mutex> lck(this->adaptive_controller->mtx);
+
         this->getHardware();
         this->getBattery();
-
-        this->adaptive_controller->statesTimer();
 
         std::optional<std::pair<int64_t,Message::node>> ris = this->connections->sendUpdate(this->nodeS, this->update); // manda update al nodo leader
         if(ris == nullopt) {           // il messaggio di update non ha ottenuto ack
@@ -344,6 +266,10 @@ void AdaptiveFollower::timer() {
             this->update.first= (*ris).first;
             this->update.second= (*ris).second;
         }
+
+        AdaptiveController::ready = true;
+        lck.unlock();
+        this->adaptive_controller->cv.notify_one();
 
         //every 10 iterations ask the nodes in case the server cant reach this network
         if(iter%10 == 0) {
@@ -400,26 +326,21 @@ void AdaptiveFollower::timer() {
         //     this->startIperf();
         // }
 
-
-
-        
-        if(this->metrics[BANDWIDTH]){
-            if(iter % 3 == 0) {
-                string out = this->pIperf->readoutput();
-                cout << "Iperf restart" << endl;
-                delete this->pIperf;
-                this->pIperf = NULL;
-                this->startIperf();
-            }
+        if(iter % 3 == 0) {
+            string out = this->pIperf->readoutput();
+            cout << "Iperf restart" << endl;
+            delete this->pIperf;
+            this->pIperf = NULL;
+            this->startIperf();
         }
         
 
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
-        int sleeptime = this->node->timeReport-elapsed_time;
+        int sleeptime = Node::timeReport-elapsed_time;
         
         
-        //cout << "Time report: " << Node::timeReport << endl;
+        cout << "Time report: " << Node::timeReport << endl;
         
 
         if (sleeptime > 0)
@@ -432,25 +353,17 @@ void AdaptiveFollower::timer() {
 
 void AdaptiveFollower::TestTimer(){
     int iter=0;
-    while((metrics[LATENCY] ||
-           metrics[BANDWIDTH] ||
-           metrics[CONNECTED_IOTS])
-           &&
-           this->running)
-        {
-
-        bool lt = metrics[LATENCY]; bool bw = metrics[BANDWIDTH]; bool ciots = metrics[CONNECTED_IOTS];
-        test_ready = false;
-
+    while(this->running) {
         //monitor IoT
-        if(ciots &&
+        if(metrics[CONNECTED_IOTS] &&
            iter%4 == 0){
             cout << "Measuring IoTs..." << endl;
             this->testIoT();
         }
 
+
         vector<thread> LatencyThreads;
-        if(lt){
+        if(metrics[LATENCY]){
             //get list ordered by time for the latency tests
             //test the least recent
             cout << "Measuring Latency..." << endl;
@@ -472,14 +385,8 @@ void AdaptiveFollower::TestTimer(){
         }
 
         thread BandwidthThread;
-        if(bw){
-
-            if(this->pIperf == NULL &&
-               this->pAssoloRcv == NULL &&
-               this->pAssoloSnd == NULL){
-                   this->startBandwidthTest();
-               }
-
+        
+        if(metrics[BANDWIDTH]){
             //start thread for bandwidth tests
             BandwidthThread = thread([this]{
                 //test bandwidth
@@ -488,7 +395,7 @@ void AdaptiveFollower::TestTimer(){
                 vector<Message::node> ips = this->storage->getLRBandwidth(this->node->maxPerBandwidth + 5, this->node->timeBandwidth);
                 cout << "List B: ";
                 for(auto node : ips) {
-                    cout << node.ip << " ";
+                    //cout << node.ip << " ";
                 }
                 cout << endl;
                 int i=0;
@@ -500,7 +407,6 @@ void AdaptiveFollower::TestTimer(){
                     }
                     Report::test_result last;
                     int state = this->storage->getTestBandwidthState(ips[i], last);
-
                     float val = this->testBandwidth(ips[i], last.mean, state);
                     if (state==3) {
                         if(val < 0)
@@ -512,24 +418,19 @@ void AdaptiveFollower::TestTimer(){
                     }
                     i++;
                 }
-            });
-        }else{
-            this->stopBandwidthTest();
+        });
         }
     
-        if(lt)
+        if(metrics[LATENCY])
             for(auto &LatencyThread : LatencyThreads)
                 LatencyThread.join();
 
-        if(bw)   
+        if(metrics[BANDWIDTH])   
             BandwidthThread.join();
 
-        test_ready = true;
         sleeper.sleepFor(chrono::seconds(this->node->timeTests));
         iter++;
     }
-
-    this->stopBandwidthTest();
 }
 
 bool AdaptiveFollower::changeServer(vector<Message::node> mNodes) {
@@ -570,82 +471,13 @@ bool AdaptiveFollower::changeServer(vector<Message::node> mNodes) {
 }
 
 void AdaptiveFollower::disableMetrics(vector<Metric> metrics) {
-
-    for(auto &m : metrics){
-        cout << "Disabling metric " << Metric2String.at(m) << "..." << endl;
-    }
-
     for(auto &m : metrics){
         this->metrics[m] = false;
-    }
-
-    if(!this->metrics[LATENCY] &&
-       !this->metrics[BANDWIDTH] &&
-       !this->metrics[CONNECTED_IOTS]){
-        
-        if(this->timerTestThread.joinable()){
-            this->timerTestThread.join();
-        }
     }
 }
 
 void AdaptiveFollower::enableMetrics(vector<Metric> metrics){
-
-    for(auto &m : metrics){
-        cout << "Enabling metric " << Metric2String.at(m) << "..." << endl;
-    }
-
-    bool lt = this->metrics[LATENCY]; bool bw = this->metrics[BANDWIDTH]; bool ciots = this->metrics[CONNECTED_IOTS];
-
     for(auto &m : metrics){
         this->metrics[m] = true;
-    }
-
-    if((!lt && !bw && !ciots)
-       &&
-       (this->metrics[LATENCY] ||
-       this->metrics[BANDWIDTH] ||
-       this->metrics[CONNECTED_IOTS])){
-
-        if(!this->timerTestThread.joinable()){
-            this->timerTestThread = thread(&AdaptiveFollower::TestTimer, this);
-        }
-    }
-}
-
-void AdaptiveFollower::stopBandwidthTest() {
-    cout << "Stopping bandwidth test..." << endl;
-
-    if(this->pIperf)
-        delete this->pIperf;
-    if(this->pAssoloRcv)
-        delete this->pAssoloRcv;
-    if(this->pAssoloSnd)
-        delete this->pAssoloSnd;
-    {
-        std::lock_guard<std::mutex> lock(this->mTest);
-        if(this->pTest)
-            delete this->pTest;
-        this->pTest = NULL;
-    }
-    this->pIperf = NULL;
-    this->pAssoloRcv = NULL;
-    this->pAssoloSnd = NULL;
-}
-
-void AdaptiveFollower::startBandwidthTest() {
-    cout << "Starting bandwidth test..." << endl;
-
-    srandom(time(nullptr));
-
-    if(this->startEstimate() != 0) {
-        fprintf(stderr,"Cannot start the estimate\n");
-        this->stop();
-        exit(1);
-    }
-    if(this->startIperf() != 0) {
-        fprintf(stderr,"Cannot start iperf3\n");
-        this->stop();
-        exit(1);
     }
 }

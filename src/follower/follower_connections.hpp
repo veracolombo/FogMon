@@ -24,7 +24,7 @@ public:
 
     std::vector<Message::node> requestMNodes(Message::node ipS); 
     std::vector<Message::node> requestNodes(Message::node ipS);
-    virtual bool sendHello(Message::node ipS);
+    bool sendHello(Message::node ipS);
     virtual std::optional<std::pair<int64_t,Message::node>> sendUpdate(Message::node ipS, std::pair<int64_t,Message::node> update);
 
     //return the port for the test

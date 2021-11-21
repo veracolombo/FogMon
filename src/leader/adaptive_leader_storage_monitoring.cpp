@@ -20,7 +20,6 @@ void AdaptiveLeaderStorageMonitoring::createTables(){
                             "CREATE TABLE IF NOT EXISTS MLinks (idA STRING REFERENCES MNodes(id) NOT NULL, idB STRING REFERENCES MNodes(id) NOT NULL, meanL FLOAT, varianceL FLOAT, lasttimeL TIMESTAMP, meanB FLOAT, varianceB FLOAT, lasttimeB TIMESTAMP, PRIMARY KEY(idA,idB))",
                             "CREATE TABLE IF NOT EXISTS MIots (id STRING PRIMARY KEY, desc STRING, ms INTEGER, idNode STRING REFERENCES MNodes(id) NOT NULL)",
                             "CREATE TABLE IF NOT EXISTS MStates (id STRING, metric INTEGER, state INTEGER)",
-                            "CREATE TABLE IF NOT EXISTS MMetrics (id STRING, metric INTEGER)",
                             "DELETE FROM MMNodes",
                             string("INSERT OR IGNORE INTO MMNodes (id, ip, port) VALUES (\"")+ this->nodeM.id+ string("\", \"::1\", \""+ this->nodeM.port +"\")")};
     
@@ -58,20 +57,14 @@ AdaptiveReport::adaptive_report_result AdaptiveLeaderStorageMonitoring::getAdapt
 
 
 std::string AdaptiveLeaderStorageMonitoring::addNode(Message::node node, AdaptiveReport::hardware_result hardware, AdaptiveReport::battery_result battery, Message::node *monitored) {
-
-    int64_t lasttime;
-    if(hardware.lasttime != 0){
-        lasttime = hardware.lasttime;
-    }else if(battery.lasttime != 0){
-        lasttime = battery.lasttime;
-    }else{
+    if(hardware.lasttime == 0 || battery.lasttime == 0) { //these are directly measured
         return "";
     }
 
     char *zErrMsg = 0;
     char buf[1024];
     vector<long long> res;
-    std::sprintf(buf,"SELECT strftime('%%s',lasttime) FROM MNodes WHERE (strftime('%%s',lasttime)-%" PRId64" > 0) AND (id = \"%s\") ", lasttime, node.id.c_str());
+    std::sprintf(buf,"SELECT strftime('%%s',lasttime) FROM MNodes WHERE (strftime('%%s',lasttime)-%" PRId64" > 0) AND (id = \"%s\") ", hardware.lasttime, node.id.c_str());
     int err = sqlite3_exec(this->db, buf, IStorage::VectorIntCallback, &res, &zErrMsg);
     isError(err, zErrMsg, "addNodeAdaptiveLeader0");
 
@@ -82,7 +75,7 @@ std::string AdaptiveLeaderStorageMonitoring::addNode(Message::node node, Adaptiv
                     " VALUES (\""<< node.id <<"\", \""<< node.ip <<"\", \""<< node.port <<"\", "<<
                         hardware.cores <<", "<< hardware.mean_free_cpu <<", "<< hardware.var_free_cpu <<", "<<
                         hardware.memory <<", "<< hardware.mean_free_memory <<", "<< hardware.var_free_memory <<", "<<
-                        hardware.disk <<", "<< hardware.mean_free_disk <<", "<< hardware.var_free_disk <<", "<< battery.mean_battery <<", "<< battery.var_battery <<", DATETIME("<< lasttime <<",\"unixepoch\"),";
+                        hardware.disk <<", "<< hardware.mean_free_disk <<", "<< hardware.var_free_disk <<", "<< battery.mean_battery <<", "<< battery.var_battery <<", DATETIME("<< hardware.lasttime <<",\"unixepoch\"),";
         if(!monitored) {
             query << " \"" << this->nodeM.id <<"\")";
         }else {
@@ -160,37 +153,13 @@ void AdaptiveLeaderStorageMonitoring::addReportStates(Message::node node, map<Me
     query.str("");
     for(auto &m : states){
         for(auto &s : m.second){
-            query << "INSERT INTO MStates (id, metric, state) VALUES (\"" << node.id << "\", " << m.first << ", " << s << ")";
+            query << "INSERT OR REPLACE INTO MStates (id, metric, state) VALUES (\"" << node.id << "\", " << m.first << ", " << s << ")";
             
             err = sqlite3_exec(this->db, query.str().c_str(), 0, 0, &zErrMsg);
             isError(err, zErrMsg, "addReportStates2");
 
             query.str("");
         }
-    }
-}
-
-void AdaptiveLeaderStorageMonitoring::addReportMetrics(Message::node node, std::vector<Metric> metrics) {
-    if(metrics.empty()){
-        return;
-    }
-
-    char *zErrMsg = 0;
-    stringstream query;
-
-    query << "DELETE FROM MMetrics WHERE id = \"" << node.id << "\"";
-
-    int err = sqlite3_exec(this->db, query.str().c_str(), 0, 0, &zErrMsg);
-    isError(err, zErrMsg, "addReportMetrics1");
-
-    query.str("");
-    for(auto &m : metrics){
-        query << "INSERT INTO MMetrics (id, metric) VALUES (\"" << node.id << "\", " << m << ")";
-
-        err = sqlite3_exec(this->db, query.str().c_str(), 0, 0, &zErrMsg);
-        isError(err, zErrMsg, "addReportMetrics2");
-
-        query.str("");
     }
 }
 
@@ -211,7 +180,7 @@ std::vector<Message::node> AdaptiveLeaderStorageMonitoring::getFollowerIdBattery
 }
 */
 
-vector<tuple<string, Metric, State>> AdaptiveLeaderStorageMonitoring::getMStates() {
+vector<tuple<string, Metric, State>> AdaptiveLeaderStorageMonitoring::getFollowerStates() {
     char *zErrMsg = 0;
     stringstream query;
 
@@ -219,22 +188,8 @@ vector<tuple<string, Metric, State>> AdaptiveLeaderStorageMonitoring::getMStates
 
     vector<tuple<string, Metric, State>> data;
 
-    int err = sqlite3_exec(this->db, query.str().c_str(), getMStatesCallback, &data, &zErrMsg);
-    isError(err, zErrMsg, "getMStates()");
-
-    return data;
-}
-
-vector<tuple<string, Metric>> AdaptiveLeaderStorageMonitoring::getMMetrics() {
-    char *zErrMsg = 0;
-    stringstream query;
-
-    query << "SELECT * FROM MMetrics";
-
-    vector<tuple<string, Metric>> data;
-
-    int err = sqlite3_exec(this->db, query.str().c_str(), getMMetricsCallback, &data, &zErrMsg);
-    isError(err, zErrMsg, "getMMetrics()");
+    int err = sqlite3_exec(this->db, query.str().c_str(), getFollowerStatesCallback, &data, &zErrMsg);
+    isError(err, zErrMsg, "getFollowerStates()");
 
     return data;
 }
@@ -251,32 +206,4 @@ Message::node AdaptiveLeaderStorageMonitoring::getMNode(std::string id) {
     isError(err, zErrMsg, "getMNode()");
 
     return node;
-}
-
-void AdaptiveLeaderStorageMonitoring::removeOldNodesMStates(vector<Message::node> nodes) {
-    char *zErrMsg = 0;
-    stringstream query;
-
-    for(auto &n : nodes){
-        query << "DELETE FROM MStates WHERE id = \"" << n.id << "\"";
-
-        int err = sqlite3_exec(this->db, query.str().c_str(), 0, 0, &zErrMsg);
-        isError(err, zErrMsg, "removeOldNodesMStates()");
-
-        query.str("");
-    }
-}
-
-void AdaptiveLeaderStorageMonitoring::removeOldNodesMMetrics(vector<Message::node> nodes) {
-    char *zErrMsg = 0;
-    stringstream query;
-
-    for(auto &n : nodes){
-        query << "DELETE FROM MMetrics WHERE id = \"" << n.id << "\"";
-
-        int err = sqlite3_exec(this->db, query.str().c_str(), 0, 0, &zErrMsg);
-        isError(err, zErrMsg, "removeOldNodesMMetrics()");
-
-        query.str("");
-    }
 }

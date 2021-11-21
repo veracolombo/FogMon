@@ -9,6 +9,8 @@
 
 using namespace std;
 
+int Node::timeReport = 30;
+
 Node::Node(string port, bool isLeader, int threads, bool adp) {
     this->timeTests = 30;
     this->timeLatency = 30;
@@ -177,9 +179,7 @@ string Node::genId() {
 bool Node::setParam(std::string name, std::vector<std::string> value){
     if(name == string("mg_options")) {
         this->mg_options = value;
-    }else if(name == string("m_en_dis_options")){
-        this->m_en_dis_options = value;
-    } else{
+    }else{
         return false;
     }
     return true;

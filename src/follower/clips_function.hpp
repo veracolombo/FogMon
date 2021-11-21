@@ -9,11 +9,9 @@ public:
     ClipsFunction();
     ~ClipsFunction();
 
-    static void GetTimeReportMean(Environment *env, UDFContext *udfc, UDFValue *out);
-    static void GetNumActiveMetrics(Environment *env, UDFContext *udfc, UDFValue *out);
-    static void LoadFactsLeader(Environment *env, UDFContext *udfc, UDFValue *out);
-    static void LoadFactsFollower(Environment *env, UDFContext *udfc, UDFValue *out);
     static void GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *out);
+    static void GetNumActiveMetrics(Environment *env, UDFContext *udfc, UDFValue *out);
+    static void LoadFacts(Environment *env, UDFContext *udfc, UDFValue *out);
 };
 
 #endif

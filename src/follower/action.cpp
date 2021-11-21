@@ -12,65 +12,27 @@ void Action::ChangeTimeReport(Environment *env, UDFContext *udfc, UDFValue *out)
     UDFFirstArgument(udfc, INTEGER_BIT, &t);
     int time = t.integerValue->contents;
 
-    AdaptiveFollower* node = AdaptiveFollower::myobj;
-
-    node->node->timeReport = time;
-
-    cout << "Time report changed: " << node->node->timeReport << endl;
+    Node::timeReport = time;
+    cout << "Time report changed: " << Node::timeReport << endl;
 }
 
-void Action::ChangeTimeTests(Environment *env, UDFContext *udfc, UDFValue *out){
-    UDFValue t;
-    UDFFirstArgument(udfc, INTEGER_BIT, &t);
-    int time = t.integerValue->contents;
 
-    AdaptiveFollower* node = AdaptiveFollower::myobj;
+void Action::EnableMetric(Environment *env, UDFContext *udfc, UDFValue *out){
+    UDFValue m;
+    UDFFirstArgument(udfc, STRING_BIT, &m);
+    const char* metric = m.lexemeValue->contents;
 
-    node->node->timeTests = time;
-
-    cout << "Time tests changed: " << node->node->timeTests << endl;
+    AdaptiveFollower::metrics[lMetrics.at(metric)] = true;
+    cout << "Metric " << metric << " enabled" << endl;
 }
 
-void Action::ChangeTimeLatency(Environment *env, UDFContext *udfc, UDFValue *out){
-    UDFValue t;
-    UDFFirstArgument(udfc, INTEGER_BIT, &t);
-    int time = t.integerValue->contents;
+void Action::DisableMetric(Environment *env, UDFContext *udfc, UDFValue *out){
+    UDFValue m;
+    UDFFirstArgument(udfc, STRING_BIT, &m);
+    const char* metric = m.lexemeValue->contents;
 
-    AdaptiveFollower* node = AdaptiveFollower::myobj;
-
-    node->node->timeLatency = time;
-
-    cout << "Time latency changed: " << node->node->timeLatency << endl;
-}
-
-void Action::EnableMetrics(Environment *env, UDFContext *udfc, UDFValue *out){
-    UDFValue _metrics; 
-    UDFFirstArgument(udfc, MULTIFIELD_BIT, &_metrics);
-
-    string s;
-    vector<Metric> metrics;
-    for(int i=0; i<_metrics.multifieldValue->length; i++){
-        s = (_metrics.multifieldValue->contents[i]).lexemeValue->contents;
-        metrics.push_back(lMetrics.at(s));
-    }
-
-    AdaptiveFollower* node = AdaptiveFollower::myobj;
-    node->enableMetrics(metrics);
-}
-
-void Action::DisableMetrics(Environment *env, UDFContext *udfc, UDFValue *out){
-    UDFValue _metrics; 
-    UDFFirstArgument(udfc, MULTIFIELD_BIT, &_metrics);
-
-    string s;
-    vector<Metric> metrics;
-    for(int i=0; i<_metrics.multifieldValue->length; i++){
-        s = (_metrics.multifieldValue->contents[i]).lexemeValue->contents;
-        metrics.push_back(lMetrics.at(s));
-    }
-
-    AdaptiveFollower* node = AdaptiveFollower::myobj;
-    node->disableMetrics(metrics);
+    AdaptiveFollower::metrics[lMetrics.at(metric)] = false;
+    cout << "Metric " << metric << " disabled" << endl;
 }
 
 void Action::SetLeaderAdequacy(Environment *env, UDFContext *udfc, UDFValue *out){

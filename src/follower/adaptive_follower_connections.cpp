@@ -38,40 +38,21 @@ std::optional<std::pair<int64_t,Message::node>> AdaptiveFollowerConnections::sen
     m.setArgument(Message::Argument::argREPORT);
 
     AdaptiveReport r;
+    r.setHardware(this->parent->getStorage()->getHardware());
+    r.setBattery(this->parent->getStorage()->getBattery());
+    r.setStates(this->parent->getAdaptiveController()->getStates());
+    r.setIot(this->parent->getStorage()->getIots());
 
     int64_t now = this->parent->getStorage()->getTime();
     int64_t time = update.first;
-
-    bool skip = false;
-    for(auto &m : this->parent->getMetrics()){
-        if(m == FREE_CPU || m == FREE_MEMORY || m == FREE_DISK){
-            if(!skip){
-                r.setHardware(this->parent->getStorage()->getHardware());
-                skip = true;
-            }
-        }else if(m == BATTERY){
-            r.setBattery(this->parent->getStorage()->getBattery());
-        }else if(m == LATENCY){
-            if(ipS == update.second) {          // se l'ultima update è stata fatta a questo ip
-                r.setLatency(this->parent->getStorage()->getLatency(this->parent->node->sensitivity,time));
+    if(ipS == update.second) {          // se l'ultima update è stata fatta a questo ip
+        r.setLatency(this->parent->getStorage()->getLatency(this->parent->node->sensitivity,time));
+        r.setBandwidth(this->parent->getStorage()->getBandwidth(this->parent->node->sensitivity,time));
         
-            } else { //send all data
-                r.setLatency(this->parent->getStorage()->getLatency(0));
-            }
-        }else if(m == BANDWIDTH){
-            if(ipS == update.second) {          // se l'ultima update è stata fatta a questo ip
-                r.setBandwidth(this->parent->getStorage()->getBandwidth(this->parent->node->sensitivity,time));
-        
-            } else { //send all data
-                r.setBandwidth(this->parent->getStorage()->getBandwidth(0));
-            }
-        }else if(m == CONNECTED_IOTS){
-            r.setIot(this->parent->getStorage()->getIots());
-        }
+    } else { //send all data
+        r.setLatency(this->parent->getStorage()->getLatency(0));
+        r.setBandwidth(this->parent->getStorage()->getBandwidth(0));
     }
-
-    r.setMetrics(this->parent->getMetrics());
-    r.setStates(this->parent->getAdaptiveController()->getStates());
 
     m.setData(r);
 
@@ -114,28 +95,18 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
                 res.setArgument(Message::Argument::argPOSITIVE);
 
                 AdaptiveReport r;
-
-                bool skip = false;
-                for(auto &m : this->parent->getMetrics()){
-                    if(m == FREE_CPU || m == FREE_MEMORY || m == FREE_DISK){
-                        if(!skip){
-                            r.setHardware(this->parent->getStorage()->getHardware());
-                            skip = true;
-                        }
-                    }else if(m == BATTERY){
-                        r.setBattery(this->parent->getStorage()->getBattery());
-                    }
-                }
                 
-
+                r.setHardware(this->parent->getStorage()->getHardware());
+                r.setBattery(this->parent->getStorage()->getBattery());
                 r.setLatency(this->parent->getStorage()->getLatency(this->parent->node->sensitivity));
                 r.setBandwidth(this->parent->getStorage()->getBandwidth(this->parent->node->sensitivity));
                 r.setIot(this->parent->getStorage()->getIots());
-
                 res.setData(r);
 
                 //send report
-                this->sendMessage(fd, res);
+                if(this->sendMessage(fd, res)) {
+                    
+                }
             }
         }else if(m.getCommand() == Message::Command::commDISABLE){
             if(m.getArgument() == Message::Argument::argMETRICS){
@@ -155,27 +126,6 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
                 }
 
                 this->parent->disableMetrics(metrics);
-
-                this->sendMessage(fd, res);
-            }
-        }else if(m.getCommand() == Message::Command::commENABLE){
-            if(m.getArgument() == Message::Argument::argMETRICS){
-                handled = true;
-
-                Message res;
-                res.setType(Message::Type::typeRESPONSE);
-                res.setCommand(Message::Command::commENABLE);
-                res.setArgument(Message::Argument::argPOSITIVE);
-
-                vector<int> data;
-                m.getData(data);
-
-                vector<Metric> metrics;
-                for(auto &d : data){
-                    metrics.push_back(static_cast<Metric>(d));
-                }
-
-                this->parent->enableMetrics(metrics);
 
                 this->sendMessage(fd, res);
             }
@@ -220,62 +170,6 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
 
     if(!handled)
         this->call_super_handler(fd, m);
-}
-
-bool AdaptiveFollowerConnections::sendHello(Message::node ipS) {
-    cout << "Trying server " << ipS.id << " " << ipS.ip << ":" << ipS.port <<endl;
-    int Socket = openConnection(ipS.ip, ipS.port);
-    if(Socket < 0) {
-        return false;
-    }
-
-    fflush(stdout);
-    char buffer[10];
-
-    //build hello message
-    Message m;
-    m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::typeNOTIFY);
-    m.setCommand(Message::Command::commHELLO);
-    AdaptiveReport r;
-    
-
-    bool skip = false;
-    for(auto &m : this->parent->getMetrics()){
-        if(m == FREE_CPU || m == FREE_MEMORY || m == FREE_DISK){
-            if(!skip){
-                r.setHardware(this->parent->getStorage()->getHardware());
-                skip = true;
-            }
-        }else if(m == BATTERY){
-            r.setBattery(this->parent->getStorage()->getBattery());
-        }
-    }
-    
-    m.setData(r);
-    bool result = false;
-
-    //send hello message
-    if(this->sendMessage(Socket, m)) {
-        Message res;
-        if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::typeRESPONSE &&
-                res.getCommand() == Message::Command::commHELLO &&
-                res.getArgument() == Message::Argument::argPOSITIVE) {
-                Message::node node;
-                vector<Message::node> vec;
-                if(res.getData(node, vec)) {
-                    cout << "My id: " << node.id << " " << node.ip << ":" << node.port << endl;
-                    this->parent->getStorage()->setFilter(ipS.ip);
-                    this->parent->getStorage()->refreshNodes(vec);
-                    result = true;
-                    cout << "Server: " << ipS.id << " " << ipS.ip << ":" << ipS.port << endl;
-                }
-            }
-        }
-    }
-    
-    return result;
 }
 
 

@@ -19,8 +19,6 @@ public:
 
     void initialize(IAdaptiveFollower* parent);
     std::optional<std::pair<int64_t,Message::node>> sendUpdate(Message::node ipS, std::pair<int64_t,Message::node> update) override;
-
-    bool sendHello(Message::node ipS) override;
 };
 
 #endif

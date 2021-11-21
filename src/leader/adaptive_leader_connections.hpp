@@ -5,7 +5,6 @@
 #include "adaptive_follower_connections.hpp"
 #include "iadaptiveleader_connections.hpp"
 #include "iadaptiveleader.hpp"
-#include <fstream>
 
 class AdaptiveLeaderConnections : public LeaderConnections, public AdaptiveFollowerConnections, virtual public IAdaptiveLeaderConnections {
 
@@ -14,8 +13,6 @@ protected:
     void call_super_handler(int fd, Message &m) override;
 
     IAdaptiveLeader* parent;
-
-    ofstream f;
 
 public:
     AdaptiveLeaderConnections(int nThread);
@@ -33,7 +30,6 @@ public:
     bool sendRemoveLeader(Message::leader_update update);
 
     bool sendDisableMetrics(Message::node ip, vector<Metric> metrics);
-    bool sendEnableMetrics(Message::node ip, vector<Metric> metrics);
 };
 
 #endif

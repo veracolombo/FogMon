@@ -1,12 +1,10 @@
 #include "message.hpp"
 
 #include "report.hpp"
-#include "adaptive_report.hpp"
 #include "rapidjson/reader.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
-
 
 using namespace std;
 using namespace rapidjson;
@@ -256,7 +254,6 @@ string Message::getString() {
 }
 
 /////////////////////////////////////////////////////////////
-
 void Message::setData(std::vector<int> metrics) {
     Value arr(kArrayType);
     Document::AllocatorType& allocator = doc.GetAllocator();

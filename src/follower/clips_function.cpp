@@ -9,7 +9,7 @@ using namespace std;
 ClipsFunction::ClipsFunction() {}
 ClipsFunction::~ClipsFunction() {}
 
-void ClipsFunction::GetTimeReportMean(Environment *env, UDFContext *udfc, UDFValue *out) {
+void ClipsFunction::GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *out) {
     
     UDFValue _c; UDFValue _n; UDFValue _w; UDFValue _mintr; UDFValue _maxtr;  
 
@@ -30,51 +30,6 @@ void ClipsFunction::GetTimeReportMean(Environment *env, UDFContext *udfc, UDFVal
     out->integerValue = CreateInteger(env,tr);
 }
 
-void ClipsFunction::GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *out) {
-    
-    UDFValue _s; UDFValue _t; 
-
-    UDFNthArgument(udfc, 1, STRING_BIT, &_s);
-    UDFNthArgument(udfc, 2, INTEGER_BIT, &_t);
-
-    const char* state = _s.lexemeValue->contents;
-    int x = _t.integerValue->contents;
-
-    float a=0;
-    float b=0;
-    float min_x=0;
-    float max_x=0;
-
-    int res = 0;
-
-    if(state == State2String.at(UNSTABLE)){
-
-        if(x <= 5){
-            a=-15;
-            b=-5;
-            min_x=1;
-            max_x=5;
-            res = floor(- ( (b - a) * ( (x - min_x) / (max_x - min_x) ) + a ));
-        }else{
-            res = 5;
-        }
-
-    } else if(state == State2String.at(STABLE)){
-
-        if(x<=10){
-            a=20;
-            b=60;
-            min_x=1;
-            max_x=10;
-            res = floor(( (b - a) * ( (x - min_x) / (max_x - min_x) ) + a ));
-        }else{
-            res = 60;
-        }
-    }
-
-    out->integerValue = CreateInteger(env,res);
-}
-
 void ClipsFunction::GetNumActiveMetrics(Environment *env, UDFContext *udfc, UDFValue *out){
     int count = 0;
 
@@ -85,51 +40,15 @@ void ClipsFunction::GetNumActiveMetrics(Environment *env, UDFContext *udfc, UDFV
     out->integerValue = CreateInteger(env,count);
 }
 
-void ClipsFunction::LoadFactsLeader(Environment *env, UDFContext *udfc, UDFValue *out){
+void ClipsFunction::LoadFacts(Environment *env, UDFContext *udfc, UDFValue *out){
 
     AdaptiveLeader* node = AdaptiveLeader::myobj;
 
-    string s;
-
-    // follower's active metrics
-    vector<tuple<string, Metric>> metrics = node->getStorage()->getMMetrics();
-    for(auto &m : metrics){
-        s = "(node_metric_enabled (node " + get<0>(m) + ") (metric " + Metric2String.at(get<1>(m)) + "))";
-        AssertString(env, s.c_str());
-    }
-
-    // follower's metrics states
-    vector<tuple<string, Metric, State>> states = node->getStorage()->getMStates();
-    for(auto &m : states){
-        s = "(node_metric_state (node " + get<0>(m) +  ") (metric " + Metric2String.at(get<1>(m)) + ") (state " + State2String.at(get<2>(m)) + "))";
-        AssertString(env, s.c_str());
-    }
-}
-
-void ClipsFunction::LoadFactsFollower(Environment *env, UDFContext *udfc, UDFValue *out){
-
-    AdaptiveFollower* node = AdaptiveFollower::myobj;
+    vector<tuple<string, Metric, State>> data = node->getStorage()->getFollowerStates();
 
     string s;
-
-    // parameters
-    int time_report = node->node->timeReport;
-    int time_tests = node->node->timeTests;
-    int time_latency = node->node->timeLatency;
-    s = "(my_parameters (time_report " + to_string(time_report) + ") (time_tests " + to_string(time_tests) + ") (time_latency " + to_string(time_latency) + "))";
-    AssertString(env, s.c_str());
-
-    // active metrics
-    vector<Metric> metrics = node->getMetrics();
-    for(auto &m : metrics){
-        s = "(my_metric_enabled (metric " + Metric2String.at(m) + "))";
-        AssertString(env, s.c_str());
-    }
-
-    // metrics states
-    vector<tuple<string, int, int>> states = node->getStorage()->getCurrentStates();
-    for(auto &m : states){
-        s = "(my_metric_state (metric " + Metric2String.at(static_cast<Metric>(get<1>(m))) +  ") (state " + State2String.at(static_cast<State>(get<2>(m))) + "))";
+    for(auto &m : data){
+        s = "(metric_state (node " + get<0>(m) +  ") (metric " + Metric2String.at(get<1>(m)) + ") (state " + State2String.at(get<2>(m)) + "))";
         AssertString(env, s.c_str());
     }
 }

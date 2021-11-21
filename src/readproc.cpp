@@ -36,7 +36,7 @@ ReadProc::ReadProc(char** args) {
 }
 
 ReadProc::~ReadProc() {
-    int res = this->killproc();
+    this->killproc();
     posix_spawn_file_actions_destroy(&action);
     sleep(1); // wait for the other process to exit before destroying variables
 }

@@ -38,7 +38,7 @@ public:
     bool isAdaptive();
 
     //configs
-    int timeReport;
+    static int timeReport;
     int timeTests;
     int timeLatency;
     int timeBandwidth;
@@ -59,7 +59,6 @@ public:
     int session;
 
     std::vector<std::string> mg_options;
-    std::vector<std::string> m_en_dis_options;
 
 protected:
     IAgent * agent;

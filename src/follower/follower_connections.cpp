@@ -279,7 +279,6 @@ bool FollowerConnections::sendHello(Message::node ipS) {
     Report r;
     
     r.setHardware(this->parent->getStorage()->getHardware());
-
     m.setData(r);
     bool result = false;
 
@@ -302,6 +301,8 @@ bool FollowerConnections::sendHello(Message::node ipS) {
             }
         }
     }
+
+    close(Socket);
     
     return result;
 }

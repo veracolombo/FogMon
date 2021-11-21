@@ -91,22 +91,17 @@ void UserFunctions(
 
     // actions
     AddUDF(env, "ChangeTimeReport","v",1,1,"l",Action::ChangeTimeReport,"ChangeTimeReport",NULL);
-    AddUDF(env, "ChangeTimeTests","v",1,1,"l",Action::ChangeTimeTests,"ChangeTimeTests",NULL);
-    AddUDF(env, "ChangeTimeLatency","v",1,1,"l",Action::ChangeTimeLatency,"ChangeTimeLatency",NULL);
-    AddUDF(env, "DisableMetrics","v",1,1,"m",Action::DisableMetrics,"DisableMetrics",NULL);
-    AddUDF(env, "EnableMetrics", "v",1,1,"m",Action::EnableMetrics,"EnableMetrics",NULL);
+    AddUDF(env, "EnableMetric", "v",1,1,"s",Action::EnableMetric,"EnableMetric",NULL);
+    AddUDF(env, "DisableMetric","v",1,1,"s",Action::DisableMetric,"DisableMetric",NULL);
     AddUDF(env, "SetLeaderAdequacy","v",1,1,"l",Action::SetLeaderAdequacy,"SetLeaderAdequacy",NULL);
 
     // leader //
     AddUDF(env, "ChangeTimeReportLeader","v",2,2,"ls",LeaderAction::ChangeTimeReportLeader,"ChangeTimeReportLeader",NULL);
     AddUDF(env, "SendChangeServer","v",0,0,NULL,LeaderAction::SendChangeServer,"SendChangeServer",NULL);
     AddUDF(env, "SendDisableMetrics","v",1,10,"ym",LeaderAction::SendDisableMetrics,"SendDisableMetrics",NULL);
-    AddUDF(env, "SendEnableMetrics", "v",1,10,"ym",LeaderAction::SendEnableMetrics,"SendEnableMetrics",NULL);
 
     // helper
-    AddUDF(env, "GetTimeReportMean", "l",5,5,"l",ClipsFunction::GetTimeReportMean,"GetTimeReportMean",NULL);
+    AddUDF(env, "GetTimeReport", "l",5,5,"l",ClipsFunction::GetTimeReport,"GetTimeReport",NULL);
     AddUDF(env, "GetNumActiveMetrics",NULL,0,0,"l",ClipsFunction::GetNumActiveMetrics,"GetNumActiveMetrics",NULL);
-    AddUDF(env, "LoadFactsLeader","v",0,0,NULL,ClipsFunction::LoadFactsLeader,"LoadFactsLeader",NULL);
-    AddUDF(env, "LoadFactsFollower","v",0,0,NULL,ClipsFunction::LoadFactsFollower,"LoadFactsFollower",NULL);
-    AddUDF(env, "GetTimeReport", "l",2,2,"sl",ClipsFunction::GetTimeReport,"GetTimeReport",NULL);
+    AddUDF(env, "LoadFacts","v",0,0,NULL,ClipsFunction::LoadFacts,"LoadFacts",NULL);
 }

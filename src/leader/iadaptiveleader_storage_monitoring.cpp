@@ -2,7 +2,7 @@
 
 using namespace std;
 
-int IAdaptiveLeaderStorageMonitoring::getMStatesCallback(void *vec, int argc, char **argv, char **azColName) {
+int IAdaptiveLeaderStorageMonitoring::getFollowerStatesCallback(void *vec, int argc, char **argv, char **azColName) {
     vector<tuple<string, Metric, State>> *v = (vector<tuple<string, Metric, State>>*)vec;
     tuple<string, Metric, State> state;
 
@@ -11,17 +11,6 @@ int IAdaptiveLeaderStorageMonitoring::getMStatesCallback(void *vec, int argc, ch
     v->push_back(state);
 
    return 0;
-}
-
-int IAdaptiveLeaderStorageMonitoring::getMMetricsCallback(void *vec, int argc, char **argv, char **azColName) {
-    vector<tuple<string, Metric>> *v = (vector<tuple<string, Metric>>*)vec;
-    tuple<string, Metric> metric;
-
-    metric = make_tuple(string(argv[0]), static_cast<Metric>(stoi(argv[1])));
-
-    v->push_back(metric);
-
-    return 0;
 }
 
 

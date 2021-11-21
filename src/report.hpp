@@ -151,12 +151,12 @@ public:
      * parse a rapidjson value to generate the report
      * @param data the rapidjson value
     */
-    virtual bool parseJson(rapidjson::Value& data);
+    bool parseJson(rapidjson::Value& data);
 
     /**
      * @return the rapidjson from this report
     */
-    virtual rapidjson::Value* getJson();
+    rapidjson::Value* getJson();
 
     /**
      * get the json node of this message

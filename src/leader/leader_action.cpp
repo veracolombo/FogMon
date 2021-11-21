@@ -57,6 +57,7 @@ void LeaderAction::SendChangeServer(Environment *env, UDFContext *udfc, UDFValue
 }
 
 void LeaderAction::SendDisableMetrics(Environment *env, UDFContext *udfc, UDFValue *out){
+    cout << "SendDisableMetrics()" << endl;
     //get arguments
     UDFValue _id; UDFValue _metrics; 
     UDFNthArgument(udfc, 1, SYMBOL_BIT, &_id);
@@ -78,7 +79,7 @@ void LeaderAction::SendDisableMetrics(Environment *env, UDFContext *udfc, UDFVal
     node->getConnections()->sendDisableMetrics(follower, metrics);
 }
 
-void LeaderAction::SendEnableMetrics(Environment *env, UDFContext *udfc, UDFValue *out){
+void LeaderAction::SendActivateMetrics(Environment *env, UDFContext *udfc, UDFValue *out){
     //get arguments
     UDFValue _id; UDFValue _metrics; 
     UDFNthArgument(udfc, 1, SYMBOL_BIT, &_id);
@@ -94,8 +95,4 @@ void LeaderAction::SendEnableMetrics(Environment *env, UDFContext *udfc, UDFValu
         metrics.push_back(lMetrics.at(s));
     }
 
-    AdaptiveLeader* node = AdaptiveLeader::myobj;
-    Message::node follower = node->getStorage()->getMNode(id);
-
-    node->getConnections()->sendEnableMetrics(follower, metrics);
 }
