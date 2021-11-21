@@ -5,7 +5,11 @@
 #include <utility>
 
 
+<<<<<<< HEAD
 enum Metric {FREE_CPU, FREE_MEMORY, FREE_DISK, LATENCY, BANDWIDTH, CONNECTED_IOTS, BATTERY, TOTAL_MEMORY, TOTAL_DISK, LIGHT_INTENSITY};
+=======
+enum Metric {FREE_CPU, FREE_MEMORY, FREE_DISK, LATENCY, BANDWIDTH, CONNECTED_IOTS};
+>>>>>>> parent of 371572f (aggiunta estensione storage per altre metriche)
 enum State {STABLE, UNSTABLE, INCREASING, DECREASING, TOO_HIGH, TOO_LOW, ALARMING_HIGH, ALARMING_LOW, OK, NONE};
 
 const std::map<std::string, Metric> lMetrics = {{"free_cpu", Metric::FREE_CPU}, 
@@ -13,10 +17,7 @@ const std::map<std::string, Metric> lMetrics = {{"free_cpu", Metric::FREE_CPU},
                                                 {"free_disk", Metric::FREE_DISK},
                                                 {"latency", Metric::LATENCY},
                                                 {"bandwidth", Metric::BANDWIDTH},
-                                                {"connected_iots", Metric::CONNECTED_IOTS},
-                                                {"battery", Metric::BATTERY},
-                                                {"total_memory", Metric::TOTAL_MEMORY},
-                                                {"total_disk", Metric::TOTAL_DISK}};
+                                                {"connected_iots", Metric::CONNECTED_IOTS}};
 
 const std::map<std::string, State> lStates = {{"stable", State::STABLE},
                                                   {"unstable", State::UNSTABLE},

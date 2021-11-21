@@ -7,7 +7,6 @@
 #include "common.hpp"
 #include "adaptive_follower_connections.hpp"
 #include "iadaptivefollower.hpp"
-#include "metrics_generator.hpp"
 
 class AdaptiveFollower : virtual public IAdaptiveFollower, virtual public Follower {
 
@@ -55,7 +54,14 @@ protected:
     AdaptiveFactory * factory;
 
     AdaptiveFollowerConnections *connections;
+<<<<<<< HEAD
     IAdaptiveStorageMonitoring *storage;
+=======
+
+    //void getCpu();
+    //void getMemory();
+    //void getDisk();
+>>>>>>> parent of 371572f (aggiunta estensione storage per altre metriche)
 
     MetricsGenerator *metricsGenerator;
 

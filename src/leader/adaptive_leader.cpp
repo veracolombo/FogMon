@@ -62,6 +62,7 @@ void AdaptiveLeader::initialize(AdaptiveLeaderFactory* fact){
     Follower::connections = this->connections;
     this->connections->initialize(this);
 
+<<<<<<< HEAD
     this->storage = this->factory->newStorage("monitoring.db", this->nodeS);
     Leader::storage = this->storage;
     AdaptiveFollower::storage = this->storage;
@@ -71,6 +72,17 @@ void AdaptiveLeader::initialize(AdaptiveLeaderFactory* fact){
     AdaptiveFollower::adaptive_controller = this->adaptive_controller;
     this->adaptive_controller->initialize(this);
     
+=======
+    Leader::initialize(this->factory);
+
+    //this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
+    //AdaptiveFollower::adaptiveStorage = this->adaptiveStorage;
+
+    //this->adaptive_controller = new AdaptiveController(this);
+    //this->adaptive_controller->initialize();
+    //AdaptiveFollower::adaptive_controller = this->adaptive_controller;
+
+>>>>>>> parent of 371572f (aggiunta estensione storage per altre metriche)
     AdaptiveFollower::initialize(this->factory);
 }
 

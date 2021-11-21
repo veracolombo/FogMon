@@ -15,7 +15,6 @@ using namespace std;
 #include <unistd.h>
 
 #include "clips.h"
-#include "metrics_generator.hpp"
 
 void handler(int sig) {
   void *array[10];
@@ -195,8 +194,11 @@ int main(int argc, char *argv[]) {
 
     node.setParam(string("interface"), interfaceIp);
     node.setParam(string("session"), session);
+<<<<<<< HEAD
 
     node.setParam(string("mg_options"), mg_options);
+=======
+>>>>>>> parent of 371572f (aggiunta estensione storage per altre metriche)
     
     node.start();
 

@@ -35,8 +35,16 @@ void Leader::initialize(LeaderFactory* fact) {
     this->storage = this->factory->newStorage("monitoring.db", this->nodeS);
     Follower::storage = this->storage;
 
+<<<<<<< HEAD
     this->connections = this->factory->newConnections(this->nThreads);
     this->connections->initialize(this);
+=======
+    if(this->connections == NULL){
+        this->connections = this->factory->newConnections(this->nThreads);
+        this->connections->initialize(this);
+    }
+
+>>>>>>> parent of 371572f (aggiunta estensione storage per altre metriche)
     Follower::connections = this->connections;
     
     Follower::initialize(this->factory);
