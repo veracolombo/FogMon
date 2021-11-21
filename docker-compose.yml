@@ -12,13 +12,11 @@ services:
       - ./monitoring_logs:/monitoring_logs
     expose:
       - "1024-65535"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 50M
-    cap_add:
-      - NET_ADMIN
+    #deploy:
+    #  resources:
+    #    limits:
+    #      cpus: '0.50'
+    #      memory: 50M
 
   follower1:
     build:
@@ -34,13 +32,11 @@ services:
       - ./monitoring_logs:/monitoring_logs
     expose:
       - "1024-65535"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 50M
-    cap_add:
-      - NET_ADMIN
+    #deploy:
+    #  resources:
+    #    limits:
+    #      cpus: '0.50'
+    #      memory: 50M
 
   #leader2:
   #  build: .
