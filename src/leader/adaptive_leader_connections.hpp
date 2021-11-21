@@ -20,10 +20,14 @@ public:
 
     void initialize(IAdaptiveLeader* parent);
 
+<<<<<<< HEAD
     bool sendRequestReport(Message::node ip) override;
 
     bool sendMReport(Message::node ip, vector<AdaptiveReport::adaptive_report_result> report);
 
+=======
+    //bool sendMReport(Message::node ip, vector<AdaptiveReport::adaptive_report_result> report);
+>>>>>>> parent of 08c75ae (leader stores adaptive updates from follower)
     bool sendChangeServer();
     bool sendChangeTimeReport(Message::node ip, int newTimeReport);
 

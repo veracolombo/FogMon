@@ -18,7 +18,7 @@ void AdaptiveFollowerConnections::initialize(IAdaptiveFollower* parent) {
     this->parent = parent;
 }
 
-
+/*
 std::optional<std::pair<int64_t,Message::node>> AdaptiveFollowerConnections::sendUpdate(Message::node ipS, std::pair<int64_t,Message::node> update) {
     cout << "sendUpdate0" << endl;
     int Socket = openConnection(ipS.ip, ipS.port);
@@ -76,6 +76,7 @@ std::optional<std::pair<int64_t,Message::node>> AdaptiveFollowerConnections::sen
     close(Socket);
     return result;
 }
+*/
 
 
 void AdaptiveFollowerConnections::handler(int fd, Message &m){

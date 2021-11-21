@@ -14,6 +14,7 @@ AdaptiveUIConnection::AdaptiveUIConnection(Message::node myNode, std::string ip,
 AdaptiveUIConnection::~AdaptiveUIConnection() { }
 
 bool AdaptiveUIConnection::sendTopology(std::vector<AdaptiveReport::adaptive_report_result> report) {
+    cout << "here 2.0" << endl;
     bool res = false;
     if(this->ip != "") {
         Message m;
@@ -33,5 +34,6 @@ bool AdaptiveUIConnection::sendTopology(std::vector<AdaptiveReport::adaptive_rep
             res = sendToInterface(this->ip,m.getString());
         }
     }
+    cout << "here 2.5" << endl;
     return res;
 }

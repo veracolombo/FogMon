@@ -156,7 +156,11 @@ void AdaptiveLeader::timerFun(){
                 continue;
             }
             
+<<<<<<< HEAD
             vector<AdaptiveReport::adaptive_report_result> report = this->getStorage()->getAdaptiveReport();
+=======
+            vector<Report::report_result> report = this->getStorage()->getReport();
+>>>>>>> parent of 08c75ae (leader stores adaptive updates from follower)
 
             if(this->connections->sendMReport(ips[i], report)) {
                 sent++;

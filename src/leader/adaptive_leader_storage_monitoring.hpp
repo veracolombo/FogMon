@@ -16,7 +16,7 @@ public:
     std::vector<AdaptiveReport::adaptive_report_result> getAdaptiveReport(bool complete);
     AdaptiveReport::adaptive_report_result getAdaptiveReport(Message::node node, bool complete);
 
-    std::string addNode(Message::node node, AdaptiveReport::hardware_result hardware, AdaptiveReport::battery_result battery, Message::node *monitored = NULL);
+    //std::string addNode(Message::node node, AdaptiveReport::hardware_result hardware, AdaptiveReport::battery_result battery, Message::node *monitored = NULL);
 
     void addReport(AdaptiveReport::adaptive_report_result result, Message::node *monitored = NULL);
     void addReport(std::vector<AdaptiveReport::adaptive_report_result> results, Message::node ip);

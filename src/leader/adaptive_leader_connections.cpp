@@ -18,6 +18,7 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
     string strIp = this->getSource(fd,m);
 
     bool handled = false;
+<<<<<<< HEAD
 
     if(m.getType() == Message::Type::typeMREQUEST) {
         if(m.getCommand() == Message::Command::commSET) {
@@ -71,6 +72,11 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
             }
         }
     } else if(m.getType() == Message::Type::typeNOTIFY){
+=======
+    /*
+
+    if(m.getType() == Message::Type::typeNOTIFY){
+>>>>>>> parent of 08c75ae (leader stores adaptive updates from follower)
         if(m.getCommand() == Message::Command::commUPDATE){
             if(m.getArgument() == Message::Argument::argREPORT){
                 handled = true;
@@ -144,6 +150,7 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
             }
         }
     }
+    */
 
     if(!handled)
         LeaderConnections::handler(fd, m);
@@ -155,6 +162,7 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
 
 void AdaptiveLeaderConnections::call_super_handler(int fd, Message &m) { }
 
+<<<<<<< HEAD
 bool AdaptiveLeaderConnections::sendRequestReport(Message::node ip) {
     cout << "sendRequestReport()" << endl;
     int Socket = openConnection(ip.ip,ip.port);
@@ -216,6 +224,9 @@ bool AdaptiveLeaderConnections::sendRequestReport(Message::node ip) {
     return ret;
 }
 
+=======
+/*
+>>>>>>> parent of 08c75ae (leader stores adaptive updates from follower)
 bool AdaptiveLeaderConnections::sendMReport(Message::node ip, vector<AdaptiveReport::adaptive_report_result> report) {
     int Socket = this->openConnection(ip.ip, ip.port);
     if(Socket < 0) {

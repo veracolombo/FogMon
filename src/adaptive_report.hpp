@@ -2,9 +2,6 @@
 #define ADAPTIVE_REPORT_HPP_
 
 #include "report.hpp"
-#include "common.hpp"
-#include <iostream>
-#include <map>
 
 class AdaptiveReport : public Report {
 public:
@@ -34,7 +31,6 @@ public:
             this->var_battery = var_battery;
             this->lasttime = lasttime;
         }
-        
     }battery_result;
 
     /**
@@ -44,11 +40,9 @@ public:
        
         battery_result battery;
 
-        std::map<Metric, std::vector<State>> states;
-        
-        adaptive_report_result() : report_result() {}
-        adaptive_report_result(Message::node Source, hardware_result Hardware, battery_result Battery, std::vector<test_result> Latency, std::vector<test_result> Bandwidth, std::vector<IoT> Iot, std::string _leader, std::map<Metric, std::vector<State>> States)
-        : report_result(Source, Hardware, Latency, Bandwidth, Iot, _leader), battery(Battery), states(States) {}
+        adaptive_report_result() {}
+        adaptive_report_result(Message::node Source, hardware_result Hardware, battery_result Battery, std::vector<test_result> Latency, std::vector<test_result> Bandwidth, std::vector<IoT> Iot, std::string _leader)
+        : report_result(Source, Hardware, Latency, Bandwidth, Iot, _leader), battery(Battery) {}
 
     }adaptive_report_result;
 

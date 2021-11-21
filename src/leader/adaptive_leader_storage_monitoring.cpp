@@ -55,8 +55,9 @@ AdaptiveReport::adaptive_report_result AdaptiveLeaderStorageMonitoring::getAdapt
     return ar;
 }
 
-
+/*
 std::string AdaptiveLeaderStorageMonitoring::addNode(Message::node node, AdaptiveReport::hardware_result hardware, AdaptiveReport::battery_result battery, Message::node *monitored) {
+    
     if(hardware.lasttime == 0 || battery.lasttime == 0) { //these are directly measured
         return "";
     }
@@ -92,6 +93,7 @@ std::string AdaptiveLeaderStorageMonitoring::addNode(Message::node node, Adaptiv
     }
     return "";
 }
+<<<<<<< HEAD
 
 void AdaptiveLeaderStorageMonitoring::addReport(AdaptiveReport::adaptive_report_result result, Message::node *monitored) {
     if( this->addNode(result.source, result.hardware, result.battery, monitored) != "") {
@@ -123,6 +125,9 @@ void AdaptiveLeaderStorageMonitoring::addReport(std::vector<AdaptiveReport::adap
     }
 }
 
+=======
+*/
+>>>>>>> parent of 08c75ae (leader stores adaptive updates from follower)
 
 AdaptiveReport::battery_result AdaptiveLeaderStorageMonitoring::getBattery(Message::node node) {
     char *zErrMsg = 0;
