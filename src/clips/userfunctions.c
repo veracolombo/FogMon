@@ -77,6 +77,7 @@ void UserFunctions(
 #pragma unused(env)
 #endif
 
+<<<<<<< HEAD
 
 <<<<<<< HEAD
     // conditions
@@ -107,6 +108,8 @@ void UserFunctions(
     AddUDF(env, "LoadFacts","v",0,0,NULL,ClipsFunction::LoadFacts,"LoadFacts",NULL);
 }
 =======
+=======
+>>>>>>> parent of 106a5a7 (added adaptive leader)
  // conditions
  AddUDF(env,"MetricInStateFor","l",2,2,"s",Condition::MetricInStateFor,"MetricInStateFor",NULL);
 
@@ -117,6 +120,5 @@ void UserFunctions(
 
  // helper
  AddUDF(env, "GetTimeReport", "l",5,5,"l",ClipsFunction::GetTimeReport,"GetTimeReport",NULL);
- 
   }
 >>>>>>> parent of f5a88dd (added changeServer())

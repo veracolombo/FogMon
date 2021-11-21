@@ -1,7 +1,4 @@
 #include "iagent.hpp"
-#include <iostream>
-
-using namespace std;
 
 IAgent::IAgent() {
     running = false;

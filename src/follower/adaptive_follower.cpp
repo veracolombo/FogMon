@@ -5,37 +5,17 @@
 
 map<Metric, bool> AdaptiveFollower::metrics = {
     {Metric::FREE_CPU, true},
-    {Metric::FREE_MEMORY, false},
-    {Metric::FREE_DISK, false},
+    {Metric::FREE_MEMORY, true},
+    {Metric::FREE_DISK, true},
     {Metric::LATENCY, true},
     {Metric::BANDWIDTH, true},
     {Metric::CONNECTED_IOTS, true}
 };
 
-AdaptiveFollower::AdaptiveFollower() {}
+AdaptiveFollower::AdaptiveFollower(Message::node node, int nThreads) : Follower(node, nThreads) { }
 
-AdaptiveFollower::AdaptiveFollower(Message::node node, int nThreads) : Follower(node, nThreads) {
-    this->connections = NULL;
-    this->storage = NULL;
-    this->metricsGenerator = NULL;
-    this->adaptive_controller = NULL;
-}
-
-AdaptiveFollower::~AdaptiveFollower() {
-    this->stop();
-
-    try{
-        delete this->adaptive_controller;
-        this->adaptive_controller = NULL;
-    }catch(...) {}
-
-    try{
-        delete this->metricsGenerator;
-        this->metricsGenerator = NULL;
-    }catch(...) {}
-}
-
-void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
+void AdaptiveFollower::initialize(Factory* fact, AdaptiveFactory* adFact) {
+    Follower::initialize(fact);
 
     if(fact == NULL) {
         this->factory = &this->tFactory;
@@ -78,6 +58,15 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
     */
 }
 
+AdaptiveFollower::~AdaptiveFollower() {
+    
+    try{
+        delete this->adaptiveStorage;
+        this->adaptiveStorage = NULL;
+    }catch(...) {}
+    
+}
+
 void AdaptiveFollower::start(vector<Message::node> mNodes){
     Follower::start(mNodes);
 
@@ -90,10 +79,9 @@ void AdaptiveFollower::stop(){
         this->metricsGenerator->stop();
     }
 
-    if(this->adaptive_controller){
-        this->adaptive_controller->stop();
-    }
-
+    if(this->adaptiveStorage)
+        this->adaptiveStorage->close();
+    
     Follower::stop();
 }
 
@@ -121,7 +109,6 @@ void AdaptiveFollower::setMetrics(vector<Metric> metrics){
     }
 }
 
-
 /*
 void AdaptiveFollower::addMetric(Metric metric){
     for(auto m : this->metrics){
@@ -137,12 +124,8 @@ void AdaptiveFollower::removeMetric(Metric metric){
 }
 */
 
-IAdaptiveFollowerConnections* AdaptiveFollower::getConnections() {
-    return this->connections;
-}
-
-IAdaptiveStorageMonitoring* AdaptiveFollower::getStorage() {
-    return this->storage;
+IAdaptiveStorage* AdaptiveFollower::getAdaptiveStorage() {
+    return this->adaptiveStorage;
 }
 
 /*
@@ -283,58 +266,35 @@ void AdaptiveFollower::getHardware(){
     sigar_close(sigar);
 }
 
-bool AdaptiveFollower::sendReport(){
-    cout << "AdaptiveFollower::sendReport()" << endl;
-    bool ret = true;
-
-    cout << "sendUpdate start" << endl;
-    std::optional<std::pair<int64_t,Message::node>> ris = this->connections->sendUpdate(this->nodeS, this->update);
-    cout << "sent Update end" << endl;
-
-    if(ris == nullopt) {
-        cout << "update retry..." << endl;
-        ris = this->connections->sendUpdate(this->nodeS,this->update);
-        if(ris == nullopt) {
-            //change server
-            cout << "Changing server..." << endl;
-            if(!selectServer(this->node->getMNodes())) {
-                cout << "Failed to find a server!!!!!!!!" << endl;
-            }
-            ret = false;
-        }
-    }
-
-    if(metrics[BATTERY]){
-        battery.mean_battery = MetricsGenerator::currentVal[BATTERY];
-        this->storage->saveBattery(battery, this->node->hardwareWindow);
-    }
-}
-
-void AdaptiveFollower::timer() {
-
-    cout << this->node->isFollower() << endl;
-
+void AdaptiveFollower::timer(){
     int iter=0;
     while(this->running) {
 
         auto t_start = std::chrono::high_resolution_clock::now();
 
-        std::unique_lock<std::mutex> lck(this->adaptive_controller->mtx);
+        if(metrics[FREE_CPU] &&
+           metrics[FREE_MEMORY] &&
+           metrics[FREE_DISK]) {
+            //generate hardware report and send it
+            this->getHardware();
 
-        this->getHardware();
-        this->getBattery();
-
-        std::optional<std::pair<int64_t,Message::node>> ris = this->connections->sendUpdate(this->nodeS, this->update); // manda update al nodo leader
-        if(ris == nullopt) {           // il messaggio di update non ha ottenuto ack
-            cout << "update retry..." << endl;
-            ris = this->connections->sendUpdate(this->nodeS,this->update);  
+            std::optional<std::pair<int64_t,Message::node>> ris = this->connections->sendUpdate(this->nodeS, this->update);
             if(ris == nullopt) {
-                //change server
-                cout << "Changing server..." << endl;
-                if(!selectServer(this->node->getMNodes())) {        // cerca un nuovo leader
-                    cout << "Failed to find a server!!!!!!!!" << endl;
+                cout << "update retry..." << endl;
+                ris = this->connections->sendUpdate(this->nodeS,this->update);
+                if(ris == nullopt) {
+                    //change server
+                    cout << "Changing server..." << endl;
+                    if(!selectServer(this->node->getMNodes())) {
+                        cout << "Failed to find a server!!!!!!!!" << endl;
+                    }
+                    iter=0;
                 }
-                iter=0;
+            }
+
+            if(ris != nullopt) {
+                this->update.first= (*ris).first;
+                this->update.second= (*ris).second;
             }
         }
 
@@ -435,18 +395,14 @@ void AdaptiveFollower::TestTimer(){
     int iter=0;
     while(this->running) {
         //monitor IoT
-        if(metrics[CONNECTED_IOTS] &&
-           iter%4 == 0){
-            cout << "Measuring IoTs..." << endl;
+        if(metrics[CONNECTED_IOTS] && iter%4 == 0)
             this->testIoT();
-        }
 
 
         vector<thread> LatencyThreads;
         if(metrics[LATENCY]){
             //get list ordered by time for the latency tests
             //test the least recent
-            cout << "Measuring Latency..." << endl;
             vector<Message::node> ips = this->storage->getLRLatency(this->node->maxPerLatency, this->node->timeLatency);
 
             for(auto node : ips) {
@@ -464,14 +420,12 @@ void AdaptiveFollower::TestTimer(){
             }
         }
 
-        thread BandwidthThread;
         
-        if(metrics[BANDWIDTH]){
-            //start thread for bandwidth tests
-            BandwidthThread = thread([this]{
-                //test bandwidth
-                //get 10 nodes tested more than 300 seconds in the past
-                cout << "Measuring Bandwidth..." << endl;
+        //start thread for bandwidth tests
+        thread BandwidthThread = thread([this]{
+            //test bandwidth
+            //get 10 nodes tested more than 300 seconds in the past
+            if(metrics[BANDWIDTH]){
                 vector<Message::node> ips = this->storage->getLRBandwidth(this->node->maxPerBandwidth + 5, this->node->timeBandwidth);
                 cout << "List B: ";
                 for(auto node : ips) {
@@ -498,15 +452,19 @@ void AdaptiveFollower::TestTimer(){
                     }
                     i++;
                 }
+            }
         });
-        }
     
-        if(metrics[LATENCY])
-            for(auto &LatencyThread : LatencyThreads)
+        if(metrics[LATENCY]){
+            for(auto &LatencyThread : LatencyThreads) {
                 LatencyThread.join();
+            }
+        }
 
-        if(metrics[BANDWIDTH])   
+        if(metrics[BANDWIDTH]){        
             BandwidthThread.join();
+        }
+
 
         sleeper.sleepFor(chrono::seconds(this->node->timeTests));
         iter++;

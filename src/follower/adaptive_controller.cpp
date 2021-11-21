@@ -2,10 +2,16 @@
 #include "iadaptivefollower.hpp"
 #include <iostream>
 
+<<<<<<< HEAD
 bool AdaptiveController::ready = false;
 
 AdaptiveController::AdaptiveController(){
     this->running = false;
+=======
+AdaptiveController::AdaptiveController(AdaptiveFollower* node){
+    this->node = node;
+    this->rule = new Rule();
+>>>>>>> parent of 106a5a7 (added adaptive leader)
 }
 
 AdaptiveController::~AdaptiveController() {
@@ -31,12 +37,10 @@ void AdaptiveController::initialize() {
 }
 
 void AdaptiveController::start() {
-    this->running = true;
     this->statesThread = thread(&AdaptiveController::statesTimer, this);
 }
 
 void AdaptiveController::stop() {
-    this->running = false;
     if(this->statesThread.joinable()){
         this->statesThread.join();
     }
@@ -51,17 +55,25 @@ void AdaptiveController::addState(Metric metric, State state){
 }
 
 void AdaptiveController::saveStates(){
+    
     for(auto &s : this->states){
         this->node->getStorage()->saveStates(s.second, s.first);
     }
 }
 
+
 void AdaptiveController::statesTimer(){
 
+<<<<<<< HEAD
     while(this->running){
 
         std::unique_lock<std::mutex> lck(mtx);
         cv.wait(lck, [] { return ready; });
+=======
+    while(true){
+    
+        auto t_start = std::chrono::high_resolution_clock::now();
+>>>>>>> parent of 106a5a7 (added adaptive leader)
 
         this->series.clear();
         this->states.clear();
@@ -97,9 +109,18 @@ void AdaptiveController::statesTimer(){
         this->toStringSeries();
         this->toStringStates();
 
+<<<<<<< HEAD
         ready = false;
         lck.unlock();
         cv.notify_one();
+=======
+        auto t_end = std::chrono::high_resolution_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
+        int sleeptime = this->node->node->timeReport - elapsed_time + 1.5;
+        
+        if (sleeptime > 0)
+            sleeper.sleepFor(chrono::seconds(sleeptime));
+>>>>>>> parent of 106a5a7 (added adaptive leader)
     }
 }
 
@@ -113,7 +134,7 @@ void AdaptiveController::stable(float delta_max, float tol){
             continue;
 
         State first_sample = State::NONE;
-        if(abs(s.second[0] - s.second[1] < delta_max)){
+        if(s.second[0] - s.second[1] < delta_max){
             first_sample = State::STABLE;
         }
 
@@ -135,7 +156,6 @@ void AdaptiveController::stable(float delta_max, float tol){
         }
     }
 }
-
 
 void AdaptiveController::increasing(float tol) {
     for(auto s : this->series){
@@ -160,15 +180,12 @@ void AdaptiveController::increasing(float tol) {
                 increasing += 1;
             }
         }
-        
-       
-        // first_sample == State::INCREASING &&
-        if(increasing >= ceil(tol*k) && s.second[0]>s.second[k]){
+
+        if(/*first_sample == State::INCREASING &&*/ increasing >= ceil(tol*k) && s.second[0]>s.second[k]){
             this->states[s.first].push_back(State::INCREASING);
         }
     }
 }
-
 
 void AdaptiveController::decreasing(float tol){
     for(auto s : this->series){
@@ -194,12 +211,14 @@ void AdaptiveController::decreasing(float tol){
                 decreasing += 1;
             }
         }
-        // first_sample == State::DECREASING &&
-        if(decreasing >= ceil(tol*k) && s.second[0]<s.second[k]){
+
+        if(/*first_sample == State::DECREASING && */decreasing >= ceil(tol*k) && s.second[0]<s.second[k]){
             this->states[s.first].push_back(State::DECREASING);
         }
     }
 }
+
+
 
 
 void AdaptiveController::alarms(float tol, float too_high, float too_low, float alarming_high, float alarming_low){
@@ -256,8 +275,10 @@ void AdaptiveController::alarms(float tol, float too_high, float too_low, float 
 }
 
 
+
+
 void AdaptiveController::toStringSeries(){
-    cout << "************ Series ************" << endl;
+    cout << "********* Series *********" << endl;
 
     for(auto s : this->series){
         switch(s.first){
@@ -279,7 +300,11 @@ void AdaptiveController::toStringSeries(){
 }
 
 void AdaptiveController::toStringStates(){
+<<<<<<< HEAD
     cout << "************ Current state ************" << endl;
+=======
+    cout << "********* Actual state *********" << endl;
+>>>>>>> parent of 106a5a7 (added adaptive leader)
 
     for(auto s : this->states){
         switch(s.first){
@@ -308,5 +333,5 @@ void AdaptiveController::toStringStates(){
         }
         cout << endl;
     }
-    cout << "**************************************" << endl; 
+    cout << "********************************" << endl; 
 }

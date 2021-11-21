@@ -2,7 +2,6 @@
 #include "leader.hpp"
 #include "follower.hpp"
 #include "adaptive_follower.hpp"
-#include "adaptive_leader.hpp"
 
 #include <iostream>
 #include <unistd.h>
@@ -11,7 +10,7 @@ using namespace std;
 
 int Node::timeReport = 30;
 
-Node::Node(string port, bool isLeader, int threads, bool adp) {
+Node::Node(string port, bool isLeader, int threads) {
     this->timeTests = 30;
     this->timeLatency = 30;
     this->maxPerLatency = 100;
@@ -31,7 +30,6 @@ Node::Node(string port, bool isLeader, int threads, bool adp) {
     this->leaderFormula = 0;
 
     this->isLeader = isLeader;
-    this->adp = adp;
     this->agent = NULL;
     this->port = port;
     this->threads = threads;
@@ -65,29 +63,15 @@ void Node::stop() {
 
 void Node::create() {
     if(isLeader) {
-        if(adp){
-            cout << "Starting Adaptive Leader..." << endl;
-            AdaptiveLeader * agent1 = new AdaptiveLeader(Message::node(this->id,"::1",this->port), this->threads);
-            agent1->initialize();
-            this->agent = agent1;
-        }else{
-            cout << "Starting Leader..." << endl;
-            Leader * agent1 = new Leader(Message::node(this->id,"::1",this->port), this->threads);
-            agent1->initialize();
-            this->agent = agent1;
-        }
+        cout << "Starting Leader" << endl;
+        Leader * agent1 = new Leader(Message::node(this->id,"::1",this->port), this->threads);
+        agent1->initialize();
+        this->agent = agent1;
     }else {
-        if(adp){
-            cout << "Starting Adaptive Follower..." << endl;
-            AdaptiveFollower * agent1 = new AdaptiveFollower(Message::node(this->id,"::1",this->port), this->threads);
-            agent1->initialize();
-            this->agent = agent1;
-        }else{
-            cout << "Starting Follower..." << endl;
-            Follower * agent1 = new Follower(Message::node(this->id,"::1",this->port), this->threads);
-            agent1->initialize();
-            this->agent = agent1;
-        }
+        cout << "Starting Follower" << endl;
+        AdaptiveFollower * agent1 = new AdaptiveFollower(Message::node(this->id,"::1",this->port), this->threads);
+        agent1->initialize();
+        this->agent = agent1;
     }
     this->agent->setParent(this);
 }

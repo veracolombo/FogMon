@@ -31,10 +31,6 @@
 using namespace std;
 using namespace rapidjson;
 
-int Follower::nUpdate = 0;
-
-Follower::Follower() {}
-
 Follower::Follower(Message::node node, int nThreads) : IAgent() {
     this->nThreads = nThreads;
 

@@ -1,13 +1,26 @@
-#ifndef ADAPTIVE_CONTROLLER_HPP_
-#define ADAPTIVE_CONTROLLER_HPP_
+#ifndef STATES_HPP_
+#define STATES_HPP_
 
-#include "sleeper.hpp"
-#include "common.hpp"
-#include "rule.hpp"
-
+//#include "enums.hpp"
+#include "report.hpp"
 #include <map>
 #include <vector>
 #include <math.h>
+<<<<<<< HEAD
+=======
+
+#include "iagent.hpp"
+#include "follower_connections.hpp"
+#include "server.hpp"
+#include "factory.hpp"
+#include "iiotdiscoverer.hpp"
+#include "readproc.hpp"
+
+#include "sleeper.hpp"
+#include "common.hpp"
+
+#include "rule.hpp"
+>>>>>>> parent of 106a5a7 (added adaptive leader)
 
 #include <thread>               // std::thread
 #include <mutex>                // std::mutex, std::unique_lock
@@ -50,8 +63,6 @@ protected:
     std::mutex mtx;
     std::condition_variable cv;
 
-    bool running;
-
     void statesTimer();
 
     void addState(Metric metric, State state);
@@ -60,7 +71,11 @@ protected:
     void stable(float delta_max = 0.1, float tol = 0.8);
     void increasing(float tol = 0.8);
     void decreasing(float tol = 0.8);
+<<<<<<< HEAD
     void alarms(float tol=0.8, float too_high=1, float too_low=0.3, float alarming_high=1, float alarming_low=0.4);
+=======
+    void alarms(float tol=0.8, float too_high=0.9, float too_low=0.1, float alarming_high=0.8, float alarming_low=0.2);
+>>>>>>> parent of 106a5a7 (added adaptive leader)
 
 };
 #endif

@@ -1,13 +1,11 @@
 (defglobal ?*max-priority* = 100)
-(defglobal ?*mid-priority* = 0)
 (defglobal ?*min-priority* = -100)
-
 (defglobal ?*min-time-report* = 10)
-(defglobal ?*max-time-report* = 50)
+(defglobal ?*max-time-report* = 30)
 (defglobal ?*n-metrics* = 3)
 (defglobal ?*window* = 10)
 
-(defrule ch_tr (declare (salience ?*max-priority*))
+(defrule ctr (declare (salience ?*max-priority*))
  =>
  (bind ?x (MetricInStateFor "free_cpu" "stable"))
  (bind ?y (MetricInStateFor "free_memory" "stable"))
@@ -19,6 +17,7 @@
                                   ?*min-time-report* 
                                   ?*max-time-report*)))
 
+<<<<<<< HEAD
 (defrule en_mem_disk
  (test (>= (MetricInStateFor "free_cpu" "stable") 2))
  =>
@@ -36,3 +35,20 @@
 
 =======
 >>>>>>> parent of f5a88dd (added changeServer())
+=======
+(defrule en_fcpu
+ (test (< (MetricInStateFor "free_cpu" "unstable") 3))
+ =>
+ (DisableMetric "free_memory"))
+
+(defrule dis_fcpu
+ (test (>= (MetricInStateFor "free_cpu" "unstable") 3))
+ =>
+ (EnableMetric "free_memory"))
+
+(defrule en_qos
+ (test (> (MetricInStateFor "free_memory" "increasing") 1))
+ =>
+ (EnableMetric "latency")
+ (EnableMetric "bandwidth"))
+>>>>>>> parent of 106a5a7 (added adaptive leader)

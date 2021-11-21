@@ -26,8 +26,7 @@ const std::map<std::string, State> lStates = {{"stable", State::STABLE},
                                                   {"alarming_high", State::ALARMING_HIGH},
                                                   {"alarming_low", State::ALARMING_LOW},
                                                   {"too_high", State::TOO_HIGH},
-                                                  {"too_low", State::TOO_LOW},
-                                                  {"ok", State::OK}};
+                                                  {"too_low", State::TOO_LOW}};
 
 const std::map<Metric, std::string> Metric2String ={{Metric::FREE_CPU, "free_cpu"},
                                                     {Metric::FREE_MEMORY, "free_memory"},

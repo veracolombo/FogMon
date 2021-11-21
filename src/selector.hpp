@@ -10,7 +10,6 @@
 
 class Selector {
 public:
-    Selector();
     Selector(ILeader *leader);
     ~Selector();
 

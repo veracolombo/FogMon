@@ -19,8 +19,6 @@
 
 using namespace std;
 
-Leader::Leader() {}
-
 Leader::Leader(Message::node node, int nThreads) : Follower(node, nThreads), selector(this) {
     this->nodeS = node;
 }
@@ -31,8 +29,12 @@ void Leader::initialize(LeaderFactory* fact) {
     }else {
         this->factory = fact;
     }
+<<<<<<< HEAD
 
     this->storage = this->factory->newStorage("monitoring.db", this->nodeS);
+=======
+    this->storage = this->factory->newStorage("monitoring", this->nodeS);
+>>>>>>> parent of 106a5a7 (added adaptive leader)
     Follower::storage = this->storage;
 
 <<<<<<< HEAD
@@ -106,6 +108,10 @@ void Leader::start(vector<Message::node> mNodes) {
     }
 
     this->timerFunThread = thread(&Leader::timerFun, this);
+
+    ////////////////////////////////////////////////////////////////////////
+    //this ->updateTimeReportThread = thread(&Leader::updateTimeReport, this);
+    ////////////////////////////////////////////////////////////////////////
 }
 
 void Leader::stop() {

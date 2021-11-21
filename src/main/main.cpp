@@ -102,10 +102,13 @@ int main(int argc, char *argv[]) {
     int leader_formula = 0;
 
     bool leader = false;
+<<<<<<< HEAD
     bool adp = false;   // adaptivity support
 
     // metrics generator options
     vector<string> mg_options;
+=======
+>>>>>>> parent of 106a5a7 (added adaptive leader)
     
     std::string interfaceIp = "";
     int session = 0;
@@ -150,6 +153,7 @@ int main(int argc, char *argv[]) {
     if(input.cmdOptionExists("--leader"))
         leader = true;
 
+<<<<<<< HEAD
     if(input.cmdOptionExists("--adp"))
         adp = true;
     
@@ -159,13 +163,15 @@ int main(int argc, char *argv[]) {
         mg_options.push_back("bs");
     }
 
+=======
+>>>>>>> parent of 106a5a7 (added adaptive leader)
     if(input.cmdOptionExists("-i"))
         interfaceIp = input.getCmdOption("-i");
     
     if(input.cmdOptionExists("-s"))
         session = stoi(input.getCmdOption("-s"));
 
-    Node node(myPort, leader, threads, adp);
+    Node node(myPort, leader, threads);
 
     vector<Message::node> known;
 
