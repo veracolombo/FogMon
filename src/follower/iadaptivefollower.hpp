@@ -9,6 +9,7 @@
 class IAdaptiveFollower : virtual public IAgent {
 public:
     virtual IAdaptiveFollowerConnections* getConnections() = 0;
+<<<<<<< HEAD
     virtual IAdaptiveStorageMonitoring* getStorage() = 0;
     virtual AdaptiveController* getAdaptiveController() = 0;
 
@@ -17,6 +18,9 @@ public:
 
     virtual void disableMetrics(vector<Metric> metrics) = 0;
     virtual void enableMetrics(vector<Metric> metrics) = 0;
+=======
+    virtual IAdaptiveStorage* getAdaptiveStorage() = 0;
+>>>>>>> parent of f5a88dd (added changeServer())
 };
 
 #endif

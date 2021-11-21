@@ -2,5 +2,6 @@
 #include <iostream>
 
 AdaptiveLeaderConnections* AdaptiveLeaderFactory::newConnections(int nThread){
+    cout << "AdaptiveLeaderFactory::newConnections()" << endl;
     return new AdaptiveLeaderConnections(nThread);
 }

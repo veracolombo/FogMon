@@ -78,6 +78,7 @@ void UserFunctions(
 #endif
 
 
+<<<<<<< HEAD
     // conditions
     AddUDF(env,"MetricInStateFor","l",2,2,"s",Condition::MetricInStateFor,"MetricInStateFor",NULL);
     AddUDF(env,"IsMetricEnabled","b",1,1,"s",Condition::IsMetricEnabled,"IsMetricEnabled",NULL);
@@ -105,3 +106,17 @@ void UserFunctions(
     AddUDF(env, "GetNumActiveMetrics",NULL,0,0,"l",ClipsFunction::GetNumActiveMetrics,"GetNumActiveMetrics",NULL);
     AddUDF(env, "LoadFacts","v",0,0,NULL,ClipsFunction::LoadFacts,"LoadFacts",NULL);
 }
+=======
+ // conditions
+ AddUDF(env,"MetricInStateFor","l",2,2,"s",Condition::MetricInStateFor,"MetricInStateFor",NULL);
+
+// actions
+ AddUDF(env, "ChangeTimeReport","v",1,1,"l",Action::ChangeTimeReport,"ChangeTimeReport",NULL);
+ AddUDF(env, "EnableMetric", "v",1,1,"s",Action::EnableMetric,"EnableMetric",NULL);
+ AddUDF(env, "DisableMetric","v",1,1,"s",Action::DisableMetric,"DisableMetric",NULL);
+
+ // helper
+ AddUDF(env, "GetTimeReport", "l",5,5,"l",ClipsFunction::GetTimeReport,"GetTimeReport",NULL);
+ 
+  }
+>>>>>>> parent of f5a88dd (added changeServer())

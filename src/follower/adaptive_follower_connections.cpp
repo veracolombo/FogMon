@@ -1,12 +1,15 @@
 #include "adaptive_follower_connections.hpp"
 #include <iostream>
 
+<<<<<<< HEAD
 #include <sys/socket.h>
 #include <unistd.h>
 #include "adaptive_report.hpp"
 #include "adaptive_message.hpp"
 
 
+=======
+>>>>>>> parent of f5a88dd (added changeServer())
 AdaptiveFollowerConnections::AdaptiveFollowerConnections(int nThread) : FollowerConnections(nThread) {
 }
 
@@ -14,11 +17,11 @@ AdaptiveFollowerConnections::~AdaptiveFollowerConnections() {
 }
 
 void AdaptiveFollowerConnections::initialize(IAdaptiveFollower* parent) {
-    Connections::initialize(parent);
     this->parent = parent;
 }
 
 /*
+<<<<<<< HEAD
 std::optional<std::pair<int64_t,Message::node>> AdaptiveFollowerConnections::sendUpdate(Message::node ipS, std::pair<int64_t,Message::node> update) {
     cout << "sendUpdate0" << endl;
     int Socket = openConnection(ipS.ip, ipS.port);
@@ -79,6 +82,8 @@ std::optional<std::pair<int64_t,Message::node>> AdaptiveFollowerConnections::sen
 */
 
 
+=======
+>>>>>>> parent of f5a88dd (added changeServer())
 void AdaptiveFollowerConnections::handler(int fd, Message &m){
     string strIp = this->getSource(fd,m);
 
@@ -154,8 +159,9 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
         }
     }else if(m.getType() == Message::Type::typeNOTIFY){
         if(m.getCommand() == Message::Command::commSELECT_NEW_SERVER){
-            if(m.getArgument() == Message::Argument::argMNODES){
+            if(m.getArgument() == Message::Argument::argNONE){
                 handled = true;
+<<<<<<< HEAD
 
                 vector<Message::node> res;
                 m.getData(res);
@@ -165,16 +171,21 @@ void AdaptiveFollowerConnections::handler(int fd, Message &m){
                 } else{
                     cout << "Server changed" << endl;
                 }
+=======
+                //this->parent->changeServer();
+                cout << "changeServer()" << endl;
+>>>>>>> parent of f5a88dd (added changeServer())
             }
         }
     }
 
     if(!handled)
-        this->call_super_handler(fd, m);
+        FollowerConnections::handler(fd, m);
 }
+*/
 
-
-
+/*
 void AdaptiveFollowerConnections::call_super_handler(int fd, Message &m) {
     FollowerConnections::handler(fd, m);
 }
+*/

@@ -1,4 +1,5 @@
 (defglobal ?*max-priority* = 100)
+(defglobal ?*mid-priority* = 0)
 (defglobal ?*min-priority* = -100)
 
 (defglobal ?*min-time-report* = 10)
@@ -20,19 +21,18 @@
 
 (defrule en_mem_disk
  (test (>= (MetricInStateFor "free_cpu" "stable") 2))
- (test (not (IsMetricEnabled "free_memory")))
- (test (not (IsMetricEnabled "free_disk")))
  =>
  (EnableMetric "free_memory")
  (EnableMetric "free_disk"))
 
 (defrule dis_mem_disk
  (test (>= (MetricInStateFor "free_cpu" "unstable") 3))
- (test (IsMetricEnabled "free_memory"))
- (test (IsMetricEnabled "free_disk"))
  =>
  (DisableMetric "free_memory")
  (DisableMetric "free_disk")
 )
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> parent of f5a88dd (added changeServer())

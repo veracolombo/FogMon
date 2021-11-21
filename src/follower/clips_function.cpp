@@ -1,6 +1,9 @@
 #include "clips_function.hpp"
+<<<<<<< HEAD
 #include "adaptive_follower.hpp"
 #include "adaptive_leader.hpp"
+=======
+>>>>>>> parent of f5a88dd (added changeServer())
 #include <cmath>
 #include <iostream>
 
@@ -9,7 +12,7 @@ using namespace std;
 ClipsFunction::ClipsFunction() {}
 ClipsFunction::~ClipsFunction() {}
 
-void ClipsFunction::GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *out) {
+void ClipsFunction::GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *out){
     
     UDFValue _c; UDFValue _n; UDFValue _w; UDFValue _mintr; UDFValue _maxtr;  
 
@@ -28,6 +31,7 @@ void ClipsFunction::GetTimeReport(Environment *env, UDFContext *udfc, UDFValue *
     int tr = (int)ceil(((maxtr-mintr)*(c/(n*w))) + mintr);
 
     out->integerValue = CreateInteger(env,tr);
+<<<<<<< HEAD
 }
 
 void ClipsFunction::GetNumActiveMetrics(Environment *env, UDFContext *udfc, UDFValue *out){
@@ -51,4 +55,6 @@ void ClipsFunction::LoadFacts(Environment *env, UDFContext *udfc, UDFValue *out)
         s = "(metric_state (node " + get<0>(m) +  ") (metric " + Metric2String.at(get<1>(m)) + ") (state " + State2String.at(get<2>(m)) + "))";
         AssertString(env, s.c_str());
     }
+=======
+>>>>>>> parent of f5a88dd (added changeServer())
 }

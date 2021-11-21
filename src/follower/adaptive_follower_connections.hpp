@@ -3,15 +3,14 @@
 
 #include "follower_connections.hpp"
 #include "iadaptivefollower_connections.hpp"
-#include "iadaptivefollower.hpp"
 
 class AdaptiveFollowerConnections : virtual public FollowerConnections, virtual public IAdaptiveFollowerConnections {
 protected:
-    void handler(int fd, Message &m);
+    //void handler(int fd, Message &m);
 
     IAdaptiveFollower* parent;
 
-    virtual void call_super_handler(int fd, Message &m);
+    //virtual void call_super_handler(int fd, Message &m);
 
 public:
     AdaptiveFollowerConnections(int nThread);

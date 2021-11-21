@@ -2,7 +2,11 @@
 #include "adaptive_uiconnection.hpp"
 #include <iostream>
 
+<<<<<<< HEAD
 AdaptiveLeader* AdaptiveLeader::myobj = NULL;
+=======
+bool AdaptiveLeader::leaderAdequacy = false;
+>>>>>>> parent of f5a88dd (added changeServer())
  
 AdaptiveLeader::AdaptiveLeader() {
     myobj = this;
@@ -75,12 +79,12 @@ void AdaptiveLeader::initialize(AdaptiveLeaderFactory* fact){
 =======
     Leader::initialize(this->factory);
 
-    //this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
-    //AdaptiveFollower::adaptiveStorage = this->adaptiveStorage;
+    this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
+    AdaptiveFollower::adaptiveStorage = this->adaptiveStorage;
 
-    //this->adaptive_controller = new AdaptiveController(this);
-    //this->adaptive_controller->initialize();
-    //AdaptiveFollower::adaptive_controller = this->adaptive_controller;
+    this->adaptive_controller = new AdaptiveController(this);
+    this->adaptive_controller->initialize();
+    AdaptiveFollower::adaptive_controller = this->adaptive_controller;
 
 >>>>>>> parent of 371572f (aggiunta estensione storage per altre metriche)
     AdaptiveFollower::initialize(this->factory);
@@ -90,6 +94,7 @@ IAdaptiveLeaderConnections* AdaptiveLeader::getConnections() {
     return this->connections;
 }
 
+<<<<<<< HEAD
 IAdaptiveLeaderStorageMonitoring* AdaptiveLeader::getStorage() {
     return this->storage;
 }
@@ -99,6 +104,9 @@ AdaptiveLeaderController* AdaptiveLeader::getAdaptiveController() {
 }
 
 
+=======
+/*
+>>>>>>> parent of f5a88dd (added changeServer())
 void AdaptiveLeader::timerFun(){
     this->iter = 1;
     this->lastQuality = -random()%10-20;
@@ -123,7 +131,9 @@ void AdaptiveLeader::timerFun(){
             cout << "timerFun1 " << elapsed_time2 << endl;
         }
         //remove the nodes that failed to respond
+        cout << "sending RemoveNodes..." << endl;
         this->connections->sendRemoveNodes(rem);
+        cout << "removeNodes sent." << endl;
         vector<Message::node> tmp;
         this->getStorage()->updateNodes(tmp,rem);   
         {
@@ -205,9 +215,10 @@ void AdaptiveLeader::timerFun(){
             auto elapsed_time2 = std::chrono::duration_cast<std::chrono::duration<float>>(t_end2-t_start).count();
             cout << "timerFun5 " << elapsed_time2 << endl;
         }
-    
+        */
 
         /// *** LEADER ADEQUACY CHECK *** ///
+<<<<<<< HEAD
         
         /*
         if (!AdaptiveFollower::leaderAdequacy){
@@ -227,13 +238,16 @@ void AdaptiveLeader::timerFun(){
             this->changeRole(nodes);
             */
            /*
+=======
+        /*
+        if (!leaderAdequacy){
+            // manda messaggio di notifica ai follower
+            this->connections->sendChangeServer();
+>>>>>>> parent of f5a88dd (added changeServer())
         }
         */
 
-        // ******************************* //
-        
-
-       
+       /*
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
         //std::cout << "timerFun1: "<< elapsed_time << " s"<< endl;
@@ -247,3 +261,4 @@ void AdaptiveLeader::timerFun(){
         //std::cout << "timerFun2: "<< elapsed_time << " s"<< endl;
     }
 }
+*/

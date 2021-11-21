@@ -10,7 +10,11 @@
 class AdaptiveLeader : virtual public IAdaptiveLeader, public Leader, public AdaptiveFollower {
 
 public:
+<<<<<<< HEAD
     static AdaptiveLeader* myobj;
+=======
+    static bool leaderAdequacy;
+>>>>>>> parent of f5a88dd (added changeServer())
 
     AdaptiveLeader();
     AdaptiveLeader(Message::node node, int nThreads);
@@ -27,9 +31,13 @@ public:
     AdaptiveLeaderController* getAdaptiveController();
 
 protected:
+<<<<<<< HEAD
     AdaptiveLeaderController *adaptive_controller;
 
     void timerFun() override;
+=======
+    // void timerFun() override;
+>>>>>>> parent of f5a88dd (added changeServer())
 
     AdaptiveLeaderFactory tFactory;
     AdaptiveLeaderFactory *factory;

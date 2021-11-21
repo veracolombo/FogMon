@@ -11,7 +11,11 @@ services:
 
   follower:
     build: .
+<<<<<<< HEAD
     command: -C leader -i 131.114.72.76:8248 -s 10 --adp --btl
+=======
+    command: -C leader -i 131.114.72.76:8248 -s 10 --adp
+>>>>>>> parent of f5a88dd (added changeServer())
     stdin_open: true
     depends_on:
       - leader
@@ -24,7 +28,32 @@ services:
   #      limits:
   #        cpus: '0.50'
   #        memory: 50M
+<<<<<<< HEAD
         
+=======
+          
+  follower2_adp:
+    build: .
+    command: -C leader -i 131.114.72.76:8248 -s 10 --adp
+    stdin_open: true
+    depends_on:
+      - leader
+    networks:
+      fm_net_adp:
+    expose:
+      - "1024-65535"
+
+  follower3_adp:
+    build: .
+    command: -C leader -i 131.114.72.76:8248 -s 10 --adp
+    stdin_open: true
+    depends_on:
+      - leader
+    networks:
+      fm_net_adp:
+    expose:
+      - "1024-65535"
+>>>>>>> parent of f5a88dd (added changeServer())
 
 networks:
   fm_net_adp:

@@ -12,9 +12,7 @@ map<Metric, bool> AdaptiveFollower::metrics = {
     {Metric::CONNECTED_IOTS, true}
 };
 
-bool AdaptiveFollower::leaderAdequacy = true;
-
-AdaptiveFollower::AdaptiveFollower() { }
+AdaptiveFollower::AdaptiveFollower() {}
 
 AdaptiveFollower::AdaptiveFollower(Message::node node, int nThreads) : Follower(node, nThreads) {
     this->connections = NULL;
@@ -45,14 +43,9 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
         this->factory = fact;
     }
 
-    this->metricsGenerator = new MetricsGenerator();
-    this->metricsGenerator->initialize(this);
-
-    if(this->adaptive_controller == NULL){
-        this->adaptive_controller = new AdaptiveController();
-        this->adaptive_controller->initialize(this);
-    }
-
+    if(this->adaptiveStorage == NULL)
+        this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
+    
     if(this->connections == NULL){
         this->connections = this->factory->newConnections(this->nThreads);
         this->connections->initialize(this);
@@ -60,7 +53,29 @@ void AdaptiveFollower::initialize(AdaptiveFactory* fact) {
         Follower::initialize(this->factory);
     }
 
+    if(this->adaptive_controller == NULL){
+        this->adaptive_controller = new AdaptiveController(this);
+        this->adaptive_controller->initialize();
+    }
+    
+    /*
+    if(fact == NULL) {
+        this->factory = &this->tFactory;
+    }else {
+        this->factory = fact;
+    }
+
+    if(this->adaptiveStorage == NULL)
+        this->adaptiveStorage = this->factory->newAdaptiveStorage("adaptive_storage.db");
+    
+    this->connections = this->factory->newConnections(this->nThreads);
+    this->connections->initialize(this);
+    Follower::connections = this->connections;
     Follower::initialize(this->factory);
+
+    this->adaptive_controller = new AdaptiveController(this);
+    this->adaptive_controller->initialize();
+    */
 }
 
 void AdaptiveFollower::start(vector<Message::node> mNodes){
@@ -268,9 +283,26 @@ void AdaptiveFollower::getHardware(){
     sigar_close(sigar);
 }
 
-void AdaptiveFollower::getBattery(){
-    
-    AdaptiveReport::battery_result battery;
+bool AdaptiveFollower::sendReport(){
+    cout << "AdaptiveFollower::sendReport()" << endl;
+    bool ret = true;
+
+    cout << "sendUpdate start" << endl;
+    std::optional<std::pair<int64_t,Message::node>> ris = this->connections->sendUpdate(this->nodeS, this->update);
+    cout << "sent Update end" << endl;
+
+    if(ris == nullopt) {
+        cout << "update retry..." << endl;
+        ris = this->connections->sendUpdate(this->nodeS,this->update);
+        if(ris == nullopt) {
+            //change server
+            cout << "Changing server..." << endl;
+            if(!selectServer(this->node->getMNodes())) {
+                cout << "Failed to find a server!!!!!!!!" << endl;
+            }
+            ret = false;
+        }
+    }
 
     if(metrics[BATTERY]){
         battery.mean_battery = MetricsGenerator::currentVal[BATTERY];
@@ -481,51 +513,9 @@ void AdaptiveFollower::TestTimer(){
     }
 }
 
-bool AdaptiveFollower::changeServer(vector<Message::node> mNodes) {
-    if(!this->node->isFollower()){
-        if(!this->connections->sendHello(this->nodeS));
-            return false;
-        return true;
-    }
-
-    vector<Message::node> res = mNodes;
-    if(!res.empty()) {
-        for(int i=0; i<res.size(); i++) {
-            if(res[i].ip==std::string("::1")||res[i].ip==std::string("127.0.0.1"))
-                res[i].ip = this->nodeS.ip;
-        }
-        this->node->setMNodes(res);
-    }
-
-    while(!res.empty()) {
-        int imin=0;
-        unsigned int min = (unsigned int)this->testPing(res[imin].ip);
-
-        for(int i=1; i<res.size(); i++) {
-            unsigned int tmp = (unsigned int)this->testPing(res[i].ip);
-            if(tmp < min) {
-                imin = i;
-                min = tmp;
-            }
-        }
-        this->nodeS = res[imin];
-        if(!this->connections->sendHello(this->nodeS)) {
-            res.erase(res.begin()+imin);
-        }else
-            return true;
-        
-    }
-    return false;
+/*
+void AdaptiveFollower::changeServer(){
+    cout << "AdaptiveFollower::changeServer()" << endl;
 }
+*/
 
-void AdaptiveFollower::disableMetrics(vector<Metric> metrics) {
-    for(auto &m : metrics){
-        this->metrics[m] = false;
-    }
-}
-
-void AdaptiveFollower::enableMetrics(vector<Metric> metrics){
-    for(auto &m : metrics){
-        this->metrics[m] = true;
-    }
-}

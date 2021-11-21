@@ -1,11 +1,14 @@
 #include "condition.hpp"
+<<<<<<< HEAD
 #include "adaptive_follower.hpp"
+=======
+#include "adaptive_storage.hpp"
+>>>>>>> parent of f5a88dd (added changeServer())
 #include <iostream>
 
 Condition::Condition() {}
 
 Condition::~Condition() {}
-
 
 void Condition::MetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *out) {
 
@@ -17,6 +20,7 @@ void Condition::MetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *o
     const char* metric = m.lexemeValue->contents;
     const char* state = s.lexemeValue->contents;
 
+<<<<<<< HEAD
     int res = MetricInStateFor(lMetrics.at(metric), lStates.at(state));
     out->integerValue = CreateInteger(env, res);
 }
@@ -52,14 +56,13 @@ void Condition::NumMetricInStateFor(Environment *env, UDFContext *udfc, UDFValue
 vector<tuple<string, int, int>> Condition::getData(){
     IAdaptiveStorageMonitoring* storage = new AdaptiveStorageMonitoring();
     storage->open("monitoring.db");
+=======
+    // get data
+    IAdaptiveStorage* storage = new AdaptiveStorage();
+    storage->open("adaptive_storage.db");
+>>>>>>> parent of f5a88dd (added changeServer())
     vector<tuple<string, int, int>> data = storage->getStates();
     storage->close();
-
-    return data;
-}
-
-int Condition::MetricInStateFor(Metric metric, State state){
-    vector<tuple<string, int, int>> data = getData();
 
     int count = 0;
     bool found = false;
@@ -87,13 +90,14 @@ int Condition::MetricInStateFor(Metric metric, State state){
             }
         }
 
-        if(get<1>(data[i]) == metric &&
-           get<2>(data[i]) == state){
+        if(get<1>(data[i]) == lMetrics.at(metric) &&
+           get<2>(data[i]) == lStates.at(state)){
                 count += 1;
                 found = true;
         }     
     }
 
+<<<<<<< HEAD
     return count;
 }
 
@@ -108,3 +112,8 @@ int Condition::NumMetricInStateFor(State state, int time) {
     }
     return count;
 }
+=======
+    // cout << "Metric " << metric << " in state " << state << " for " << count << " samples" << endl;
+    out->integerValue = CreateInteger(env,count);
+ }
+>>>>>>> parent of f5a88dd (added changeServer())

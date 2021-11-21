@@ -18,10 +18,16 @@ AdaptiveController::~AdaptiveController() {
 void AdaptiveController::initialize(IAdaptiveFollower* node) {
     this->node = node;
 
+<<<<<<< HEAD
     this->rule = new Rule();
     vector<string> paths;
     paths.push_back("clips/rules.clp");
     this->rule->initialize(paths);
+=======
+void AdaptiveController::initialize() {
+    cout << "AdaptiveController::initialize()" << endl;
+    this->rule->initialize("clips/facts.clp", "clips/rules.clp");
+>>>>>>> parent of f5a88dd (added changeServer())
 }
 
 void AdaptiveController::start() {
@@ -62,26 +68,21 @@ void AdaptiveController::statesTimer(){
 
         vector<Metric> met = this->node->getMetrics(); 
 
-        for(auto const &m : met) {
+        for(auto const &m : met){
 
-            vector<float> data;
-            data = this->node->getStorage()->getLastValues(m, this->history);
-
-            int i=0;
-            bool stop = false;
             vector<float> res;
+            res = this->node->getStorage()->getLastValues(m, this->history);
 
-            while(!stop && i<data.size()){
-                if(data[i] != 0){
-                    res.push_back(data[i]);
-                }else{
-                    stop = true;
-                }
-                i++;
+            /*
+            switch(m){
+                case(FREE_CPU):     {res = this->node->getAdaptiveStorage()->getFreeCpu(this->history); break;}
+                case(FREE_MEMORY):  {res = this->node->getAdaptiveStorage()->getFreeMemory(this->history); break;}
+                case(FREE_DISK):    {res = this->node->getAdaptiveStorage()->getFreeDisk(this->history); break;}
             }
-           
+            */
+
             if(!res.empty()){
-                this->series[m] = res;
+              this->series[m] = res;
             }
         }
 
@@ -91,7 +92,6 @@ void AdaptiveController::statesTimer(){
         this->alarms();
 
         this->saveStates();
-        
         this->rule->run();         // trigger to CLIPS rules engine
 
         this->toStringSeries();

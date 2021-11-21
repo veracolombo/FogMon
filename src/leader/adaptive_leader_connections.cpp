@@ -8,11 +8,14 @@ AdaptiveLeaderConnections::AdaptiveLeaderConnections(int nThread) : LeaderConnec
 AdaptiveLeaderConnections::~AdaptiveLeaderConnections() { }
 
 void AdaptiveLeaderConnections::initialize(IAdaptiveLeader* parent) {
-    LeaderConnections::initialize(parent);
-    AdaptiveFollowerConnections::parent = parent;
     this->parent = parent;
+    LeaderConnections::parent = this->parent;
 }
 
+<<<<<<< HEAD
+=======
+/*
+>>>>>>> parent of f5a88dd (added changeServer())
 void AdaptiveLeaderConnections::handler(int fd, Message &m){
     
     string strIp = this->getSource(fd,m);
@@ -63,6 +66,7 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
                 }
                 this->parent->changeRole(update.selected);
 
+<<<<<<< HEAD
                 Message res;
                 res.setType(Message::Type::typeMRESPONSE);
                 res.setCommand(Message::Command::commSET);
@@ -151,6 +155,9 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
         }
     }
     */
+=======
+    // gestione messaggi Adaptive Leader
+>>>>>>> parent of f5a88dd (added changeServer())
 
     if(!handled)
         LeaderConnections::handler(fd, m);
@@ -158,9 +165,9 @@ void AdaptiveLeaderConnections::handler(int fd, Message &m){
     if(!handled)
         AdaptiveFollowerConnections::handler(fd, m);
 }
+*/
 
-
-void AdaptiveLeaderConnections::call_super_handler(int fd, Message &m) { }
+//void AdaptiveLeaderConnections::call_super_handler(int fd, Message &m) { }
 
 <<<<<<< HEAD
 bool AdaptiveLeaderConnections::sendRequestReport(Message::node ip) {
@@ -264,6 +271,7 @@ bool AdaptiveLeaderConnections::sendMReport(Message::node ip, vector<AdaptiveRep
 }
 
 bool AdaptiveLeaderConnections::sendChangeServer(){
+<<<<<<< HEAD
     vector<Message::node> mnodes = this->parent->getStorage()->getMNodes();
 
     cout << "MNodes:" << endl;
@@ -282,14 +290,13 @@ bool AdaptiveLeaderConnections::sendChangeServer(){
         cout << n.ip << endl;
     }
 
+=======
+>>>>>>> parent of f5a88dd (added changeServer())
     Message broadcast;
     broadcast.setSender(this->parent->getMyNode());
     broadcast.setType(Message::Type::typeNOTIFY);
     broadcast.setCommand(Message::Command::commSELECT_NEW_SERVER);
-    broadcast.setArgument(Message::Argument::argMNODES);
-    broadcast.setData(nodes);
-
-    cout << "Sending changeServer()" << endl;
+    broadcast.setArgument(Message::Argument::argNONE);
 
     return this->notifyAll(broadcast);
 }

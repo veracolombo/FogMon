@@ -19,13 +19,6 @@ public:
 
     //* da quanti istanti consecutivi la metrica M si trova nello stato S *//
     static void MetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *out);
-    static void IsMetricEnabled(Environment *env, UDFContext *udfc, UDFValue *out);
-
-    static void NumMetricInStateFor(Environment *env, UDFContext *udfc, UDFValue *out);
-
-    static int MetricInStateFor(Metric metric, State state);
-    static int NumMetricInStateFor(State state, int time);
-    static vector<tuple<string, int, int>> getData();
 };
 
 #endif

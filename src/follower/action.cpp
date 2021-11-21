@@ -34,16 +34,3 @@ void Action::DisableMetric(Environment *env, UDFContext *udfc, UDFValue *out){
     AdaptiveFollower::metrics[lMetrics.at(metric)] = false;
     cout << "Metric " << metric << " disabled" << endl;
 }
-
-void Action::SetLeaderAdequacy(Environment *env, UDFContext *udfc, UDFValue *out){
-    UDFValue v;
-    UDFFirstArgument(udfc, INTEGER_BIT, &v);
-    int value = v.integerValue->contents;
-
-    if(value == 0){
-        AdaptiveFollower::leaderAdequacy = false;
-    }else{
-        AdaptiveFollower::leaderAdequacy = true;
-    }
-    cout << "Leader Adequacy: " << AdaptiveFollower::leaderAdequacy << endl;
-}

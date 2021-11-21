@@ -14,9 +14,6 @@ public:
     // metrics
     static map<Metric, bool> metrics;
 
-    // leader adequacy
-    static bool leaderAdequacy;
-
     AdaptiveFollower();
     AdaptiveFollower(Message::node node, int nThreads);
     ~AdaptiveFollower();
@@ -41,10 +38,14 @@ public:
     void removeMetric(Metric metric);
     */
 
+<<<<<<< HEAD
     virtual bool changeServer(vector<Message::node> mNodes);
 
     virtual void disableMetrics(vector<Metric> metrics);
     virtual void enableMetrics(vector<Metric> metrics);
+=======
+    IAdaptiveStorage* getAdaptiveStorage();
+>>>>>>> parent of f5a88dd (added changeServer())
 
 protected:
 
