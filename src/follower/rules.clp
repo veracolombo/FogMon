@@ -18,7 +18,6 @@
  (LoadFactsFollower)
 )
 
-<<<<<<< HEAD
 (defrule ch_tr_stable (declare (salience 10))
  (my_metric_state (metric cpu) (state stable))
  =>
@@ -31,7 +30,7 @@
  =>
  (bind ?x (MetricInStateFor "cpu" "unstable"))
  (ChangeTimeReport (GetTimeReport "unstable" ?x))
-=======
+
 (defrule disable_metrics_btl (declare (salience 10))
  (my_metric_state (metric battery) (state too_low))
  (my_metric_enabled (metric ?x&:(neq ?x battery)))
@@ -46,5 +45,4 @@
  (ChangeTimeReport 60)
  (ChangeTimeTests 60)
  (ChangeTimeLatency 60)
->>>>>>> parent of 5b5c071 (piccole modifiche)
 )

@@ -28,10 +28,9 @@ WORKDIR /
 #RUN rm -Rf /compile
 #
 
-RUN dnf install -y iproute
-
 COPY start-my-p2p.sh /
-RUN chmod +x /start-my-p2p.sh
+RUN chmod +x /start-my-p2p.sh 
 
-ENTRYPOINT []
+RUN dnf install -y iproute
+ENTRYPOINT ["/FogMon"]
 CMD []

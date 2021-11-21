@@ -647,7 +647,6 @@ void Follower::timer() {
         //     this->startIperf();
         // }
 
-        
         if(iter % 3 == 0) {
             string out = this->pIperf->readoutput();
             cout << "Iperf restart" << endl;
@@ -655,8 +654,6 @@ void Follower::timer() {
             this->pIperf = NULL;
             this->startIperf();
         }
-        
-        
 
         auto t_end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
@@ -714,7 +711,7 @@ void Follower::TestTimer() {
             LatencyThreads.push_back(move(LatencyThread));
         }
 
-        
+
         //start thread for bandwidth tests
         thread BandwidthThread = thread([this]{
             //test bandwidth
@@ -746,16 +743,13 @@ void Follower::TestTimer() {
                 i++;
             }
         });
-        
-    
 
         for(auto &LatencyThread : LatencyThreads) {
             LatencyThread.join();
         }
         
-        
         BandwidthThread.join();
-        
+
 
         sleeper.sleepFor(chrono::seconds(this->node->timeTests));
         iter++;

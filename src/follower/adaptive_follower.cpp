@@ -471,8 +471,6 @@ void AdaptiveFollower::TestTimer(){
             }
         }
 
-
-        
         thread BandwidthThread;
         if(bw){
 
@@ -518,19 +516,13 @@ void AdaptiveFollower::TestTimer(){
         }else{
             this->stopBandwidthTest();
         }
-        
-        
     
         if(lt)
             for(auto &LatencyThread : LatencyThreads)
                 LatencyThread.join();
 
-        
         if(bw)   
             BandwidthThread.join();
-        
-        
-        
 
         test_ready = true;
         sleeper.sleepFor(chrono::seconds(this->node->timeTests));
