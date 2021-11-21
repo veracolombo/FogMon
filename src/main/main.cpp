@@ -1,4 +1,5 @@
 
+
 #include "inputParser.hpp"
 #include "node.hpp"
 #include "message.hpp"
@@ -113,7 +114,6 @@ int main(int argc, char *argv[]) {
     std::string interfaceIp = "";
     int session = 0;
 
-
     if(input.cmdOptionExists("--time-report"))
         time_report = stoi(input.getCmdOption("--time-report"));
 
@@ -171,6 +171,7 @@ int main(int argc, char *argv[]) {
     if(input.cmdOptionExists("-s"))
         session = stoi(input.getCmdOption("-s"));
 
+
     Node node(myPort, leader, threads);
 
     vector<Message::node> known;
@@ -201,11 +202,14 @@ int main(int argc, char *argv[]) {
     node.setParam(string("interface"), interfaceIp);
     node.setParam(string("session"), session);
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     node.setParam(string("mg_options"), mg_options);
 =======
 >>>>>>> parent of 371572f (aggiunta estensione storage per altre metriche)
     
+=======
+>>>>>>> parent of 1966314 (aggiunta classe States)
     node.start();
 
     int a = -1;

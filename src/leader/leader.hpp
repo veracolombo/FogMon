@@ -37,21 +37,11 @@ public:
 protected:
     virtual void timerFun();
 
-    ////////////////////////////////////
-    //void updateTimeReport();
-    ////////////////////////////////////
-
     //for the leader selection algorithms
     Selector selector;
 
     int iter;
-
     std::thread timerFunThread;
-
-    ///////////////////////////////////
-    //std::thread updateTimeReportThread;
-    ///////////////////////////////////
-
     int lastQuality; 
 
     LeaderConnections *connections;

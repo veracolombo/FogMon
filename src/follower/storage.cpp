@@ -91,6 +91,7 @@ Report::hardware_result Storage::getHardware() {
     return r;
 }
 
+<<<<<<< HEAD
 /*
 vector<float> Storage::getFreeCpu(int limit){
     char *zErrMsg = 0;
@@ -139,6 +140,8 @@ vector<float> Storage::getFreeDisk(int limit){
 }
 */
 
+=======
+>>>>>>> parent of 1966314 (aggiunta classe States)
 std::vector<Report::test_result> Storage::getLatency(int sensitivity, int64_t last) {
     char *zErrMsg = 0;
     char buf[1024];

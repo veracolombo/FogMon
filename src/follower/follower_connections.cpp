@@ -181,7 +181,11 @@ void FollowerConnections::handler(int fd, Message &m) {
                 cout << "I'm not a leader anymore!? (closed)" << endl;
             }
         }
+<<<<<<< HEAD
     }
+=======
+    }   
+>>>>>>> parent of 1966314 (aggiunta classe States)
 }
 
 vector<Message::node> FollowerConnections::requestNodes(Message::node ipS) {
@@ -331,7 +335,7 @@ optional<pair<int64_t,Message::node>> FollowerConnections::sendUpdate(Message::n
 
     int64_t now = this->parent->getStorage()->getTime();
     int64_t time = update.first;
-    if(ipS == update.second) {          // se l'ultima update è stata fatta a questo ip
+    if(ipS == update.second) {
         r.setLatency(this->parent->getStorage()->getLatency(this->parent->node->sensitivity,time));
         r.setBandwidth(this->parent->getStorage()->getBandwidth(this->parent->node->sensitivity,time));
         

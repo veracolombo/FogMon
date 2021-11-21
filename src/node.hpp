@@ -58,8 +58,11 @@ public:
     std::string interfaceIp;
     int session;
 
+<<<<<<< HEAD
     std::vector<std::string> mg_options;
 
+=======
+>>>>>>> parent of 1966314 (aggiunta classe States)
 protected:
     IAgent * agent;
     bool isLeader;

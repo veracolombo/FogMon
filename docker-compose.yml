@@ -1,6 +1,7 @@
 version: '3'
 services:
   leader:
+<<<<<<< HEAD
     build: .
 <<<<<<< HEAD
     command: --leader -i 131.114.72.76:8248 -s 10 --adp --bs
@@ -18,6 +19,12 @@ services:
     command: -C leader -i 131.114.72.76:8248 -s 10 --adp
 >>>>>>> parent of f5a88dd (added changeServer())
 =======
+=======
+    image: diunipisocc/liscio-fogmon:test2
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+>>>>>>> parent of 1966314 (aggiunta classe States)
     command: --leader -i 131.114.72.76:8248 -s 10
     stdin_open: true
     # tty: true
@@ -26,8 +33,10 @@ services:
     expose:
       - "1024-65535"
   follower1:
-    # image: diunipisocc/liscio-fogmon:test2
-    build: .
+    image: diunipisocc/liscio-fogmon:test2
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     command: -C leader -i 131.114.72.76:8248 -s 10
 >>>>>>> parent of 106a5a7 (added adaptive leader)
     stdin_open: true
@@ -55,8 +64,10 @@ services:
     expose:
       - "1024-65535"
   follower2:
-    # image: diunipisocc/liscio-fogmon:test2
-    build: .
+    image: diunipisocc/liscio-fogmon:test2
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     command: -C leader -i 131.114.72.76:8248 -s 10
 >>>>>>> parent of 106a5a7 (added adaptive leader)
     stdin_open: true
@@ -76,8 +87,10 @@ services:
     expose:
       - "1024-65535"
   follower3:
-    # image: diunipisocc/liscio-fogmon:test2
-    build: .
+    image: diunipisocc/liscio-fogmon:test2
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     command: -C leader -i 131.114.72.76:8248 -s 10
 >>>>>>> parent of 106a5a7 (added adaptive leader)
     stdin_open: true

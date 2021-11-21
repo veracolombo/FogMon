@@ -18,7 +18,11 @@ public:
     /**
      * possible types for the messages
     */
+<<<<<<< HEAD
     enum Type {typeREQUEST, typeNOTIFY, typeRESPONSE, typeMREQUEST, typeMNOTIFY, typeMRESPONSE, typePREQUEST, typePRESPONSE};
+=======
+    enum Type {REQUEST, NOTIFY, RESPONSE, MREQUEST, MNOTIFY, MRESPONSE};
+>>>>>>> parent of 1966314 (aggiunta classe States)
     /**
      * possible commands for the messages
     */
@@ -26,7 +30,11 @@ public:
     /**
      * possible arguments for the messages
     */
+<<<<<<< HEAD
     enum Argument {argNONE, argNODES, argMNODES, argREPORT, argPOSITIVE, argNEGATIVE, argIPERF, argESTIMATE, argLATENCY, argBANDWIDTH, argROLES, argPARAM_TIME_REPORT, argMETRICS};
+=======
+    enum Argument {NONE, NODES, MNODES, REPORT, POSITIVE, NEGATIVE, IPERF, ESTIMATE, LATENCY, BANDWIDTH, ROLES};
+>>>>>>> parent of 1966314 (aggiunta classe States)
 
     typedef struct node {
         std::string id;

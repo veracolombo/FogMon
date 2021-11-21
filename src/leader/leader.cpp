@@ -108,10 +108,6 @@ void Leader::start(vector<Message::node> mNodes) {
     }
 
     this->timerFunThread = thread(&Leader::timerFun, this);
-
-    ////////////////////////////////////////////////////////////////////////
-    //this ->updateTimeReportThread = thread(&Leader::updateTimeReport, this);
-    ////////////////////////////////////////////////////////////////////////
 }
 
 void Leader::stop() {
@@ -127,37 +123,6 @@ ILeaderConnections* Leader::getConnections() {
 ILeaderStorage* Leader::getStorage() {
     return this->storage;
 }
-
-//////////////////////////////////////////////////////////////////////////
-// thread che ogni x secondi manda segnale di timeReport update ai suoi follower
-/*
-void Leader::updateTimeReport(){
-    while(this->running){
-        
-        auto t_start = std::chrono::high_resolution_clock::now();
-
-        vector<Message::node> ips = this->getStorage()->getNodes();
-
-        int newTimeReport = rand()%21+10;        // random number between 10 and 30 (seconds)
-
-        for(auto&& node : ips){
-            bool res = this->connections->sendChangeTimeReport(node, newTimeReport);
-            if (!res)
-                cout << "Error: ACK not received " << node.ip.c_str() << endl;
-        }
-
-        auto t_end = std::chrono::high_resolution_clock::now();
-        auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_end-t_start).count();
-        cout << "updateTimeReport " << elapsed_time << endl;
-
-        int sleeptime = 40-elapsed_time;
-        if (sleeptime > 0)
-            sleeper.sleepFor(chrono::seconds(sleeptime));
-    }
-}
-*/
-
-//////////////////////////////////////////////////////////////////////////
 
 void Leader::timerFun() {
     this->iter = 1;

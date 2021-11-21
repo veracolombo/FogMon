@@ -151,7 +151,10 @@ protected:
     static int VectorNodeCallback(void *vec, int argc, char **argv, char **azColName);
     static int VectorStringCallback(void *vec, int argc, char **argv, char **azColName);
     static int VectorIntCallback(void *vec, int argc, char **argv, char **azColName);
+<<<<<<< HEAD
     static int VectorFloatCallback(void *vec, int argc, char **argv, char **azColName);
+=======
+>>>>>>> parent of 1966314 (aggiunta classe States)
     static int VectorIoTCallback(void *vec, int argc, char **argv, char **azColName);
 
     static int getInt64Callback(void *i, int argc, char **argv, char **azColName);

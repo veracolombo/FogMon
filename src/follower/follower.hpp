@@ -8,7 +8,10 @@
 #include "iiotdiscoverer.hpp"
 #include "readproc.hpp"
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 1966314 (aggiunta classe States)
 class Follower : virtual public IAgent {
 public:
     Follower(Message::node node, int nThreads);
@@ -72,6 +75,10 @@ protected:
 
     int nThreads;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of 1966314 (aggiunta classe States)
     //start iperf command line server
     virtual int startIperf();
     //start estimate tool (assolo) server
