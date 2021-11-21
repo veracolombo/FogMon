@@ -60,6 +60,18 @@ void Storage::isError(int err, char *zErrMsg, std::string mess) {
     }
 }
 
+int getFloatCallback(void *i, int argc, char **argv, char **azColName) {
+    float *val = (float*)i;
+    *val = stof(argv[0]);
+    return 0;
+}
+
+int getIntCallback(void *i, int argc, char **argv, char **azColName) {
+    int *val = (int*)i;
+    *val = stoi(argv[0]);
+    return 0;
+}
+
 void Storage::createTables() {
     char *zErrMsg = 0;
 
@@ -91,57 +103,6 @@ Report::hardware_result Storage::getHardware() {
     return r;
 }
 
-<<<<<<< HEAD
-/*
-vector<float> Storage::getFreeCpu(int limit){
-    char *zErrMsg = 0;
-    char buf[1024];
-    stringstream query;
-    query << "SELECT free_cpu FROM Hardware ORDER BY time DESC LIMIT " << limit;
-    std::sprintf(buf, query.str().c_str());
-
-    vector<float> r;
-    int err = sqlite3_exec(this->db, buf, IStorage::VectorFloatCallback, &r, &zErrMsg);
-    isError(err, zErrMsg, "getFreeCpu");
-
-    return r;
-}
-*/
-
-/*
-vector<float> Storage::getFreeMemory(int limit){
-    char *zErrMsg = 0;
-    char buf[1024];
-    stringstream query;
-    query << "SELECT free_memory/memory FROM Hardware ORDER BY time DESC LIMIT " << limit;
-    std::sprintf(buf, query.str().c_str());
-
-    vector<float> r;
-    int err = sqlite3_exec(this->db, buf, IStorage::VectorFloatCallback, &r, &zErrMsg);
-    isError(err, zErrMsg, "getFreeMemory");
-
-    return r;
-}
-*/
-
-/*
-vector<float> Storage::getFreeDisk(int limit){
-    char *zErrMsg = 0;
-    char buf[1024];
-    stringstream query;
-    query << "SELECT free_disk/disk FROM Hardware ORDER BY time DESC LIMIT " << limit;
-    std::sprintf(buf, query.str().c_str());
-
-    vector<float> r;
-    int err = sqlite3_exec(this->db, buf, IStorage::VectorFloatCallback, &r, &zErrMsg);
-    isError(err, zErrMsg, "getFreeDisk");
-
-    return r;
-}
-*/
-
-=======
->>>>>>> parent of 1966314 (aggiunta classe States)
 std::vector<Report::test_result> Storage::getLatency(int sensitivity, int64_t last) {
     char *zErrMsg = 0;
     char buf[1024];
@@ -241,7 +202,7 @@ void Storage::saveLatencyTest(Message::node node, int ms, int window) {
     err = sqlite3_exec(this->db, buf, getFloatCallback, &mean, &zErrMsg);
     isError(err, zErrMsg, "saveLatencyTest3");
 
-    if ( (ms-mean)/mean > 5) {  // se differisce più del 5%
+    if ( (ms-mean)/mean > 5) {
         cout << "meanL: " << mean << " ms: " << ms << endl;
         std::sprintf(buf,"DELETE FROM Latency WHERE time < (SELECT time FROM Latency WHERE idNodeB = \"%s\" ORDER BY time DESC LIMIT 1) and idNodeB = \"%s\"",node.id.c_str(), node.id.c_str());
         err = sqlite3_exec(this->db, buf, 0, 0, &zErrMsg);
@@ -356,7 +317,7 @@ void Storage::updateNodes(vector<Message::node> add, vector<Message::node> rem) 
 
     for(auto node : add) {
         if(node.id != "") {
-            //does not exists then insert (con valori fittizzi di latenza e larghezza di banda)
+            //does not exists then insert
             std::sprintf(buf,"INSERT OR IGNORE INTO Nodes (id,ip,port, latencyTime, lastMeanL, lastVarianceL, bandwidthTime, bandwidthState, lastMeanB, lastVarianceB) VALUES (\"%s\", \"%s\", \"%s\", datetime('now', '-1 month'), -1, -1, datetime('now', '-1 month'), 0, -1, -1)", node.id.c_str(),node.ip.c_str(),node.port.c_str());
             int err = sqlite3_exec(this->db, buf, 0, 0, &zErrMsg);
             isError(err, zErrMsg, "updateNodes1"); 
@@ -373,8 +334,8 @@ void Storage::updateNodes(vector<Message::node> add, vector<Message::node> rem) 
         int err = sqlite3_exec(this->db, buf, 0, 0, &zErrMsg);
         isError(err, zErrMsg, "updateNodes2");
 
-        std::sprintf(buf,"DELETE FROM Latency WHERE idNodeB = \"%s\"", node.id.c_str());    // cancella i dati di latenza e larghezza di banda con quel nodo
-                                                                                            // che non fa più parte del gruppo
+        std::sprintf(buf,"DELETE FROM Latency WHERE idNodeB = \"%s\"", node.id.c_str());
+
         err = sqlite3_exec(this->db, buf, 0, 0, &zErrMsg);
         isError(err, zErrMsg, "updateNodes3");
 

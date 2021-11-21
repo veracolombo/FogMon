@@ -1,16 +1,14 @@
 #include "node.hpp"
 #include "leader.hpp"
 #include "follower.hpp"
-#include "adaptive_follower.hpp"
 
 #include <iostream>
 #include <unistd.h>
 
 using namespace std;
 
-int Node::timeReport = 30;
-
 Node::Node(string port, bool isLeader, int threads) {
+    this->timeReport = 30;
     this->timeTests = 30;
     this->timeLatency = 30;
     this->maxPerLatency = 100;
@@ -18,7 +16,7 @@ Node::Node(string port, bool isLeader, int threads) {
     this->maxPerBandwidth = 1;
     this->leaderCheck = 10;
 
-    this->timePropagation = 10;
+    this->timePropagation = 20;
     this->timesilent = 120;
     this->interfaceIp = "";
     this->session = 0;
@@ -37,8 +35,7 @@ Node::Node(string port, bool isLeader, int threads) {
 
     cout << "Generated id: "<< this->id << endl;
 
-    unlink("monitoring.db");
-    unlink("adaptive_storage.db");
+    unlink("leader_node.db");
 
     this->create();
 
@@ -69,7 +66,7 @@ void Node::create() {
         this->agent = agent1;
     }else {
         cout << "Starting Follower" << endl;
-        AdaptiveFollower * agent1 = new AdaptiveFollower(Message::node(this->id,"::1",this->port), this->threads);
+        Follower * agent1 = new Follower(Message::node(this->id,"::1",this->port), this->threads);
         agent1->initialize();
         this->agent = agent1;
     }
@@ -121,10 +118,6 @@ bool Node::isFollower() {
     return !this->isLeader;
 }
 
-bool Node::isAdaptive() {
-    return this->adp;
-}
-
 extern "C"
 {
 #ifdef WIN32
@@ -157,16 +150,6 @@ std::string newUUID()
 
 string Node::genId() {
     return newUUID();
-}
-
-
-bool Node::setParam(std::string name, std::vector<std::string> value){
-    if(name == string("mg_options")) {
-        this->mg_options = value;
-    }else{
-        return false;
-    }
-    return true;
 }
 
 bool Node::setParam(std::string name, std::string value){

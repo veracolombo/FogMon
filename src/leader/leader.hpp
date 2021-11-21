@@ -35,7 +35,7 @@ public:
     virtual void changeRoles(Message::leader_update update);
     virtual void changeRole(std::vector<Message::node> leaders);
 protected:
-    virtual void timerFun();
+    void timerFun();
 
     //for the leader selection algorithms
     Selector selector;

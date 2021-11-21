@@ -10,9 +10,8 @@ TEST(NodeTest, LeaderTest) {
     bool leader = true;
     string myPort = "5555";
     int threads = 2;
-    bool adp = false;
 
-    Node node(myPort, leader, threads, adp);
+    Node node(myPort, leader, threads);
 
     EXPECT_EQ(node.isFollower(), false);  
 }
@@ -22,9 +21,8 @@ TEST(NodeTest, GetMNodesTest) {
     bool leader = true;
     string myPort = "5555";
     int threads = 2;
-    bool adp = false;
 
-    Node node(myPort, leader, threads, adp);
+    Node node(myPort, leader, threads);
     EXPECT_EQ(node.getMNodes().size(), 0);
 
     std::vector<Message::node> nodes;
@@ -42,9 +40,8 @@ TEST(NodeTest, SetParametersTest) {
     bool leader = true;
     string myPort = "5555";
     int threads = 2;
-    bool adp = false;
 
-    Node node(myPort, leader, threads, adp);
+    Node node(myPort, leader, threads);
 
     int A[9];
     A[0] = 30;

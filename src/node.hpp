@@ -1,12 +1,14 @@
 #ifndef NODE_HPP_
 #define NODE_HPP_
 
-#include <string>
-#include <thread>
-#include <vector>
-#include "message.hpp"
 
+
+#include <string>
+
+#include <thread>
+#include "message.hpp"
 class IAgent;
+
 
 class Node {
 public:
@@ -22,9 +24,6 @@ public:
     
     bool setParam(std::string name, std::string value);
 
-    // metrics generator options
-    bool setParam(std::string name, std::vector<std::string> value);
-
     //promote to leader if follower
     virtual void promote(std::vector<Message::node> nodes);
 
@@ -35,10 +34,9 @@ public:
     std::vector<Message::node> getMNodes();
 
     bool isFollower();
-    bool isAdaptive();
 
     //configs
-    static int timeReport;
+    int timeReport;
     int timeTests;
     int timeLatency;
     int timeBandwidth;
@@ -58,11 +56,6 @@ public:
     std::string interfaceIp;
     int session;
 
-<<<<<<< HEAD
-    std::vector<std::string> mg_options;
-
-=======
->>>>>>> parent of 1966314 (aggiunta classe States)
 protected:
     IAgent * agent;
     bool isLeader;

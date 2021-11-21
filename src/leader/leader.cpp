@@ -29,26 +29,11 @@ void Leader::initialize(LeaderFactory* fact) {
     }else {
         this->factory = fact;
     }
-<<<<<<< HEAD
-
-    this->storage = this->factory->newStorage("monitoring.db", this->nodeS);
-=======
-    this->storage = this->factory->newStorage("monitoring", this->nodeS);
->>>>>>> parent of 106a5a7 (added adaptive leader)
+    this->storage = this->factory->newStorage("leader_node.db", this->nodeS);
     Follower::storage = this->storage;
-
-<<<<<<< HEAD
     this->connections = this->factory->newConnections(this->nThreads);
     this->connections->initialize(this);
-=======
-    if(this->connections == NULL){
-        this->connections = this->factory->newConnections(this->nThreads);
-        this->connections->initialize(this);
-    }
-
->>>>>>> parent of 371572f (aggiunta estensione storage per altre metriche)
     Follower::connections = this->connections;
-    
     Follower::initialize(this->factory);
 }
 
@@ -275,13 +260,7 @@ Message::node Leader::getMyNode() {
 }
 
 void Leader::changeRole(vector<Message::node> leaders) {
-    cout << "Leader::changeRole()" << endl;
-    for(auto &l : leaders){
-        cout << l.ip << endl;
-    }
-
     bool present = false;
-
     for(auto node : leaders) {
         if(node.id == this->getMyNode().id) {
             present = true;
@@ -303,7 +282,6 @@ void Leader::changeRole(vector<Message::node> leaders) {
         this->lastQuality = -random()%10-20;
         this->node->demote(leaders);
     }else {
-        cout << "removing leaders ..." << endl;
         this->storage->removeChangeRole(leaders);
         printf("E\n");
         fflush(stdout);

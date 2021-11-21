@@ -39,18 +39,18 @@ void LeaderConnections::handler(int fd, Message &m) {
 
     bool handled = false;
 
-    if(m.getType() == Message::Type::typeMREQUEST) {
-        if(m.getCommand() == Message::Command::commSET) {
-            if(m.getArgument() == Message::Argument::argREPORT) {
+    if(m.getType() == Message::Type::MREQUEST) {
+        if(m.getCommand() == Message::Command::SET) {
+            if(m.getArgument() == Message::Argument::REPORT) {
 
                 handled = true;
                 Report r;
 
                 // Too long reponding
                 Message res;
-                res.setType(Message::Type::typeMRESPONSE);
-                res.setCommand(Message::Command::commSET);
-                res.setArgument(Message::Argument::argPOSITIVE);
+                res.setType(Message::Type::MRESPONSE);
+                res.setCommand(Message::Command::SET);
+                res.setArgument(Message::Argument::POSITIVE);
 
                 sendMessage(fd, res);
 
@@ -62,19 +62,19 @@ void LeaderConnections::handler(int fd, Message &m) {
                     }
                 }
             }
-        }else if(m.getCommand() == Message::Command::commMHELLO) {
+        }else if(m.getCommand() == Message::Command::MHELLO) {
             handled = true;
             Message res;
-            res.setType(Message::Type::typeMRESPONSE);
-            res.setCommand(Message::Command::commMHELLO);
+            res.setType(Message::Type::MRESPONSE);
+            res.setCommand(Message::Command::MHELLO);
 
             if(m.getSender().id == this->parent->getMyNode().id)
             {
-                res.setArgument(Message::Argument::argNEGATIVE);
+                res.setArgument(Message::Argument::NEGATIVE);
             }else {
                 this->parent->getStorage()->addMNode(m.getSender());
                 
-                res.setArgument(Message::Argument::argPOSITIVE);
+                res.setArgument(Message::Argument::POSITIVE);
 
                 vector<Message::node> nodes = this->parent->getStorage()->getMNodes();
 
@@ -88,56 +88,56 @@ void LeaderConnections::handler(int fd, Message &m) {
                 this->parent->getStorage()->updateNodes(v,v2);
             }
             sendMessage(fd, res);
-        }else if(m.getCommand() == Message::Command::commSELECTION_INIT) {
+        }else if(m.getCommand() == Message::Command::SELECTION_INIT) {
             Message::node node = m.getSender();
             int id;
             m.getData(id);
             bool r = this->parent->initSelection(id);
             Message res;
-            res.setType(Message::Type::typeMRESPONSE);
-            res.setCommand(Message::Command::commSELECTION_INIT);
+            res.setType(Message::Type::MRESPONSE);
+            res.setCommand(Message::Command::SELECTION_INIT);
 
             if(r) {
-                res.setArgument(Message::Argument::argPOSITIVE);
+                res.setArgument(Message::Argument::POSITIVE);
             }else {
-                res.setArgument(Message::Argument::argNEGATIVE);
+                res.setArgument(Message::Argument::NEGATIVE);
             }
             sendMessage(fd, res);
-        }else if(m.getCommand() == Message::Command::commSELECTION_START) {
+        }else if(m.getCommand() == Message::Command::SELECTION_START) {
             Message::node node = m.getSender();
             int id;
             m.getData(id);
             bool e;
             bool r = this->parent->calcSelection(node,id,e);
             Message res;
-            res.setType(Message::Type::typeMRESPONSE);
-            res.setCommand(Message::Command::commSELECTION_START);
+            res.setType(Message::Type::MRESPONSE);
+            res.setCommand(Message::Command::SELECTION_START);
 
             if(r) {
                 if(e) {
-                    res.setArgument(Message::Argument::argPOSITIVE);
+                    res.setArgument(Message::Argument::POSITIVE);
                 }else {
-                    res.setArgument(Message::Argument::argNONE);
+                    res.setArgument(Message::Argument::NONE);
                 }
             }else {
-                res.setArgument(Message::Argument::argNEGATIVE);
+                res.setArgument(Message::Argument::NEGATIVE);
             }
             sendMessage(fd, res);
-        }else if(m.getCommand() == Message::Command::commSELECTION) {
+        }else if(m.getCommand() == Message::Command::SELECTION) {
             Message::leader_update update;
             m.getData(update);
             bool r = this->parent->updateSelection(update);
             Message res;
-            res.setType(Message::Type::typeMRESPONSE);
-            res.setCommand(Message::Command::commSELECTION);
+            res.setType(Message::Type::MRESPONSE);
+            res.setCommand(Message::Command::SELECTION);
             
             if(r) {
-                res.setArgument(Message::Argument::argPOSITIVE);
+                res.setArgument(Message::Argument::POSITIVE);
             }else {
-                res.setArgument(Message::Argument::argNEGATIVE);
+                res.setArgument(Message::Argument::NEGATIVE);
             }
             sendMessage(fd, res);
-        }else if(m.getCommand() == Message::Command::commSELECTION_END) {
+        }else if(m.getCommand() == Message::Command::SELECTION_END) {
             Message::leader_update update;
             m.getData(update);
             bool r = true;
@@ -149,25 +149,25 @@ void LeaderConnections::handler(int fd, Message &m) {
                 cout << node.ip << endl;
             }
 
-            if(m.getArgument() == Message::Argument::argPOSITIVE) {
+            if(m.getArgument() == Message::Argument::POSITIVE) {
                 this->parent->changeRoles(update);
             }
             this->parent->stopSelection();
 
             Message res;
-            res.setType(Message::Type::typeMRESPONSE);
-            res.setCommand(Message::Command::commSELECTION_END);
+            res.setType(Message::Type::MRESPONSE);
+            res.setCommand(Message::Command::SELECTION_END);
             
             if(r) {
-                res.setArgument(Message::Argument::argPOSITIVE);
+                res.setArgument(Message::Argument::POSITIVE);
             }else {
-                res.setArgument(Message::Argument::argNEGATIVE);
+                res.setArgument(Message::Argument::NEGATIVE);
             }
             sendMessage(fd, res);
         }
-    }else if(m.getType() == Message::Type::typeREQUEST) {
-        if(m.getArgument() == Message::Argument::argNODES) {
-            if(m.getCommand() == Message::Command::commGET) {
+    }else if(m.getType() == Message::Type::REQUEST) {
+        if(m.getArgument() == Message::Argument::NODES) {
+            if(m.getCommand() == Message::Command::GET) {
                 handled = true;
                 //build array of nodes
                 vector<Message::node> nodes = this->parent->getStorage()->getNodes();
@@ -180,31 +180,31 @@ void LeaderConnections::handler(int fd, Message &m) {
                 
                 //send nodes
                 Message res;
-                res.setType(Message::Type::typeRESPONSE);
-                res.setCommand(Message::Command::commNODELIST);
-                res.setArgument(Message::Argument::argPOSITIVE);
+                res.setType(Message::Type::RESPONSE);
+                res.setCommand(Message::Command::NODELIST);
+                res.setArgument(Message::Argument::POSITIVE);
 
                 res.setData(nodes);
             
                 sendMessage(fd, res);
             }
-        }else if(m.getArgument() == Message::Argument::argMNODES) {
-            if(m.getCommand() == Message::Command::commGET) {
+        }else if(m.getArgument() == Message::Argument::MNODES) {
+            if(m.getCommand() == Message::Command::GET) {
                 handled = true;
                 //build array of nodes
                 vector<Message::node> nodes = this->parent->getStorage()->getMNodes();
                 //send nodes
                 Message res;
-                res.setType(Message::Type::typeRESPONSE);
-                res.setCommand(Message::Command::commMNODELIST);
-                res.setArgument(Message::Argument::argPOSITIVE);
+                res.setType(Message::Type::RESPONSE);
+                res.setCommand(Message::Command::MNODELIST);
+                res.setArgument(Message::Argument::POSITIVE);
 
                 res.setData(nodes);
             
                 sendMessage(fd, res);
             }
-        }else if(m.getArgument() == Message::Argument::argREPORT) {
-            if(m.getCommand() == Message::Command::commSET) {
+        }else if(m.getArgument() == Message::Argument::REPORT) {
+            if(m.getCommand() == Message::Command::SET) {
                 handled = true;
                 //read report ---------------------------
                 Report r;
@@ -216,8 +216,8 @@ void LeaderConnections::handler(int fd, Message &m) {
                 }
             }
         }
-    }else if(m.getType() == Message::Type::typeNOTIFY) {
-        if(m.getCommand() == Message::Command::commHELLO) {
+    }else if(m.getType() == Message::Type::NOTIFY) {
+        if(m.getCommand() == Message::Command::HELLO) {
             handled = true;
 
             //get report on hardware
@@ -240,9 +240,9 @@ void LeaderConnections::handler(int fd, Message &m) {
 
                 //get nodelist
                 Message res;
-                res.setType(Message::Type::typeRESPONSE);
-                res.setCommand(Message::Command::commHELLO);
-                res.setArgument(Message::Argument::argPOSITIVE);
+                res.setType(Message::Type::RESPONSE);
+                res.setCommand(Message::Command::HELLO);
+                res.setArgument(Message::Argument::POSITIVE);
 
                 res.setData(sender, vec);
                 
@@ -251,9 +251,9 @@ void LeaderConnections::handler(int fd, Message &m) {
                 //inform all the other nodes about it
                 //
                 Message broadcast;
-                broadcast.setType(Message::Type::typeNOTIFY);
-                broadcast.setCommand(Message::Command::commUPDATE);
-                broadcast.setArgument(Message::Argument::argNODES);
+                broadcast.setType(Message::Type::NOTIFY);
+                broadcast.setCommand(Message::Command::UPDATE);
+                broadcast.setArgument(Message::Argument::NODES);
                 vector<Message::node> v;
                 v.push_back(sender);
                 vector<Message::node> v2;
@@ -261,17 +261,17 @@ void LeaderConnections::handler(int fd, Message &m) {
 
                 this->notifyAll(broadcast);
             }
-        }else if(m.getCommand() == Message::Command::commUPDATE) {
-            if(m.getArgument() == Message::Argument::argREPORT) {
+        }else if(m.getCommand() == Message::Command::UPDATE) {
+            if(m.getArgument() == Message::Argument::REPORT) {
                 handled = true;
                 //get the report
                 //the report should be only a part of it
                 Report r;
                 if(m.getData(r)) {
                     Message res;
-                    res.setType(Message::Type::typeRESPONSE);
-                    res.setCommand(Message::Command::commUPDATE);
-                    res.setArgument(Message::Argument::argPOSITIVE);
+                    res.setType(Message::Type::RESPONSE);
+                    res.setCommand(Message::Command::UPDATE);
+                    res.setArgument(Message::Argument::POSITIVE);
                     
                     sendMessage(fd, res);
 
@@ -293,9 +293,9 @@ void LeaderConnections::handler(int fd, Message &m) {
                     }
                 }else {
                     Message res;
-                    res.setType(Message::Type::typeRESPONSE);
-                    res.setCommand(Message::Command::commUPDATE);
-                    res.setArgument(Message::Argument::argNEGATIVE);
+                    res.setType(Message::Type::RESPONSE);
+                    res.setCommand(Message::Command::UPDATE);
+                    res.setArgument(Message::Argument::NEGATIVE);
                     
                     sendMessage(fd, res);
                 }
@@ -319,12 +319,12 @@ bool LeaderConnections::notifyAllM(Message &m) {
             if(this->sendMessage(fd,m)) {
                 Message res;
                 if(this->getMessage(fd, res)) {
-                    if( res.getType()==Message::Type::typeMRESPONSE &&
+                    if( res.getType()==Message::Type::MRESPONSE &&
                         res.getCommand() == m.getCommand()) {
-                        if(res.getArgument() == Message::Argument::argPOSITIVE) {
+                        if(res.getArgument() == Message::Argument::POSITIVE) {
                             num++;
                         }
-                        else if(res.getArgument() == Message::Argument::argNEGATIVE) {
+                        else if(res.getArgument() == Message::Argument::NEGATIVE) {
                             close(fd);
                             return false;
                         }
@@ -341,11 +341,10 @@ bool LeaderConnections::notifyAllM(Message &m) {
 
 bool LeaderConnections::sendRemoveNodes(std::vector<Message::node> ips) {
     Message broadcast;
-
     broadcast.setSender(this->parent->getMyNode());
-    broadcast.setType(Message::Type::typeNOTIFY);
-    broadcast.setCommand(Message::Command::commUPDATE);
-    broadcast.setArgument(Message::Argument::argNODES);
+    broadcast.setType(Message::Type::NOTIFY);
+    broadcast.setCommand(Message::Command::UPDATE);
+    broadcast.setArgument(Message::Argument::NODES);
 
     vector<Message::node> v;
     broadcast.setData(v ,ips);
@@ -366,9 +365,9 @@ bool LeaderConnections::sendRequestReport(Message::node ip) {
     //build message
     Message m;
     m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::typeREQUEST);
-    m.setCommand(Message::Command::commGET);
-    m.setArgument(Message::Argument::argREPORT);
+    m.setType(Message::Type::REQUEST);
+    m.setCommand(Message::Command::GET);
+    m.setArgument(Message::Argument::REPORT);
 
     bool ret = false;
 
@@ -376,9 +375,9 @@ bool LeaderConnections::sendRequestReport(Message::node ip) {
     if(this->sendMessage(Socket, m)) {
         Message res;
         if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::typeRESPONSE &&
-                res.getCommand() == Message::Command::commGET &&
-                res.getArgument() == Message::Argument::argPOSITIVE) {
+            if( res.getType()==Message::Type::RESPONSE &&
+                res.getCommand() == Message::Command::GET &&
+                res.getArgument() == Message::Argument::POSITIVE) {
                 //get report and save it
                 Report r;
                 if(m.getData(r)) {
@@ -418,9 +417,9 @@ bool LeaderConnections::sendMReport(Message::node ip, vector<Report::report_resu
     //build message
     Message m;
     m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::typeMREQUEST);
-    m.setCommand(Message::Command::commSET);
-    m.setArgument(Message::Argument::argREPORT);
+    m.setType(Message::Type::MREQUEST);
+    m.setCommand(Message::Command::SET);
+    m.setArgument(Message::Argument::REPORT);
 
     Report r;
     r.setReports(report);
@@ -432,9 +431,9 @@ bool LeaderConnections::sendMReport(Message::node ip, vector<Report::report_resu
     if(this->sendMessage(Socket, m)) {
         Message res;
         if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::typeMRESPONSE &&
-                res.getCommand() == Message::Command::commSET &&
-                res.getArgument() == Message::Argument::argPOSITIVE) {
+            if( res.getType()==Message::Type::MRESPONSE &&
+                res.getCommand() == Message::Command::SET &&
+                res.getArgument() == Message::Argument::POSITIVE) {
                 ret = true;
             }
         }
@@ -455,9 +454,9 @@ bool LeaderConnections::sendMHello(Message::node ip) {
     //build message
     Message m;
     m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::typeMREQUEST);
-    m.setCommand(Message::Command::commMHELLO);
-    m.setArgument(Message::Argument::argREPORT);
+    m.setType(Message::Type::MREQUEST);
+    m.setCommand(Message::Command::MHELLO);
+    m.setArgument(Message::Argument::REPORT);
     m.setData(this->parent->getStorage()->getNode());
 
     bool ret = false;
@@ -466,9 +465,9 @@ bool LeaderConnections::sendMHello(Message::node ip) {
     if(this->sendMessage(Socket, m)) {
         Message res;
         if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::typeMRESPONSE &&
-                res.getCommand() == Message::Command::commMHELLO &&
-                res.getArgument() == Message::Argument::argPOSITIVE) {
+            if( res.getType()==Message::Type::MRESPONSE &&
+                res.getCommand() == Message::Command::MHELLO &&
+                res.getArgument() == Message::Argument::POSITIVE) {
                 
                 vector<Message::node> vec;
                 if(res.getData(vec)) {
@@ -489,9 +488,9 @@ bool LeaderConnections::sendMHello(Message::node ip) {
 bool LeaderConnections::sendInitiateSelection(int id) {
     Message broadcast;
     broadcast.setSender(this->parent->getMyNode());
-    broadcast.setType(Message::Type::typeMREQUEST);
-    broadcast.setCommand(Message::Command::commSELECTION_INIT);
-    broadcast.setArgument(Message::Argument::argNONE);
+    broadcast.setType(Message::Type::MREQUEST);
+    broadcast.setCommand(Message::Command::SELECTION_INIT);
+    broadcast.setArgument(Message::Argument::NONE);
 
     broadcast.setData(id);
 
@@ -501,9 +500,9 @@ bool LeaderConnections::sendInitiateSelection(int id) {
 bool LeaderConnections::sendStartSelection(int id) {
     Message broadcast;
     broadcast.setSender(this->parent->getMyNode());
-    broadcast.setType(Message::Type::typeMREQUEST);
-    broadcast.setCommand(Message::Command::commSELECTION_START);
-    broadcast.setArgument(Message::Argument::argNONE);
+    broadcast.setType(Message::Type::MREQUEST);
+    broadcast.setCommand(Message::Command::SELECTION_START);
+    broadcast.setArgument(Message::Argument::NONE);
 
     broadcast.setData(id);
 
@@ -518,9 +517,9 @@ bool LeaderConnections::sendSelection(Message::leader_update update, Message::no
 
     Message m;
     m.setSender(this->parent->getMyNode());
-    m.setType(Message::Type::typeMREQUEST);
-    m.setCommand(Message::Command::commSELECTION);
-    m.setArgument(Message::Argument::argNONE);
+    m.setType(Message::Type::MREQUEST);
+    m.setCommand(Message::Command::SELECTION);
+    m.setArgument(Message::Argument::NONE);
 
     m.setData(update);
 
@@ -528,9 +527,9 @@ bool LeaderConnections::sendSelection(Message::leader_update update, Message::no
     if(this->sendMessage(Socket, m)) {
         Message res;
         if(this->getMessage(Socket, res)) {
-            if( res.getType()==Message::Type::typeMRESPONSE &&
-                res.getCommand() == Message::Command::commSELECTION &&
-                res.getArgument() == Message::Argument::argPOSITIVE) {
+            if( res.getType()==Message::Type::MRESPONSE &&
+                res.getCommand() == Message::Command::SELECTION &&
+                res.getArgument() == Message::Argument::POSITIVE) {
 
                 return true;
             }
@@ -542,12 +541,12 @@ bool LeaderConnections::sendSelection(Message::leader_update update, Message::no
 bool LeaderConnections::sendEndSelection(Message::leader_update update, bool result) {
     Message broadcast;
     broadcast.setSender(this->parent->getMyNode());
-    broadcast.setType(Message::Type::typeMREQUEST);
-    broadcast.setCommand(Message::Command::commSELECTION_END);
+    broadcast.setType(Message::Type::MREQUEST);
+    broadcast.setCommand(Message::Command::SELECTION_END);
     if(result) {
-        broadcast.setArgument(Message::Argument::argPOSITIVE);
+        broadcast.setArgument(Message::Argument::POSITIVE);
     }else {
-        broadcast.setArgument(Message::Argument::argNEGATIVE);
+        broadcast.setArgument(Message::Argument::NEGATIVE);
     }
     
     broadcast.setData(update);
@@ -556,16 +555,11 @@ bool LeaderConnections::sendEndSelection(Message::leader_update update, bool res
 }
 
 bool LeaderConnections::sendChangeRoles(Message::leader_update update) {
-    cout << "LeaderConnections::sendChangeRoles()" << endl;
-    for(auto &u : update.selected){
-        cout << u.ip << endl;
-    }
-
     Message broadcast;
     broadcast.setSender(this->parent->getMyNode());
-    broadcast.setType(Message::Type::typeREQUEST);
-    broadcast.setCommand(Message::Command::commSET);
-    broadcast.setArgument(Message::Argument::argROLES);
+    broadcast.setType(Message::Type::REQUEST);
+    broadcast.setCommand(Message::Command::SET);
+    broadcast.setArgument(Message::Argument::ROLES);
 
     broadcast.setData(update);
 

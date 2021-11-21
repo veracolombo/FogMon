@@ -6,7 +6,6 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
-#include "common.hpp"
 
 class Report;
 /**
@@ -18,23 +17,15 @@ public:
     /**
      * possible types for the messages
     */
-<<<<<<< HEAD
-    enum Type {typeREQUEST, typeNOTIFY, typeRESPONSE, typeMREQUEST, typeMNOTIFY, typeMRESPONSE, typePREQUEST, typePRESPONSE};
-=======
     enum Type {REQUEST, NOTIFY, RESPONSE, MREQUEST, MNOTIFY, MRESPONSE};
->>>>>>> parent of 1966314 (aggiunta classe States)
     /**
      * possible commands for the messages
     */
-    enum Command {commGET, commSET, commHELLO, commMHELLO, commNODELIST, commMNODELIST, commUPDATE, commSTART, commSELECTION_INIT, commSELECTION_START, commSELECTION, commSELECTION_END, commSELECT_NEW_SERVER, commDISABLE};
+    enum Command {GET, SET, HELLO, MHELLO, NODELIST, MNODELIST, UPDATE, START, SELECTION_INIT, SELECTION_START, SELECTION, SELECTION_END};
     /**
      * possible arguments for the messages
     */
-<<<<<<< HEAD
-    enum Argument {argNONE, argNODES, argMNODES, argREPORT, argPOSITIVE, argNEGATIVE, argIPERF, argESTIMATE, argLATENCY, argBANDWIDTH, argROLES, argPARAM_TIME_REPORT, argMETRICS};
-=======
     enum Argument {NONE, NODES, MNODES, REPORT, POSITIVE, NEGATIVE, IPERF, ESTIMATE, LATENCY, BANDWIDTH, ROLES};
->>>>>>> parent of 1966314 (aggiunta classe States)
 
     typedef struct node {
         std::string id;
@@ -278,23 +269,7 @@ public:
     */
     bool getData(leader_update& update);
 
-
-    /////////////////////////////////////////////////////
-
-    /**
-     * set the data as a vector of nodes
-     * @param metrics
-    */
-    void setData(std::vector<int> metrics);
-
-    /**
-     * get the data expecting a vector of nodes
-     * @param metrics
-     * @return true if successful, else failed to interpreter the data or other errors
-    */
-    bool getData(std::vector<int>& metrics);
-
-protected:
+private:
 
     /**
      * the type of the message

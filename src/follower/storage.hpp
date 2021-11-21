@@ -2,7 +2,6 @@
 #define STORAGE_HPP_
 
 #include "istorage.hpp"
-#include "common.hpp"
 
 class Storage : virtual public IStorage {
 protected:

@@ -88,10 +88,7 @@ public:
     virtual std::vector<Message::node> getMLRHardware(int num, int seconds) {return vector<Message::node>();}
 
     virtual void addMNode(Message::node ip) {}
-
-    virtual Report::report_result getReport(Message::node ip, bool complete) {}
-    virtual std::vector<Report::report_result> getReport(bool complete = false) {}
-
+    virtual Report::report_result getReport(Message::node ip) {}
     virtual std::vector<Message::node> getAllNodes() {
         vector<Message::node> vect;
         for(int i=0; i<10; i++) {
@@ -105,9 +102,8 @@ public:
     virtual vector<Report::report_result> getReport() {}
 
     virtual Report::hardware_result getHardware(Message::node ip) {}
-    virtual std::vector<Report::test_result> getLatency(Message::node ip, bool complete) {}
-    virtual std::vector<Report::test_result> getBandwidth(Message::node ip, bool complete) {}
-
+    virtual std::vector<Report::test_result> getLatency(Message::node ip) {}
+    virtual std::vector<Report::test_result> getBandwidth(Message::node ip) {}
     virtual std::string addNode(Message::node strIp, Report::hardware_result hardware, Message::node *monitored = NULL) {}
     virtual void addReport(Report::report_result result, Message::node *monitored = NULL) {}
     virtual void addReport(std::vector<Report::report_result> results, Message::node ip) {}
@@ -203,7 +199,7 @@ public:
 class MNode : public Node {
 public:
 
-    MNode() : Node("a",false,0,false) {}
+    MNode() : Node("a",false,0) {}
 
     void promote() {
         sent=true;
@@ -326,9 +322,9 @@ TEST(SelectorTest, ScriptTest) {
         {500,500,500,500,500,500,0,1,1,1},
         {500,500,500,500,500,500,0,1,1,1},
     };
-    unlink("monitoring.db");
+    unlink("leader_node.db");
     ILeaderStorage * stor = new LeaderStorage(Message::node("0","::1",""));
-    stor->open("monitoring.db");
+    stor->open("leader_node.db");
     
     for(int i=0; i< 10; i++) {
         stor->addNode(Message::node(to_string(i),to_string(i),""),Report::hardware_result());
@@ -409,9 +405,9 @@ TEST(SelectorTest, ScriptTest2) {
         {500,500,500,500,500,500,0,1,1,1},
         {500,500,500,500,500,500,0,1,1,1},
     };
-    unlink("monitoring.db");
+    unlink("leader_node.db");
     ILeaderStorage * stor = new LeaderStorage(Message::node("0","::1",""));
-    stor->open("monitoring.db");
+    stor->open("leader_node.db");
     
     for(int i=0; i< 10; i++) {
         stor->addNode(Message::node(to_string(i),to_string(i),""),Report::hardware_result());

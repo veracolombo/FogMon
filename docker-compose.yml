@@ -1,30 +1,10 @@
 version: '3'
 services:
   leader:
-<<<<<<< HEAD
-    build: .
-<<<<<<< HEAD
-    command: --leader -i 131.114.72.76:8248 -s 10 --adp --bs
-    stdin_open: true
-    networks:
-      fm_net_adp:
-    expose:
-      - "1024-65535"
-
-  follower:
-    build: .
-<<<<<<< HEAD
-    command: -C leader -i 131.114.72.76:8248 -s 10 --adp --btl
-=======
-    command: -C leader -i 131.114.72.76:8248 -s 10 --adp
->>>>>>> parent of f5a88dd (added changeServer())
-=======
-=======
     image: diunipisocc/liscio-fogmon:test2
     # build:
     #   context: .
     #   dockerfile: Dockerfile
->>>>>>> parent of 1966314 (aggiunta classe States)
     command: --leader -i 131.114.72.76:8248 -s 10
     stdin_open: true
     # tty: true
@@ -38,28 +18,10 @@ services:
     #   context: .
     #   dockerfile: Dockerfile
     command: -C leader -i 131.114.72.76:8248 -s 10
->>>>>>> parent of 106a5a7 (added adaptive leader)
     stdin_open: true
     depends_on:
       - leader
     networks:
-<<<<<<< HEAD
-      fm_net_adp:
-    expose:
-      - "1024-65535"
-  #  deploy:
-  #    resources:
-  #      limits:
-  #        cpus: '0.50'
-  #        memory: 50M
-<<<<<<< HEAD
-        
-=======
-          
-  follower2_adp:
-    build: .
-    command: -C leader -i 131.114.72.76:8248 -s 10 --adp
-=======
       default:
     expose:
       - "1024-65535"
@@ -69,20 +31,10 @@ services:
     #   context: .
     #   dockerfile: Dockerfile
     command: -C leader -i 131.114.72.76:8248 -s 10
->>>>>>> parent of 106a5a7 (added adaptive leader)
     stdin_open: true
     depends_on:
       - leader
     networks:
-<<<<<<< HEAD
-      fm_net_adp:
-    expose:
-      - "1024-65535"
-
-  follower3_adp:
-    build: .
-    command: -C leader -i 131.114.72.76:8248 -s 10 --adp
-=======
       default:
     expose:
       - "1024-65535"
@@ -92,26 +44,15 @@ services:
     #   context: .
     #   dockerfile: Dockerfile
     command: -C leader -i 131.114.72.76:8248 -s 10
->>>>>>> parent of 106a5a7 (added adaptive leader)
     stdin_open: true
     depends_on:
       - leader
     networks:
-<<<<<<< HEAD
-      fm_net_adp:
-    expose:
-      - "1024-65535"
->>>>>>> parent of f5a88dd (added changeServer())
-
-networks:
-  fm_net_adp:
-=======
       default:
     expose:
       - "1024-65535"
 networks:
   default:
->>>>>>> parent of 106a5a7 (added adaptive leader)
     driver: bridge
     enable_ipv6: true
     ipam:

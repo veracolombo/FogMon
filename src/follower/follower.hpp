@@ -8,10 +8,6 @@
 #include "iiotdiscoverer.hpp"
 #include "readproc.hpp"
 
-<<<<<<< HEAD
-
-=======
->>>>>>> parent of 1966314 (aggiunta classe States)
 class Follower : virtual public IAgent {
 public:
     Follower(Message::node node, int nThreads);
@@ -75,20 +71,17 @@ protected:
 
     int nThreads;
 
-<<<<<<< HEAD
-=======
 
->>>>>>> parent of 1966314 (aggiunta classe States)
     //start iperf command line server
     virtual int startIperf();
     //start estimate tool (assolo) server
     virtual int startEstimate();
 
     //timer for heartbeat
-    virtual void timer();
+    void timer();
 
     //timer for latency and bandwidth tests
-    virtual void TestTimer();
+    void TestTimer();
 
     void testIoT();
 
@@ -110,7 +103,7 @@ protected:
     bool checkServer(vector<Message::node> mNodes);
 
     //get the hardware of this node
-    virtual void getHardware();
+    void getHardware();
 };
 
 #endif

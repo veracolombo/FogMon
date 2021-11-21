@@ -1,5 +1,4 @@
 #include "leader_factory.hpp"
-#include <iostream>
 
 ILeaderStorage* LeaderFactory::newStorage(std::string path, Message::node node) {
     ILeaderStorage* ret = new LeaderStorage(node);
